@@ -91,7 +91,7 @@ def build_kernel(
 
         f = family(state.pid, state.parent_id)
         weights = 1/count_elements(f)
-        weights = jnp.ones_like(state.logL)
+        #weights = jnp.ones_like(state.logL)
         dead_logL, dead_idx, live_idx = delete_fn(delete_fn_key, state.logL, weights)
 
         logL0 = dead_logL.max()
@@ -161,22 +161,35 @@ def build_kernel(
 
     return kernel
 
-@jax.jit
+
+def update_pid_and_parent_id(pid, parent_id):
+    sorted_indices = jnp.argsort(pid)
+    pid_sorted = pid[sorted_indices]
+    idx = jnp.searchsorted(pid_sorted, parent_id, side='left')
+    pid_matches = pid_sorted[idx]
+    is_match = pid_matches == parent_id
+    inv_sorted_indices = sorted_indices[idx]
+    parent_id_j = parent_id[inv_sorted_indices]
+    pid_updated = jnp.where(is_match, parent_id, pid)
+    parent_id_updated = jnp.where(is_match, parent_id_j, parent_id)
+    return pid_updated, parent_id_updated
+
+
 def family(pid, parent_id):
     def cond_fun(carry):
-        pid, old_pid = carry
+        pid, parent_id, old_pid = carry
         return jnp.any(pid != old_pid)
 
     def body_fun(carry):
-        pid, old_pid = carry
+        pid, parent_id, old_pid = carry
         old_pid = pid
-        pid = jnp.where(jnp.isin(parent_id, pid), parent_id, pid)
-        return pid, old_pid
+        pid, parent_id = update_pid_and_parent_id(pid, parent_id)
+        return pid, parent_id, old_pid
 
-    pid, _ = jax.lax.while_loop(cond_fun, body_fun, (pid, jnp.zeros_like(pid)))
+    pid, _, _ = jax.lax.while_loop(cond_fun, body_fun, (pid, parent_id, jnp.zeros_like(pid)))
     return pid
 
-@jax.jit
+
 def count_elements(arr):
     sort_indices = jnp.argsort(arr)
     arr_sorted = arr[sort_indices]
