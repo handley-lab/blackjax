@@ -20,7 +20,7 @@ __all__ = ["init", "as_top_level_api", "build_kernel", "nss"]
 def init(position, loglikelihood_fn, parameter_update_function):
     state = init_base(position, loglikelihood_fn)
     initial_parameter_value = parameter_update_function(
-        state, NSInfo(state, state, state, None)
+        state, NSInfo(state, state, state, state, state, None)
     )
     return StateWithParameterOverride(state, initial_parameter_value)
 
