@@ -88,10 +88,7 @@ def build_kernel(
     ) -> tuple[NSState, NSInfo]:
         num_particles = jnp.shape(jax.tree_leaves(state.particles)[0])[0]
         rng_key, delete_fn_key = jax.random.split(rng_key)
-        f = family(state.pid, state.parent_id)
-        weights = 1/count_elements(f)
-        #weights = jnp.ones_like(state.logL)
-        dead_logL, dead_idx, live_idx = delete_fn(delete_fn_key, state, weights)
+        dead_logL, dead_idx, live_idx = delete_fn(delete_fn_key, state)
 
         logL0 = dead_logL.max()
         dead_particles = jax.tree.map(lambda x: x[dead_idx], state.particles)
@@ -189,17 +186,17 @@ def family(pid, parent_id):
     return pid
 
 
-def count_elements(arr):
+def count_elements(arr, weights):
     sort_indices = jnp.argsort(arr)
     arr_sorted = arr[sort_indices]
     group_indices = jnp.searchsorted(arr_sorted, arr_sorted, side='left')
-    counts_per_group = jnp.zeros_like(arr).at[group_indices].add(1)
+    counts_per_group = jnp.zeros_like(arr).at[group_indices].add(weights)
     counts_per_element = counts_per_group[group_indices]
     inv_sort_indices = jnp.argsort(sort_indices)
     return counts_per_element[inv_sort_indices]
 
 
-def delete_fn(key, state, weights n_delete):
+def delete_fn(key, state, n_delete):
     """Analogous to resampling functions in SMC, defines the likelihood level and associated particles to delete.
     As well as resampling live particles to then evolve.
 
@@ -211,8 +208,6 @@ def delete_fn(key, state, weights n_delete):
         The current state of the Nested Sampler.
     n_delete : int
         Number of particles to delete and resample.
-    weights : jnp.ndarray
-        Weights for the resampling step.
 
     Returns:
     --------
@@ -225,7 +220,11 @@ def delete_fn(key, state, weights n_delete):
     """
     logL = state.logL
     neg_dead_logL, dead_idx = jax.lax.top_k(-logL, n_delete)
-    weights = weights * (logL > -neg_dead_logL.min()) 
+
+    mask = (logL > -neg_dead_logL.min())
+    f = family(state.pid, state.parent_id)
+    n = count_elements(f, mask)
+    weights = jnp.where(mask, 1/n, 0)
     live_idx = jax.random.choice(
         key,
         weights.shape[0],
