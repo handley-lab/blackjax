@@ -224,6 +224,7 @@ def delete_fn(key, state, n_delete):
     mask = (logL > -neg_dead_logL.min())
     f = family(state.pid, state.parent_id)
     n = count_elements(f, mask)
+    #n = count_elements(f, 1)
     weights = jnp.where(mask, 1/n, 0)
     live_idx = jax.random.choice(
         key,
