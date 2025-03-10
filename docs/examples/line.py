@@ -22,7 +22,7 @@ y =  m * x + c + sigma * jax.random.normal(key, (10,), dtype=jnp.float64)
 
 @jax.jit
 def loglikelihood_fn(p):
-    return jax.scipy.stats.multivariate_normal.logpdf(y, p["m"] * x + p["c"], p["sigma"])
+    return jax.scipy.stats.multivariate_normal.logpdf(y, p["m"] * x + p["c"], p["sigma"]**2)
 
 # | Define the prior function
 
