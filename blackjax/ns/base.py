@@ -29,8 +29,11 @@ class NSInfo(NamedTuple):
     particles: ArrayTree
     logL: Array  # The log-likelihood of the particles
     logL_birth: (Array)  # The hard likelihood threshold of each particle at birth
+    pid: Array  # particle ID
     update_info: NamedTuple
-    intermediate_states: NamedTuple
+    mcmc_chain: NamedTuple
+    mcmc_chain_start_pid: Array
+    mcmc_chain_end_pid: Array
 
 
 def init(particles: ArrayLikeTree, loglikelihood_fn, logL_star=-jnp.inf) -> NSState:
@@ -90,6 +93,8 @@ def build_kernel(
         dead_particles = jax.tree.map(lambda x: x[dead_idx], state.particles)
         dead_logL = state.logL[dead_idx]
         dead_logL_birth = state.logL_birth[dead_idx]
+        dead_pid = state.pid[dead_idx]
+        live_pid = state.pid[live_idx]
 
         new_pos = jax.tree.map(lambda x: x[live_idx], state.particles)
         new_logl = state.logL[live_idx]
@@ -110,7 +115,7 @@ def build_kernel(
 
         sample_keys = jax.random.split(sample_key, dead_idx.shape[0])
 
-        new_state, (new_state_info, intermediate_states) = jax.vmap(mcmc_kernel)(
+        new_state, (new_state_info, mcmc_chain) = jax.vmap(mcmc_kernel)(
             sample_keys, new_pos, new_logl
         )
 
@@ -124,7 +129,8 @@ def build_kernel(
         logL = state.logL.at[dead_idx].set(new_state.loglikelihood)
         logL_birth = state.logL_birth.at[dead_idx].set(logL_births)
         logL_star = state.logL.min()
-        pid = state.pid.at[dead_idx].set(state.pid[live_idx])
+        #pid = state.pid.at[dead_idx].set(live_pid)
+        pid = state.pid.at[dead_idx].set(state.pid.max() + 1 + jnp.arange(dead_idx.shape[0]))
 
         ndel = dead_idx.shape[0]
         n = jnp.arange(num_particles, num_particles - ndel, -1)
@@ -150,7 +156,7 @@ def build_kernel(
             logZ=logZ_dead,
             logZ_live=logZ_live,
         )
-        info = NSInfo(dead_particles, dead_logL, dead_logL_birth, new_state_info, intermediate_states)
+        info = NSInfo(dead_particles, dead_logL, dead_logL_birth, dead_pid, new_state_info, mcmc_chain, live_pid, pid[dead_idx])
         return new_state, info
 
     return kernel

@@ -20,9 +20,12 @@ sigma = 0.1
 key, rng_key = jax.random.split(rng_key)
 y =  m * x + c + sigma * jax.random.normal(key, (10,), dtype=jnp.float64)
 
+#plt.errorbar(x, y, yerr=sigma, fmt="o")
+#plt.plot(x, m * x + c)
+
 @jax.jit
 def loglikelihood_fn(p):
-    return jax.scipy.stats.multivariate_normal.logpdf(y, p["m"] * x + p["c"], p["sigma"]**2)
+    return jax.scipy.stats.multivariate_normal.logpdf(y, p["m"] * x + p["c"], p["sigma"])
 
 # | Define the prior function
 
@@ -83,10 +86,14 @@ dead = jax.tree.map(
         lambda *args: jnp.reshape(jnp.stack(args, axis=0), 
                                   (-1,) + args[0].shape[1:]),
         *dead)
-live = state.sampler_state
 
+live = state.sampler_state
 logL = np.concatenate((dead.logL, live.logL), dtype=float)
 logL_birth = np.concatenate((dead.logL_birth, live.logL_birth), dtype=float)
+pid = np.concatenate((dead.pid, live.pid), dtype=int)
+start_pid = np.concatenate((dead.mcmc_chain_start_pid, -1 * jnp.ones(n_live, dtype=int)), dtype=int)
+end_pid = np.concatenate((dead.mcmc_chain_end_pid, -1 * jnp.ones(n_live, dtype=int)), dtype=int)
+dead.mcmc_chain
 data = np.concatenate([
     np.column_stack([v for v in dead.particles.values()]),
     np.column_stack([v for v in live.particles.values()])
@@ -94,5 +101,22 @@ data = np.concatenate([
 
 columns = list(dead.particles.keys())
 samples = NestedSamples(data, logL=logL, logL_birth=logL_birth, columns=columns)
+samples['pid'] = pid
+samples['start_pid'] = start_pid
+samples['end_pid'] = end_pid
 samples.gui()
 samples.to_csv('line.csv') 
+
+
+# Also have access to the mcmc chain positions
+dead.mcmc_chain.position['m']
+dead.mcmc_chain.position['c']
+dead.mcmc_chain.position['sigma']
+
+# And their loglikelihoods -- this is likely the one you need
+dead.mcmc_chain.loglikelihood.shape
+
+# If you like, you can tag these onto the array
+chain_loglikelihoods = np.concatenate([dead.mcmc_chain.loglikelihood, np.nan * np.ones((n_live, num_mcmc_steps))], axis=0)
+chain_loglikelihoods
+samples[[f'logL_{i}' for i in range(num_mcmc_steps)]] = chain_loglikelihoods
