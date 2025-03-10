@@ -30,6 +30,7 @@ class NSInfo(NamedTuple):
     logL: Array  # The log-likelihood of the particles
     logL_birth: (Array)  # The hard likelihood threshold of each particle at birth
     update_info: NamedTuple
+    intermediate_states: NamedTuple
 
 
 def init(particles: ArrayLikeTree, loglikelihood_fn, logL_star=-jnp.inf) -> NSState:
@@ -101,15 +102,15 @@ def build_kernel(
 
             def body_fn(state, rng_key):
                 new_state, info = kernel(rng_key, state)
-                return new_state, info
+                return new_state, (info, new_state)
 
             keys = jax.random.split(rng_key, num_mcmc_steps)
-            last_state, info = jax.lax.scan(body_fn, state, keys)
-            return last_state, info
+            last_state, (info, new_states) = jax.lax.scan(body_fn, state, keys)
+            return last_state, (info, new_states)
 
         sample_keys = jax.random.split(sample_key, dead_idx.shape[0])
 
-        new_state, new_state_info = jax.vmap(mcmc_kernel)(
+        new_state, (new_state_info, intermediate_states) = jax.vmap(mcmc_kernel)(
             sample_keys, new_pos, new_logl
         )
 
@@ -149,7 +150,7 @@ def build_kernel(
             logZ=logZ_dead,
             logZ_live=logZ_live,
         )
-        info = NSInfo(dead_particles, dead_logL, dead_logL_birth, new_state_info)
+        info = NSInfo(dead_particles, dead_logL, dead_logL_birth, new_state_info, intermediate_states)
         return new_state, info
 
     return kernel
