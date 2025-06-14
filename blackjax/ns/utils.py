@@ -396,3 +396,70 @@ def uniform_prior(
     particles = jax.vmap(prior_sample)(init_keys)
 
     return particles, logprior_fn
+
+
+def combine_dead_info(dead_info_list, live_info):
+    """Combine multiple dead info structures with live info.
+
+    Parameters
+    ----------
+    dead_info_list
+        List of NSInfo structures containing dead particles.
+    live_info
+        NSInfo structure containing live particles.
+
+    Returns
+    -------
+    NSInfo
+        Combined NSInfo structure with all particles.
+    """
+    # Combine all dead particles
+    all_particles = []
+    all_loglikelihood = []
+    all_loglikelihood_birth = []
+    all_logprior = []
+
+    for dead_info in dead_info_list:
+        all_particles.append(dead_info.particles)
+        all_loglikelihood.append(dead_info.loglikelihood)
+        all_loglikelihood_birth.append(dead_info.loglikelihood_birth)
+        all_logprior.append(dead_info.logprior)
+
+    # Add live particles
+    all_particles.append(live_info.particles)
+    all_loglikelihood.append(live_info.loglikelihood)
+    all_loglikelihood_birth.append(live_info.loglikelihood_birth)
+    all_logprior.append(live_info.logprior)
+
+    # Concatenate all arrays
+    from blackjax.ns.base import NSInfo
+
+    return NSInfo(
+        particles=jnp.concatenate(all_particles, axis=0),
+        loglikelihood=jnp.concatenate(all_loglikelihood),
+        loglikelihood_birth=jnp.concatenate(all_loglikelihood_birth),
+        logprior=jnp.concatenate(all_logprior),
+        inner_kernel_info={},
+    )
+
+
+def sample_particles(rng_key, info, shape):
+    """Sample particles from NSInfo structure.
+
+    Parameters
+    ----------
+    rng_key
+        JAX PRNG key.
+    info
+        NSInfo structure containing particles.
+    shape
+        Number of particles to sample.
+
+    Returns
+    -------
+    ArrayTree
+        Sampled particles.
+    """
+    num_particles = info.particles.shape[0]
+    indices = jax.random.choice(rng_key, num_particles, shape=(shape,), replace=True)
+    return info.particles[indices]
