@@ -158,10 +158,12 @@ def build_kernel(
 
     Parameters
     ----------
-    logprior_fn
-        A function that computes the log-prior probability of a single particle.
-    loglikelihood_fn
-        A function that computes the log-likelihood of a single particle.
+    logprior_fn : Callable[[ArrayTree], float]
+        A function that computes the log-prior probability of a parameter sample.
+        Takes a parameter sample and returns a scalar log-prior value.
+    loglikelihood_fn : Callable[[ArrayTree], float]
+        A function that computes the log-likelihood of a parameter sample.
+        Takes a parameter sample and returns a scalar log-likelihood value.
     num_inner_steps
         The number of HRSS steps to run for each new particle generation.
         This should be a multiple of the dimension of the parameter space.
@@ -245,10 +247,12 @@ def as_top_level_api(
 
     Parameters
     ----------
-    logprior_fn
-        A function that computes the log-prior probability of a single particle.
-    loglikelihood_fn
-        A function that computes the log-likelihood of a single particle.
+    logprior_fn : Callable[[ArrayTree], float]
+        A function that computes the log-prior probability of a parameter sample.
+        Takes a parameter sample and returns a scalar log-prior value.
+    loglikelihood_fn : Callable[[ArrayTree], float]
+        A function that computes the log-likelihood of a parameter sample.
+        Takes a parameter sample and returns a scalar log-likelihood value.
     num_inner_steps
         The number of HRSS steps to run for each new particle generation.
         This should be a multiple of the dimension of the parameter space.

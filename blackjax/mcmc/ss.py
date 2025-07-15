@@ -84,6 +84,8 @@ class SliceInfo(NamedTuple):
         acceptable sample.
     evals
         The total number of log-density evaluations performed during the step.
+    d
+        The direction vector used for the slice sampling step.
     """
 
     constraint: Array = jnp.array([])
@@ -91,6 +93,7 @@ class SliceInfo(NamedTuple):
     r_steps: int = 0
     s_steps: int = 0
     evals: int = 0
+    d: ArrayTree = None
 
 
 def init(position: ArrayTree, logdensity_fn: Callable) -> SliceState:
@@ -134,6 +137,9 @@ def build_kernel(
         the log-density function, direction `d`, constraint function, constraint
         values, and strict flags, and returns a new `SliceState` and `SliceInfo`.
 
+        The log-density function signature: `Callable[[ArrayTree], float]`
+        The constraint function signature: `Callable[[ArrayTree], Array]`
+
     References
     ----------
     .. [1] Neal, R. M. (2003). Slice sampling. The Annals of Statistics, 31(3), 705-767.
@@ -167,6 +173,7 @@ def build_kernel(
             r_steps=hs_info.r_steps,
             s_steps=hs_info.s_steps,
             evals=vs_info.evals + hs_info.evals,
+            d=d,
         )
 
         return new_state, info
@@ -231,23 +238,26 @@ def horizontal_slice(
     stepper_fn
         A function `(x0, d, t) -> x_new` that computes a new point by
         moving `t` units along direction `d` from `x0`.
-    logdensity_fn
+    logdensity_fn : Callable[[ArrayTree], float]
         The log-density function of the target distribution.
-    constraint_fn
-        A function that evaluates additional constraints on the position beyond
-        the target distribution. Takes a position (PyTree) and returns an array
-        of constraint values. These values are compared against `constraint`
-        thresholds to determine if a position is acceptable. For example, in
-        nested sampling, this could evaluate the log-likelihood to ensure it
-        exceeds a minimum threshold.
-    constraint
-        An array of constraint threshold values that must be satisfied.
-        Each constraint value from `constraint_fn(x)` is compared against the
-        corresponding threshold in this array.
-    strict
-        An array of boolean flags indicating whether each constraint should be
-        strict (constraint_fn(x) > constraint) or non-strict
-        (constraint_fn(x) >= constraint).
+        Takes a parameter sample and returns a scalar log-density value.
+    constraint_fn : Callable[[ArrayTree], Array]
+        A function that evaluates additional constraints on parameter samples.
+        Takes a parameter sample and returns an array of constraint values that
+        are compared against `constraint` thresholds. For example, in nested
+        sampling, this could evaluate the log-likelihood to ensure it exceeds
+        a minimum threshold.
+
+        The output array must have consistent shape and dtype (float32) for all
+        inputs, matching the `constraint` parameter shape exactly.
+        Use `jnp.array([], dtype=jnp.float32)` for no constraints.
+    constraint : Array
+        Array of constraint threshold values that must be satisfied.
+        Must have the same shape as the output of `constraint_fn`.
+    strict : Array
+        Boolean array indicating whether each constraint should be strict
+        (constraint_fn(x) > constraint) or non-strict (constraint_fn(x) >= constraint).
+        Must have the same shape as `constraint`.
 
     Returns
     -------

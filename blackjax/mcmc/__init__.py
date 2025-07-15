@@ -1,4 +1,6 @@
 from . import (
+    adjusted_mclmc,
+    adjusted_mclmc_dynamic,
     barker,
     elliptical_slice,
     ghmc,
@@ -10,6 +12,7 @@ from . import (
     periodic_orbital,
     random_walk,
     rmhmc,
+    ss,
 )
 
 __all__ = [
@@ -24,4 +27,7 @@ __all__ = [
     "marginal_latent_gaussian",
     "random_walk",
     "mclmc",
+    "adjusted_mclmc_dynamic",
+    "adjusted_mclmc",
+    "ss",
 ]
