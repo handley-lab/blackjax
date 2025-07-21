@@ -136,6 +136,7 @@ def compute_covariance_from_particles(
         This means each leaf of `cov_pytree` will have a shape `(D, *leaf_original_dims)`.
     """
     cov_matrix = jnp.atleast_2d(particles_covariance_matrix(state.particles))
+    cov_matrix *= cov_matrix.shape[0] + 2
     cho = jnp.linalg.cholesky(cov_matrix)
     inv_cov_matrix = cho_solve((cho, True), jnp.eye(cho.shape[0]))
     single_particle = get_first_row(state.particles)
