@@ -29,6 +29,7 @@ from typing import Callable, Dict, Optional
 import jax
 import jax.numpy as jnp
 from jax.flatten_util import ravel_pytree
+from jax.scipy.linalg import cho_solve
 
 from blackjax import SamplingAlgorithm
 from blackjax.mcmc.ss import SliceState
@@ -95,10 +96,11 @@ def sample_direction_from_covariance(
         structure of a single particle), to be used by the slice sampler.
     """
     cov = params["cov"]
+    inv_cov = params["inv_cov"]
     row = get_first_row(cov)
     _, unravel_fn = ravel_pytree(row)
     cov = particles_as_rows(cov)
-    d = ss_sample_direction_from_covariance(rng_key, cov)
+    d = ss_sample_direction_from_covariance(rng_key, cov, inv_cov)
     return unravel_fn(d)
 
 
@@ -134,10 +136,13 @@ def compute_covariance_from_particles(
         This means each leaf of `cov_pytree` will have a shape `(D, *leaf_original_dims)`.
     """
     cov_matrix = jnp.atleast_2d(particles_covariance_matrix(state.particles))
+    cho = jnp.linalg.cholesky(cov_matrix)
+    inv_cov_matrix = cho_solve((cho, True), jnp.eye(cho.shape[0]))
     single_particle = get_first_row(state.particles)
     _, unravel_fn = ravel_pytree(single_particle)
     cov_pytree = jax.vmap(unravel_fn)(cov_matrix)
-    return {"cov": cov_pytree}
+    inv_cov_pytree = jax.vmap(unravel_fn)(inv_cov_matrix)
+    return {"cov": cov_pytree, "inv_cov": inv_cov_pytree}
 
 
 def build_kernel(

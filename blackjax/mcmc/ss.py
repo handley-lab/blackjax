@@ -386,7 +386,9 @@ def default_stepper_fn(x: ArrayTree, d: ArrayTree, t: float) -> ArrayTree:
     return jax.tree.map(lambda x, d: x + t * d, x, d)
 
 
-def sample_direction_from_covariance(rng_key: PRNGKey, cov: Array) -> Array:
+def sample_direction_from_covariance(
+    rng_key: PRNGKey, cov: Array, inv_cov: Array
+) -> Array:
     """Generates a random direction vector, normalized, from a multivariate Gaussian.
 
     This function samples a direction `d` from a zero-mean multivariate Gaussian
@@ -408,8 +410,7 @@ def sample_direction_from_covariance(rng_key: PRNGKey, cov: Array) -> Array:
         A normalized direction vector (1D array).
     """
     d = jax.random.multivariate_normal(rng_key, mean=jnp.zeros(cov.shape[0]), cov=cov)
-    invcov = jnp.linalg.inv(cov)
-    norm = jnp.sqrt(jnp.einsum("...i,...ij,...j", d, invcov, d))
+    norm = jnp.sqrt(jnp.einsum("...i,...ij,...j", d, inv_cov, d))
     d = d / norm[..., None]
     return d
 
