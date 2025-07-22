@@ -29,7 +29,6 @@ from typing import Callable, Dict, Optional
 import jax
 import jax.numpy as jnp
 from jax.flatten_util import ravel_pytree
-from jax.scipy.linalg import cho_solve
 
 from blackjax import SamplingAlgorithm
 from blackjax.mcmc.ss import SliceState
@@ -62,22 +61,14 @@ def sample_direction_from_covariance(
 ) -> ArrayTree:
     """Default function to generate a normalized slice direction for NSS.
 
-    This function is designed to work with covariance parameters adapted by
-    `default_adapt_direction_params_fn`. It expects `params` to contain
-    'cov', a PyTree structured identically to a single particle. Each leaf
-    of this 'cov' PyTree contains rows of the full covariance matrix that
-    correspond to that leaf's elements in the flattened particle vector.
-    (Specifically, if the full DxD covariance matrix of flattened particles is
-    `M_flat`, and `unravel_fn` un-flattens a D-vector to the particle PyTree,
-    then the input `cov` is effectively `jax.vmap(unravel_fn)(M_flat)`).
-
-    The function reassembles the full (D,D) covariance matrix from this
-    PyTree structure. It then samples a flat direction vector `d_flat` from
-    a multivariate Gaussian $\\mathcal{N}(0, M_{reassembled})$, normalizes
-    `d_flat` using the Mahalanobis norm defined by $M_{reassembled}^{-1}$,
-    and finally un-flattens this normalized direction back into the
-    particle's PyTree structure using an `unravel_fn` derived from the
-    particle structure.
+    This function uses a mathematically simplified approach to generate direction
+    vectors uniformly distributed on a hypersphere:
+    1. Sample from standard multivariate normal N(0, I)
+    2. Normalize to unit vector (uniform on hypersphere)
+    3. Transform by S^(1/2) where S is the covariance matrix
+    
+    This is equivalent to the traditional approach of sampling from N(0, S) and 
+    normalizing by Mahalanobis norm, but is more numerically stable and efficient.
 
     Parameters
     ----------
@@ -86,21 +77,23 @@ def sample_direction_from_covariance(
     params
         Keyword arguments, must contain:
         - `cov`: A PyTree (structured like a particle) whose leaves are rows
-                 of the covariance matrix, typically output by
-                 `compute_covariance_from_particles`.
+                 of the covariance matrix.
+        - `chol`: A PyTree with the square root (Cholesky factor) of the
+                  covariance matrix.
 
     Returns
     -------
     ArrayTree
-        A Mahalanobis-normalized direction vector (PyTree, matching the
-        structure of a single particle), to be used by the slice sampler.
+        A direction vector uniformly distributed on a hypersphere (PyTree, 
+        matching the structure of a single particle), to be used by the slice sampler.
     """
     cov = params["cov"]
-    inv_cov = params["inv_cov"]
+    chol = params["chol"]
     row = get_first_row(cov)
     _, unravel_fn = ravel_pytree(row)
     cov = particles_as_rows(cov)
-    d = ss_sample_direction_from_covariance(rng_key, cov, inv_cov)
+    chol = particles_as_rows(chol)
+    d = ss_sample_direction_from_covariance(rng_key, cov, chol)
     return unravel_fn(d)
 
 
@@ -128,22 +121,23 @@ def compute_covariance_from_particles(
     Returns
     -------
     Dict[str, ArrayTree]
-        A dictionary `{'cov': cov_pytree}`. `cov_pytree` is a PyTree with the
-        same structure as a single particle. If the full DxD covariance matrix
-        of the flattened particles is `M_flat`, and `unravel_fn` is the function
-        to un-flatten a D-vector to the particle's PyTree structure, then
-        `cov_pytree` is equivalent to `jax.vmap(unravel_fn)(M_flat)`.
+        A dictionary `{'cov': cov_pytree, 'chol': chol_pytree}`. 
+        `cov_pytree` is a PyTree with the same structure as a single particle 
+        containing the covariance matrix. `chol_pytree` contains the Cholesky 
+        decomposition (square root) of the covariance matrix. If the full DxD 
+        covariance matrix of the flattened particles is `M_flat`, and `unravel_fn` 
+        is the function to un-flatten a D-vector to the particle's PyTree structure, 
+        then `cov_pytree` is equivalent to `jax.vmap(unravel_fn)(M_flat)`.
         This means each leaf of `cov_pytree` will have a shape `(D, *leaf_original_dims)`.
     """
     cov_matrix = jnp.atleast_2d(particles_covariance_matrix(state.particles))
     cov_matrix *= cov_matrix.shape[0] + 2
-    cho = jnp.linalg.cholesky(cov_matrix)
-    inv_cov_matrix = cho_solve((cho, True), jnp.eye(cho.shape[0]))
+    chol_matrix = jnp.linalg.cholesky(cov_matrix)
     single_particle = get_first_row(state.particles)
     _, unravel_fn = ravel_pytree(single_particle)
     cov_pytree = jax.vmap(unravel_fn)(cov_matrix)
-    inv_cov_pytree = jax.vmap(unravel_fn)(inv_cov_matrix)
-    return {"cov": cov_pytree, "inv_cov": inv_cov_pytree}
+    chol_pytree = jax.vmap(unravel_fn)(chol_matrix)
+    return {"cov": cov_pytree, "chol": chol_pytree}
 
 
 def build_kernel(
