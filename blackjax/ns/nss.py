@@ -132,7 +132,7 @@ def compute_covariance_from_particles(
     """
     cov_matrix = jnp.atleast_2d(particles_covariance_matrix(state.particles))
     cov_matrix *= cov_matrix.shape[0] + 2
-    chol_matrix = jnp.linalg.cholesky(cov_matrix)
+    chol_matrix = jnp.linalg.cholesky(cov_matrix, lower=True)
     single_particle = get_first_row(state.particles)
     _, unravel_fn = ravel_pytree(single_particle)
     cov_pytree = jax.vmap(unravel_fn)(cov_matrix)
