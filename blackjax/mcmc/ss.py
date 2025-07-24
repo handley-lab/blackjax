@@ -386,31 +386,37 @@ def default_stepper_fn(x: ArrayTree, d: ArrayTree, t: float) -> ArrayTree:
     return jax.tree.map(lambda x, d: x + t * d, x, d)
 
 
-def sample_direction_from_covariance(rng_key: PRNGKey, cov: Array) -> Array:
+def sample_direction_from_covariance(
+    rng_key: PRNGKey, cov: Array, chol: Array
+) -> Array:
     """Generates a random direction vector, normalized, from a multivariate Gaussian.
 
-    This function samples a direction `d` from a zero-mean multivariate Gaussian
-    distribution with covariance matrix `cov`, and then normalizes `d` to be a
-    unit vector with respect to the Mahalanobis norm defined by `inv(cov)`.
-    That is, `d_normalized^T @ inv(cov) @ d_normalized = 1`.
+    This function generates a direction vector uniformly distributed on a hypersphere
+    by using the mathematical simplification:
+    1. Sample from standard multivariate normal N(0, I)
+    2. Normalize to unit vector (uniform on hypersphere)  
+    3. Transform by S^(1/2) where S is the covariance matrix
+
+    This is equivalent to sampling from N(0, S) and normalizing by Mahalanobis norm
+    but is more numerically stable and efficient.
 
     Parameters
     ----------
     rng_key
         A JAX PRNG key.
     cov
-        The covariance matrix for the multivariate Gaussian distribution from which
-        the initial direction is sampled. Assumed to be a 2D array.
+        The covariance matrix (unused in simplified version, kept for compatibility).
+    chol
+        The square root of the covariance matrix (Cholesky factor).
 
     Returns
     -------
     Array
         A normalized direction vector (1D array).
     """
-    d = jax.random.multivariate_normal(rng_key, mean=jnp.zeros(cov.shape[0]), cov=cov)
-    invcov = jnp.linalg.inv(cov)
-    norm = jnp.sqrt(jnp.einsum("...i,...ij,...j", d, invcov, d))
-    d = d / norm[..., None]
+    z = jax.random.normal(rng_key, shape=(cov.shape[0],))
+    u = z / jnp.linalg.norm(z)
+    d = chol @ u
     return d
 
 
