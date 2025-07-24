@@ -147,9 +147,7 @@ def logX(rng_key: PRNGKey, dead_info: NSInfo, shape: int = 100) -> tuple[Array, 
           `dX_i` is approximately `X_i - X_{i+1}`.
     """
     rng_key, subkey = jax.random.split(rng_key)
-    r = jnp.log(
-        jax.random.uniform(subkey, shape=(dead_info.loglikelihood.shape[0], shape))
-    )
+    r = -jax.random.exponential(subkey, shape=(dead_info.loglikelihood.shape[0], shape))
 
     num_live = compute_num_live(dead_info)
     t = r / num_live[:, jnp.newaxis]
