@@ -30,7 +30,7 @@ import jax
 import jax.numpy as jnp
 from jax.flatten_util import ravel_pytree
 
-from blackjax import SamplingAlgorithm
+from blackjax.base import SamplingAlgorithm
 from blackjax.mcmc.ss import SliceState
 from blackjax.mcmc.ss import build_kernel as build_slice_kernel
 from blackjax.mcmc.ss import default_stepper_fn
@@ -148,6 +148,7 @@ def build_kernel(
     stepper_fn: Callable = default_stepper_fn,
     adapt_direction_params_fn: Callable = compute_covariance_from_particles,
     generate_slice_direction_fn: Callable = sample_direction_from_covariance,
+    max_shrink_iterations: Optional[int] = None,
 ) -> Callable:
     """Builds the Nested Slice Sampling kernel.
 
@@ -203,7 +204,7 @@ def build_kernel(
         constraint = jnp.array([loglikelihood_0])
         strict = jnp.array([True])
         new_slice_state, slice_info = slice_kernel(
-            rng_key, slice_state, logdensity_fn, d, constraint_fn, constraint, strict
+            rng_key, slice_state, logdensity_fn, d, constraint_fn, constraint, strict, max_shrink_iterations
         )
 
         # Pass the relevant information back to PartitionedState and PartitionedInfo
@@ -235,6 +236,7 @@ def as_top_level_api(
     stepper_fn: Callable = default_stepper_fn,
     adapt_direction_params_fn: Callable = compute_covariance_from_particles,
     generate_slice_direction_fn: Callable = sample_direction_from_covariance,
+    max_shrink_iterations: Optional[int] = None,
 ) -> SamplingAlgorithm:
     """Creates an adaptive Nested Slice Sampling (NSS) algorithm.
 
@@ -283,6 +285,7 @@ def as_top_level_api(
         stepper_fn=stepper_fn,
         adapt_direction_params_fn=adapt_direction_params_fn,
         generate_slice_direction_fn=generate_slice_direction_fn,
+        max_shrink_iterations=max_shrink_iterations,
     )
     init_fn = partial(
         init,

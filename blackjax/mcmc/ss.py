@@ -27,7 +27,7 @@ References
 """
 
 from functools import partial
-from typing import Callable, NamedTuple
+from typing import Callable, NamedTuple, Optional
 
 import jax
 import jax.numpy as jnp
@@ -147,6 +147,7 @@ def build_kernel(
         constraint_fn: Callable,
         constraint: Array,
         strict: Array,
+        max_shrink_iterations: Optional[int]
     ) -> tuple[SliceState, SliceInfo]:
         rng_key, vs_key, hs_key = jax.random.split(rng_key, 3)
         intermediate_state, vs_info = vertical_slice(vs_key, state)
@@ -159,6 +160,7 @@ def build_kernel(
             constraint_fn,
             constraint,
             strict,
+            max_shrink_iterations,
         )
 
         info = SliceInfo(
@@ -210,6 +212,7 @@ def horizontal_slice(
     constraint_fn: Callable,
     constraint: Array,
     strict: Array,
+    max_shrink_iterations: Optional[int],
 ) -> tuple[SliceState, SliceInfo]:
     """Propose a new sample using the stepping-out and shrinking procedures.
 
@@ -283,7 +286,7 @@ def horizontal_slice(
     _, _, l, l_steps = jax.lax.while_loop(cond_fun, body_fun, (True, -1, -u, 0))
     _, _, r, r_steps = jax.lax.while_loop(cond_fun, body_fun, (True, +1, 1 - u, 0))
 
-    # Shrink
+    # Shrink - single while_loop with optional iteration count constraint
     def shrink_body_fun(carry):
         _, l, r, _, _, _, rng_key, s_steps = carry
         s_steps += 1
@@ -306,15 +309,36 @@ def horizontal_slice(
         return within, l, r, x, logdensity_x, constraint_x, rng_key, s_steps
 
     def shrink_cond_fun(carry):
-        within = carry[0]
-        return ~within
+        within, _, _, _, _, _, _, s_steps = carry
+        # Continue if: not within slice AND (no max iterations OR under max iterations)
+        within_slice = within
+        if max_shrink_iterations is None:
+            under_max_iterations = True
+        else:
+            under_max_iterations = s_steps < max_shrink_iterations
+        return (~within_slice) & under_max_iterations
 
     carry = (False, l, r, x0, -jnp.inf, constraint, rng_key, 0)
     carry = jax.lax.while_loop(shrink_cond_fun, shrink_body_fun, carry)
-    _, l, r, x, logdensity_x, constraint_x, rng_key, s_steps = carry
-    slice_state = SliceState(x, logdensity_x)
+    within, l, r, x, logdensity_x, constraint_x, rng_key, s_steps = carry
+    
+    # Determine final values: unbounded case uses found point directly,
+    # bounded case conditionally accepts based on whether we found a valid point
+    if max_shrink_iterations is None:
+        # Unbounded case: guaranteed to terminate with within=True
+        final_x = x
+        final_logdensity_x = logdensity_x
+        final_constraint_x = constraint_x
+    else:
+        # Bounded case: only accept if loop terminated because we found a valid point
+        # If it terminated due to max iterations, reject and use original point
+        final_x = jnp.where(within, x, x0)
+        final_logdensity_x = jnp.where(within, logdensity_x, state.logdensity)
+        final_constraint_x = jnp.where(within, constraint_x, constraint_fn(x0))
+    
+    slice_state = SliceState(final_x, final_logdensity_x)
     evals = l_steps + r_steps + s_steps
-    slice_info = SliceInfo(constraint_x, l_steps, r_steps, s_steps, evals)
+    slice_info = SliceInfo(final_constraint_x, l_steps, r_steps, s_steps, evals)
     return slice_state, slice_info
 
 
@@ -350,7 +374,7 @@ def build_hrss_kernel(
     slice_kernel = build_kernel(stepper_fn)
 
     def kernel(
-        rng_key: PRNGKey, state: SliceState, logdensity_fn: Callable
+        rng_key: PRNGKey, state: SliceState, logdensity_fn: Callable, max_shrink_iterations: Optional[int]
     ) -> tuple[SliceState, SliceInfo]:
         rng_key, prop_key = jax.random.split(rng_key, 2)
         d = generate_slice_direction_fn(prop_key)
@@ -358,7 +382,7 @@ def build_hrss_kernel(
         constraint = jnp.array([])
         strict = jnp.array([])
         return slice_kernel(
-            rng_key, state, logdensity_fn, d, constraint_fn, constraint, strict
+            rng_key, state, logdensity_fn, d, constraint_fn, constraint, strict, max_shrink_iterations
         )
 
     return kernel
