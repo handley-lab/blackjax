@@ -394,7 +394,7 @@ def sample_direction_from_covariance(
     This function generates a direction vector uniformly distributed on a hypersphere
     by using the mathematical simplification:
     1. Sample from standard multivariate normal N(0, I)
-    2. Normalize to unit vector (uniform on hypersphere)  
+    2. Normalize to unit vector (uniform on hypersphere)
     3. Transform by S^(1/2) where S is the covariance matrix
 
     This is equivalent to sampling from N(0, S) and normalizing by Mahalanobis norm
@@ -416,7 +416,7 @@ def sample_direction_from_covariance(
     """
     z = jax.random.normal(rng_key, shape=(cov.shape[0],))
     u = z / jnp.linalg.norm(z)
-    d = chol @ u
+    d = chol.T @ u
     return d
 
 
