@@ -287,15 +287,16 @@ def as_top_level_api(
         adapt_direction_params_fn=adapt_direction_params_fn,
         generate_slice_direction_fn=generate_slice_direction_fn,
     )
-    def init_fn(particles, **kwargs):
+
+    def init_fn(position, rng_key=None):
         # Vectorize the functions for parallel evaluation over particles
         return init(
-            particles,
+            position,
             logprior_fn=jax.vmap(logprior_fn),
             loglikelihood_fn=jax.vmap(loglikelihood_fn),
             update_inner_kernel_params_fn=adapt_direction_params_fn,
-            **kwargs
         )
+
     step_fn = kernel
 
     return SamplingAlgorithm(init_fn, step_fn)
