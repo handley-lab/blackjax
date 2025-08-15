@@ -24,6 +24,7 @@ constrained prior distribution as the likelihood threshold increases.
 
 from typing import Callable, Dict, Optional
 
+import jax
 import jax.numpy as jnp
 
 from blackjax.ns.base import NSInfo, NSState

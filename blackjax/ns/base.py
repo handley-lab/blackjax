@@ -236,9 +236,9 @@ def init(
     NSState
         The initial state of the Nested Sampler.
     """
-    loglikelihood = jax.vmap(loglikelihood_fn)(particles)
+    loglikelihood = loglikelihood_fn(particles)
     loglikelihood_birth = loglikelihood_birth * jnp.ones_like(loglikelihood)
-    logprior = jax.vmap(logprior_fn)(particles)
+    logprior = logprior_fn(particles)
     pid = jnp.arange(len(loglikelihood))
     dtype = loglikelihood.dtype
     logX = jnp.array(logX, dtype=dtype)
