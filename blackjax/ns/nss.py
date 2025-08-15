@@ -216,12 +216,16 @@ def build_kernel(
 
     delete_fn = partial(default_delete_fn, num_delete=num_delete)
 
+    # Vectorize the inner kernel for parallel execution
+    in_axes = (0, 0, None, None, None, None)
+    vectorized_inner_kernel = jax.vmap(inner_kernel, in_axes=in_axes)
+
     update_inner_kernel_params_fn = adapt_direction_params_fn
     kernel = build_adaptive_kernel(
         logprior_fn,
         loglikelihood_fn,
         delete_fn,
-        inner_kernel,
+        vectorized_inner_kernel,
         update_inner_kernel_params_fn,
     )
     return kernel
