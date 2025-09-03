@@ -11,20 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Hit-and-Run Slice Sampling.
-
-This module implements the Hit-and-Run Slice Sampling algorithm as described by
-Neal (2003) [1]_. Slice sampling is an MCMC method that adapts its step size
-automatically and can be efficient for sampling from distributions with complex
-geometries. The "hit-and-run" variant involves proposing a direction and then
-finding an acceptable point along that direction within a slice defined by the
-current auxiliary variable.
-
-References
-----------
-.. [1] Neal, R. M. (2003). Slice sampling. The Annals of Statistics, 31(3), 705-767.
-
-"""
+"""Public API for Hit-and-Run Slice Sampling."""
 
 from functools import partial
 from typing import Callable, NamedTuple
@@ -51,11 +38,11 @@ class SliceState(NamedTuple):
     Attributes
     ----------
     position
-        The current position of the chain.
+        Current position of the chain.
     logdensity
-        The log-density of the target distribution at the current position.
+        Log-density at the current position.
     logslice
-        The log-height defining the slice for sampling. Defaults to infinity.
+        Log-height defining the slice.
     """
 
     position: ArrayLikeTree
@@ -64,26 +51,20 @@ class SliceState(NamedTuple):
 
 
 class SliceInfo(NamedTuple):
-    """Additional information about the Slice Sampling transition.
-
-    This information can be used for diagnostics and monitoring the sampler's
-    performance.
+    """Additional information on the Slice Sampling transition.
 
     Attributes
     ----------
     constraint
-        The constraint values at the final accepted position.
+        Constraint values at the final position.
     l_steps
-        The number of steps taken to expand the interval to the left during the
-        "stepping-out" phase.
+        Number of left expansion steps.
     r_steps
-        The number of steps taken to expand the interval to the right during the
-        "stepping-out" phase.
+        Number of right expansion steps.
     s_steps
-        The number of steps taken during the "shrinking" phase to find an
-        acceptable sample.
+        Number of shrinking steps.
     evals
-        The total number of log-density evaluations performed during the step.
+        Total number of log-density evaluations.
     """
 
     constraint: Array = jnp.array([])
@@ -116,27 +97,14 @@ def build_kernel(
 ) -> Callable:
     """Build a Slice Sampling kernel.
 
-    This kernel performs one step of Slice Sampling algorithm, which involves
-    defining a vertical slice, stepping out to define an interval, and then
-    shrinking that interval to find an acceptable new sample.
-
     Parameters
     ----------
     stepper_fn
-        A function that computes a new position given an initial position,
-        direction `d` and a slice parameter `t`.
-        `(x0, d, t) -> x_new` where e.g. `x_new = x0 + t * d`.
+        Function that computes a new position given position, direction and step size.
 
     Returns
     -------
-    Callable
-        A kernel function that takes a PRNG key, the current `SliceState`,
-        the log-density function, direction `d`, constraint function, constraint
-        values, and strict flags, and returns a new `SliceState` and `SliceInfo`.
-
-    References
-    ----------
-    .. [1] Neal, R. M. (2003). Slice sampling. The Annals of Statistics, 31(3), 705-767.
+    A kernel function for Slice Sampling.
     """
 
     def kernel(
@@ -148,6 +116,7 @@ def build_kernel(
         constraint: Array,
         strict: Array,
     ) -> tuple[SliceState, SliceInfo]:
+        """Generate a new sample with the Slice Sampling kernel."""
         rng_key, vs_key, hs_key = jax.random.split(rng_key, 3)
         intermediate_state, vs_info = vertical_slice(vs_key, state)
         new_state, hs_info = horizontal_slice(
@@ -175,25 +144,18 @@ def build_kernel(
 
 
 def vertical_slice(rng_key: PRNGKey, state: SliceState) -> tuple[SliceState, SliceInfo]:
-    """Define the vertical slice for the Slice Sampling algorithm.
-
-    This function determines the height `y` for the horizontal slice by sampling
-    uniformly from `[0, p(x)]`, where `p(x)` is the target density at the current
-    position `x`. This is equivalent to sampling `log_y` uniformly from
-    `(-inf, log_p(x)]`.
+    """Define the vertical slice.
 
     Parameters
     ----------
     rng_key
-        A JAX PRNG key.
+        JAX PRNG key.
     state
-        The current slice sampling state.
+        Current slice sampling state.
 
     Returns
     -------
-    tuple[SliceState, SliceInfo]
-        A tuple containing the updated state with the slice height set and
-        info about the vertical slice step.
+    Updated state with slice height and info.
     """
     logslice = state.logdensity + jnp.log(jax.random.uniform(rng_key))
     new_state = state._replace(logslice=logslice)
@@ -211,50 +173,30 @@ def horizontal_slice(
     constraint: Array,
     strict: Array,
 ) -> tuple[SliceState, SliceInfo]:
-    """Propose a new sample using the stepping-out and shrinking procedures.
-
-    This function implements the core of the Hit-and-Run Slice Sampling algorithm.
-    It first expands an interval (`[l, r]`) along the slice starting
-    from `x0` and proceeding along direction `d` until both ends are outside
-    the slice defined by `logslice` (stepping-out). Then, it samples
-    points uniformly from this interval and shrinks the interval until a point
-    is found that lies within the slice (shrinking).
+    """Propose a new sample using stepping-out and shrinking.
 
     Parameters
     ----------
     rng_key
-        A JAX PRNG key.
-    x0
-        The current position (PyTree).
+        JAX PRNG key.
+    state
+        Current slice sampling state.
     d
-        The direction (PyTree) for proposing moves.
+        Direction for proposing moves.
     stepper_fn
-        A function `(x0, d, t) -> x_new` that computes a new point by
-        moving `t` units along direction `d` from `x0`.
+        Function that computes new position.
     logdensity_fn
-        The log-density function of the target distribution.
+        Log-density function of target distribution.
     constraint_fn
-        A function that evaluates additional constraints on the position beyond
-        the target distribution. Takes a position (PyTree) and returns an array
-        of constraint values. These values are compared against `constraint`
-        thresholds to determine if a position is acceptable. For example, in
-        nested sampling, this could evaluate the log-likelihood to ensure it
-        exceeds a minimum threshold.
+        Function that evaluates additional constraints.
     constraint
-        An array of constraint threshold values that must be satisfied.
-        Each constraint value from `constraint_fn(x)` is compared against the
-        corresponding threshold in this array.
+        Constraint threshold values.
     strict
-        An array of boolean flags indicating whether each constraint should be
-        strict (constraint_fn(x) > constraint) or non-strict
-        (constraint_fn(x) >= constraint).
+        Boolean flags for strict vs non-strict constraints.
 
     Returns
     -------
-    tuple[SliceState, SliceInfo]
-        A tuple containing the new state (with the accepted sample and its
-        log-density) and information about the sampling process (number of
-        expansion and shrinkage steps).
+    New state and sampling process information.
     """
     # Initial bounds
     rng_key, subkey = jax.random.split(rng_key)
@@ -324,34 +266,23 @@ def build_hrss_kernel(
 ) -> Callable:
     """Build a Hit-and-Run Slice Sampling kernel.
 
-    This kernel performs one step of the Hit-and-Run Slice Sampling algorithm,
-    which involves defining a vertical slice, proposing a direction, stepping out
-    to define an interval, and then shrinking that interval to find an acceptable
-    new sample.
-
     Parameters
     ----------
     generate_slice_direction_fn
-        A function that, given a PRNG key, generates a direction vector (PyTree
-        with the same structure as the position) for the "hit-and-run" part of
-        the algorithm. This direction is typically normalized.
-
+        Function that generates a direction vector for hit-and-run.
     stepper_fn
-        A function that computes a new position given an initial position, a
-        direction, and a step size `t`. It should implement something analogous
-        to `x_new = x_initial + t * direction`.
+        Function that computes new position.
 
     Returns
     -------
-    Callable
-        A kernel function that takes a PRNG key, the current `SliceState`, and
-        the log-density function, and returns a new `SliceState` and `SliceInfo`.
+    A kernel function for Hit-and-Run Slice Sampling.
     """
     slice_kernel = build_kernel(stepper_fn)
 
     def kernel(
         rng_key: PRNGKey, state: SliceState, logdensity_fn: Callable
     ) -> tuple[SliceState, SliceInfo]:
+        """Generate a new sample with the HRSS kernel."""
         rng_key, prop_key = jax.random.split(rng_key, 2)
         d = generate_slice_direction_fn(prop_key)
         constraint_fn = lambda x: jnp.array([])
@@ -365,47 +296,37 @@ def build_hrss_kernel(
 
 
 def default_stepper_fn(x: ArrayTree, d: ArrayTree, t: float) -> ArrayTree:
-    """A simple stepper function that moves from `x` along direction `d` by `t` units.
-
-    Implements the operation: `x_new = x + t * d`.
+    """Default stepper function for slice sampling.
 
     Parameters
     ----------
     x
-        The starting position (PyTree).
+        Starting position.
     d
-        The direction of movement (PyTree, same structure as `x`).
+        Direction of movement.
     t
-        The scalar step size or distance along the direction.
+        Step size along the direction.
 
     Returns
     -------
-    ArrayTree
-        The new position.
+    The new position.
     """
     return jax.tree.map(lambda x, d: x + t * d, x, d)
 
 
 def sample_direction_from_covariance(rng_key: PRNGKey, cov: Array) -> Array:
-    """Generates a random direction vector, normalized, from a multivariate Gaussian.
-
-    This function samples a direction `d` from a zero-mean multivariate Gaussian
-    distribution with covariance matrix `cov`, and then normalizes `d` to be a
-    unit vector with respect to the Mahalanobis norm defined by `inv(cov)`.
-    That is, `d_normalized^T @ inv(cov) @ d_normalized = 1`.
+    """Generate a normalized direction from a multivariate Gaussian.
 
     Parameters
     ----------
     rng_key
-        A JAX PRNG key.
+        JAX PRNG key.
     cov
-        The covariance matrix for the multivariate Gaussian distribution from which
-        the initial direction is sampled. Assumed to be a 2D array.
+        Covariance matrix for the multivariate Gaussian.
 
     Returns
     -------
-    Array
-        A normalized direction vector (1D array).
+    A normalized direction vector.
     """
     d = jax.random.multivariate_normal(rng_key, mean=jnp.zeros(cov.shape[0]), cov=cov)
     invcov = jnp.linalg.inv(cov)
@@ -418,26 +339,18 @@ def hrss_as_top_level_api(
     logdensity_fn: Callable,
     cov: Array,
 ) -> SamplingAlgorithm:
-    """Creates a Hit-and-Run Slice Sampling algorithm.
-
-    This function serves as a convenience wrapper to easily construct a
-    Hit-and-Run Slice Sampler using a default direction proposal mechanism
-    based on a multivariate Gaussian distribution with the provided covariance.
+    """Implements the (basic) user interface for Hit-and-Run Slice Sampling.
 
     Parameters
     ----------
     logdensity_fn
-        The log-density function of the target distribution to sample from.
+        Log-density function of the target distribution.
     cov
-        The covariance matrix used by the default direction proposal function
-        (`default_proposal_distribution`). This matrix shapes the random
-        directions proposed for the slice sampling steps.
+        Covariance matrix for the direction proposal.
 
     Returns
     -------
-    SamplingAlgorithm
-        A `SamplingAlgorithm` tuple containing `init` and `step` functions for
-        the configured Hit-and-Run Slice Sampler.
+    A ``SamplingAlgorithm``.
     """
     generate_slice_direction_fn = partial(sample_direction_from_covariance, cov=cov)
     kernel = build_hrss_kernel(generate_slice_direction_fn, default_stepper_fn)

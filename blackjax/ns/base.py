@@ -11,23 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Base components for Nested Sampling algorithms in BlackJAX.
-
-This module provides the fundamental data structures (`NSState`, `NSInfo`) and
-a basic, non-adaptive kernel for Nested Sampling. Nested Sampling is a
-Monte Carlo method primarily aimed at Bayesian evidence (marginal likelihood)
-computation and posterior sampling, particularly effective for multi-modal
-distributions.
-
-The core idea is to transform the multi-dimensional evidence integral into a
-one-dimensional integral over the prior volume, ordered by likelihood. This is
-achieved by iteratively replacing the point with the lowest likelihood among a
-set of "live" points with a new point sampled from the prior, subject to the
-constraint that its likelihood must be higher than the one just discarded.
-
-This base implementation uses a provided kernel to perform the constrained
-sampling.
-"""
+"""Public API for base Nested Sampling."""
 
 from typing import Callable, Dict, NamedTuple, Optional
 
@@ -46,28 +30,23 @@ class NSState(NamedTuple):
     Attributes
     ----------
     particles
-        A PyTree of arrays, where each leaf array has a leading dimension
-        equal to the number of live particles. Stores the current positions of
-        the live particles.
+        Current positions of the live particles.
     loglikelihood
-        An array of log-likelihood values, one for each live particle.
+        Log-likelihood values of the particles.
     loglikelihood_birth
-        An array storing the log-likelihood threshold that each current live
-        particle was required to exceed when it was "born" (i.e., sampled).
-        This is used for reconstructing the nested sampling path.
+        Log-likelihood threshold at particle birth.
     logprior
-        An array of log-prior values, one for each live particle.
+        Log-prior values of the particles.
     pid
-        Particle ID. An array of integers tracking the identity or lineage of
-        particles, primarily for diagnostic purposes.
+        Particle IDs for tracking lineage.
     logX
-        The log of the current prior volume estimate.
+        Current log prior volume estimate.
     logZ
-        The accumulated log evidence estimate from the "dead" points .
+        Accumulated log evidence estimate.
     logZ_live
-        The current estimate of the log evidence contribution from the live points.
+        Log evidence contribution from live particles.
     inner_kernel_params
-        A dictionary of parameters for the inner kernel.
+        Parameters for the inner kernel.
     """
 
     particles: ArrayLikeTree
@@ -82,23 +61,20 @@ class NSState(NamedTuple):
 
 
 class NSInfo(NamedTuple):
-    """Additional information returned at each step of the Nested Sampling algorithm.
+    """Additional information on the Nested Sampling transition.
 
     Attributes
     ----------
     particles
-        The PyTree of particles that were marked as "dead" (replaced) in the
-        current step.
+        Dead particles from the current step.
     loglikelihood
-        The log-likelihood values of the dead particles.
+        Log-likelihood values of dead particles.
     loglikelihood_birth
-        The birth log-likelihood thresholds of the dead particles.
+        Birth log-likelihood thresholds of dead particles.
     logprior
-        The log-prior values of the dead particles.
+        Log-prior values of dead particles.
     inner_kernel_info
-        A NamedTuple (or any PyTree) containing information from the update step
-        (inner kernel) used to generate new live particles. The content
-        depends on the specific inner kernel used.
+        Information from the inner kernel update step.
     """
 
     particles: ArrayTree
@@ -109,25 +85,16 @@ class NSInfo(NamedTuple):
 
 
 class PartitionedState(NamedTuple):
-    """State container that partitions out the loglikelihood and logprior.
-
-    This intermediate construction wraps around the usual State of an MCMC chain
-    so that the loglikelihood and logprior can be efficiently recorded, a
-    necessary step for the Parition function reconstruction that Nested
-    Sampling builds
-
+    """State container for partitioned loglikelihood and logprior.
 
     Attributes
     ----------
     position
-        A PyTree of arrays representing the current positions of the particles.
-        Each leaf array has a leading dimension corresponding to the number of particles.
+        Current positions of particles in the inner kernel.
     logprior
-        An array of log-prior density values evaluated at the particle positions.
-        Shape: (n_particles,)
+        Log-prior values for particles.
     loglikelihood
-        An array of log-likelihood values evaluated at the particle positions.
-        Shape: (n_particles,)
+        Log-likelihood values for particles.
     """
 
     position: ArrayLikeTree  # Current positions of particles in the inner kernel
@@ -136,28 +103,18 @@ class PartitionedState(NamedTuple):
 
 
 class PartitionedInfo(NamedTuple):
-    """Transition information that additionally records a partitioned loglikelihood
-    and logprior.
-
-    See PartitionedState
+    """Transition information with partitioned loglikelihood and logprior.
 
     Attributes
     ----------
     position
-        A PyTree of arrays representing the final positions after the transition step.
-        Structure matches the input particle positions.
+        Final positions after the transition.
     logprior
-        An array of log-prior density values at the final positions.
-        Kept separate to support posterior repartitioning schemes.
-        Shape: (n_particles,)
+        Log-prior values at final positions.
     loglikelihood
-        An array of log-likelihood values at the final positions.
-        Kept separate to support posterior repartitioning schemes.
-        Shape: (n_particles,)
+        Log-likelihood values at final positions.
     info
-        Additional transition-specific diagnostic information from the step.
-        The content and structure depend on the specific transition implementation
-        (e.g., acceptance rates, step sizes, number of evaluations, etc.).
+        Additional transition diagnostic information.
     """
 
     position: ArrayTree
@@ -168,10 +125,6 @@ class PartitionedInfo(NamedTuple):
 
 def new_state_and_info(position, logprior, loglikelihood, info):
     """Create new PartitionedState and PartitionedInfo from transition results.
-
-    This utility function packages the results of a transition into the standard
-    partitioned state and info containers, maintaining the separation of logprior
-    and loglikelihood components.
 
     Parameters
     ----------
@@ -186,8 +139,7 @@ def new_state_and_info(position, logprior, loglikelihood, info):
 
     Returns
     -------
-    tuple[PartitionedState, PartitionedInfo]
-        A tuple containing the new partitioned state and associated information.
+    A tuple containing the new partitioned state and associated information.
     """
     new_state = PartitionedState(
         position=position,
@@ -211,30 +163,26 @@ def init(
     logX: Optional[Array] = 0.0,
     logZ: Optional[Array] = -jnp.inf,
 ) -> NSState:
-    """Initializes the Nested Sampler state.
+    """Initialize the Nested Sampler state.
 
     Parameters
     ----------
     particles
-        An initial set of particles (PyTree of arrays) drawn from the prior
-        distribution. The leading dimension of each leaf array must be equal to
-        the number of particles.
+        Initial set of particles drawn from the prior.
     logprior_fn
-        A function that computes the log-prior of a single particle.
+        Function that computes the log-prior of a single particle.
     loglikelihood_fn
-        A function that computes the log-likelihood of a single particle.
+        Function that computes the log-likelihood of a single particle.
     loglikelihood_birth
-        The initial log-likelihood birth threshold. Defaults to -NaN, which
-        implies no initial likelihood constraint beyond the prior.
+        Initial log-likelihood birth threshold.
     logX
-        The initial log prior volume estimate. Defaults to 0.0.
+        Initial log prior volume estimate.
     logZ
-        The initial log evidence estimate. Defaults to -inf.
+        Initial log evidence estimate.
 
     Returns
     -------
-    NSState
-        The initial state of the Nested Sampler.
+    The initial state of the Nested Sampler.
     """
     loglikelihood = jax.vmap(loglikelihood_fn)(particles)
     loglikelihood_birth = loglikelihood_birth * jnp.ones_like(loglikelihood)
@@ -264,48 +212,22 @@ def build_kernel(
     delete_fn: Callable,
     inner_kernel: Callable,
 ) -> Callable:
-    """Build a generic Nested Sampling kernel.
-
-    This kernel implements one step of the Nested Sampling algorithm. In each step:
-    1. A set of particles with the lowest log-likelihoods are identified and
-       marked as "dead" using `delete_fn`. The log-likelihood of the "worst"
-       of these dead particles (i.e., max among the lowest ones) defines the new
-       likelihood constraint `loglikelihood_0`.
-    2. Live particles are selected (typically with replacement from the remaining
-       live particles, determined by `delete_fn`) to act as starting points for
-       the updates.
-    3. These selected live particles are evolved using an kernel
-       `inner_kernel`. The sampling is constrained to the region where
-       `loglikelihood(new_particle) > loglikelihood_0`.
-    4. The newly generated particles replace particles marked for replacement,
-       (typically the ones that have just been deleted).
-    5. The prior volume `logX` and evidence `logZ` are updated based on the
-       number of deleted particles and their likelihoods.
-
-    This base version does not adapt the kernel parameters.
+    """Build a Nested Sampling kernel.
 
     Parameters
     ----------
     logprior_fn
-        A function that computes the log-prior probability of a single particle.
+        Function that computes the log-prior probability of a single particle.
     loglikelihood_fn
-        A function that computes the log-likelihood of a single particle.
+        Function that computes the log-likelihood of a single particle.
     delete_fn
-        this particle deletion function has the signature
-        `(rng_key, current_state) -> (dead_idx, target_update_idx, start_idx)`
-        and identifies particles to be deleted, particles to be updated, and
-        selects live particles to be starting points for the inner kernel
-        for new particle generation.
+        Function that identifies particles to delete and selects starting points.
     inner_kernel
-        This kernel function has the signature
-        `(rng_key, inner_state, logprior_fn, loglikelihood_fn, loglikelihood_0, params) -> (new_inner_state, inner_info)`,
-        and is used to generate new particles.
+        Kernel function used to generate new particles.
 
     Returns
     -------
-    Callable
-        A kernel function for Nested Sampling:
-        `(rng_key, state) -> (new_state, ns_info)`.
+    A kernel function for Nested Sampling.
     """
 
     def kernel(rng_key: PRNGKey, state: NSState) -> tuple[NSState, NSInfo]:
@@ -382,35 +304,20 @@ def build_kernel(
 def delete_fn(
     rng_key: PRNGKey, state: NSState, num_delete: int
 ) -> tuple[Array, Array, Array]:
-    """Identifies particles to be deleted and selects live particles for resampling.
-
-    This function implements a common strategy in Nested Sampling:
-    1. Identify the `num_delete` particles with the lowest log-likelihoods. These
-       are marked as "dead".
-    2. From the remaining live particles (those not marked as dead), `num_delete`
-       particles are chosen (typically with replacement, weighted by their
-       current importance weights, here it is uniform from survivors)
-       to serve as starting points for generating new particles.
+    """Identify particles to delete and select live particles for resampling.
 
     Parameters
     ----------
     rng_key
-        A JAX PRNG key, used here for choosing live particles.
+        JAX PRNG key for choosing live particles.
     state
-        The current state of the Nested Sampler.
+        Current state of the Nested Sampler.
     num_delete
-        The number of particles to delete and subsequently replace.
+        Number of particles to delete and replace.
 
     Returns
     -------
-    tuple[Array, Array, Array]
-        A tuple containing:
-        - `dead_idx`: An array of indices corresponding to the particles
-          marked for deletion.
-        - `target_update_idx`: An array of indices corresponding to the
-          particles to be updated (same as dead_idx in this implementation).
-        - `start_idx`: An array of indices corresponding to the particles
-            selected for initialization.
+    A tuple containing dead indices, target update indices, and start indices.
     """
     loglikelihood = state.loglikelihood
     neg_dead_loglikelihood, dead_idx = jax.lax.top_k(-loglikelihood, num_delete)
@@ -430,6 +337,7 @@ def delete_fn(
 def update_ns_runtime_info(
     logX: Array, logZ: Array, loglikelihood: Array, dead_loglikelihood: Array
 ) -> tuple[Array, Array, Array]:
+    """Update the Nested Sampling runtime information."""
     num_particles = len(loglikelihood)
     num_deleted = len(dead_loglikelihood)
     num_live = jnp.arange(num_particles, num_particles - num_deleted, -1)
@@ -445,4 +353,5 @@ def update_ns_runtime_info(
 
 
 def logmeanexp(x: Array) -> Array:
+    """Compute log of mean of exp(x)."""
     return logsumexp(x) - jnp.log(len(x))
