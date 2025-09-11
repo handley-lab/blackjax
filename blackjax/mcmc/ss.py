@@ -80,9 +80,9 @@ class SliceInfo(NamedTuple):
         The total number of log-density evaluations performed during the step.
     """
 
-    num_steps: int = 0
-    num_shrink: int = 0
-    is_accepted: bool = True
+    num_steps: int
+    num_shrink: int
+    is_accepted: bool
 
 
 def init(position: ArrayTree, logdensity_fn: Callable, constraint_fn: Callable) -> SliceState:
@@ -230,7 +230,7 @@ def horizontal_slice(
     carry = (rng_key, l, r, 0, state, False)
     carry = jax.lax.while_loop(shrink_cond_fun, shrink_body_fun, carry)
     _, _, _, n, slice_state, is_accepted = carry
-    slice_info = SliceInfo(num_steps=l_steps + r_steps, num_shrink=n, is_accepted=is_accepted)
+    slice_info = SliceInfo(l_steps + r_steps, n, is_accepted)
     return slice_state, slice_info
 
 
