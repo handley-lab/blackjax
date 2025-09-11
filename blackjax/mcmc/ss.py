@@ -232,8 +232,8 @@ def horizontal_slice(
         i = carry[0]
         return is_accepted & (i > 0)
 
-    j, _, l, _ = jax.lax.while_loop(step_cond_fun, step_body_fun, (j, -1, 0, True))
-    k, _, r, _ = jax.lax.while_loop(step_cond_fun, step_body_fun, (k, +1, 1 - u, True))
+    j, _, l, _ = jax.lax.while_loop(step_cond_fun, step_body_fun, (j+1, -1, 1 - u, True))
+    k, _, r, _ = jax.lax.while_loop(step_cond_fun, step_body_fun, (k+1, +1, -u, True))
 
     # Shrink
     def shrink_body_fun(carry):
