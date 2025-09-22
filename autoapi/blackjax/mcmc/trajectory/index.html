@@ -1,0 +1,805 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>blackjax.mcmc.trajectory</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=e37d73aa" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'autoapi/blackjax/mcmc/trajectory/index';</script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="blackjax.sgmcmc" href="../../sgmcmc/index.html" />
+    <link rel="prev" title="blackjax.mcmc.termination" href="../termination/index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/blackjax.png" class="logo__image only-light" alt=" - Home"/>
+    <script>document.write(`<img src="../../../../_static/blackjax.png" class="logo__image only-dark" alt=" - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/quickstart.html">Quickstart</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">PPL INTEGRATION</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_aesara.html">Aesara</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_numpyro.html">Numpyro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_oryx.html">Oryx</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_pymc.html">PyMC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_tfp.html">Tensorflow-Probability</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">HOW TO</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_sample_multiple_chains.html">Sample with multiple chains?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_custom_gradients.html">Use custom gradients?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_other_frameworks.html">Use non-JAX log-prob functions?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_metropolis_within_gibbs.html">Build a Metropolis-Within-Gibbs sampler?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_reproduce_the_blackjax_image.html">Sample from the word BlackJAX using BlackJAX?</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">LEARN BY EXAMPLE</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference external" href="https://blackjax-devs.github.io/sampling-book">The Sampling Book</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">API Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../adaptation/index.html">blackjax.adaptation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/adjusted_mclmc_adaptation/index.html">blackjax.adaptation.adjusted_mclmc_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/base/index.html">blackjax.adaptation.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/chees_adaptation/index.html">blackjax.adaptation.chees_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/mass_matrix/index.html">blackjax.adaptation.mass_matrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/mclmc_adaptation/index.html">blackjax.adaptation.mclmc_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/meads_adaptation/index.html">blackjax.adaptation.meads_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/pathfinder_adaptation/index.html">blackjax.adaptation.pathfinder_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/step_size/index.html">blackjax.adaptation.step_size</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/window_adaptation/index.html">blackjax.adaptation.window_adaptation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../diagnostics/index.html">blackjax.diagnostics</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../index.html">blackjax.mcmc</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../adjusted_mclmc/index.html">blackjax.mcmc.adjusted_mclmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../adjusted_mclmc_dynamic/index.html">blackjax.mcmc.adjusted_mclmc_dynamic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../barker/index.html">blackjax.mcmc.barker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../diffusions/index.html">blackjax.mcmc.diffusions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dynamic_hmc/index.html">blackjax.mcmc.dynamic_hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elliptical_slice/index.html">blackjax.mcmc.elliptical_slice</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ghmc/index.html">blackjax.mcmc.ghmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hmc/index.html">blackjax.mcmc.hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../integrators/index.html">blackjax.mcmc.integrators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mala/index.html">blackjax.mcmc.mala</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../marginal_latent_gaussian/index.html">blackjax.mcmc.marginal_latent_gaussian</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mclmc/index.html">blackjax.mcmc.mclmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../metrics/index.html">blackjax.mcmc.metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../nuts/index.html">blackjax.mcmc.nuts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../periodic_orbital/index.html">blackjax.mcmc.periodic_orbital</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../proposal/index.html">blackjax.mcmc.proposal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../random_walk/index.html">blackjax.mcmc.random_walk</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rmhmc/index.html">blackjax.mcmc.rmhmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../termination/index.html">blackjax.mcmc.termination</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">blackjax.mcmc.trajectory</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../sgmcmc/index.html">blackjax.sgmcmc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../sgmcmc/csgld/index.html">blackjax.sgmcmc.csgld</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../sgmcmc/diffusions/index.html">blackjax.sgmcmc.diffusions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../sgmcmc/gradients/index.html">blackjax.sgmcmc.gradients</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../sgmcmc/sghmc/index.html">blackjax.sgmcmc.sghmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../sgmcmc/sgld/index.html">blackjax.sgmcmc.sgld</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../sgmcmc/sgnht/index.html">blackjax.sgmcmc.sgnht</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../smc/index.html">blackjax.smc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/adaptive_tempered/index.html">blackjax.smc.adaptive_tempered</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/base/index.html">blackjax.smc.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/ess/index.html">blackjax.smc.ess</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/from_mcmc/index.html">blackjax.smc.from_mcmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/inner_kernel_tuning/index.html">blackjax.smc.inner_kernel_tuning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/partial_posteriors_path/index.html">blackjax.smc.partial_posteriors_path</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/pretuning/index.html">blackjax.smc.pretuning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/resampling/index.html">blackjax.smc.resampling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/solver/index.html">blackjax.smc.solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/tempered/index.html">blackjax.smc.tempered</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../smc/tuning/index.html">blackjax.smc.tuning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../smc/tuning/from_kernel_info/index.html">blackjax.smc.tuning.from_kernel_info</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../smc/tuning/from_particles/index.html">blackjax.smc.tuning.from_particles</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/waste_free/index.html">blackjax.smc.waste_free</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../vi/index.html">blackjax.vi</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../vi/meanfield_vi/index.html">blackjax.vi.meanfield_vi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../vi/pathfinder/index.html">blackjax.vi.pathfinder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../vi/schrodinger_follmer/index.html">blackjax.vi.schrodinger_follmer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../vi/svgd/index.html">blackjax.vi.svgd</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../bib.html">Bibliography</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/blackjax-devs/blackjax" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>blackjax.mcmc.trajectory</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classes">Classes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module Contents</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.Trajectory"><code class="docutils literal notranslate"><span class="pre">Trajectory</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.Trajectory.leftmost_state"><code class="docutils literal notranslate"><span class="pre">Trajectory.leftmost_state</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.Trajectory.rightmost_state"><code class="docutils literal notranslate"><span class="pre">Trajectory.rightmost_state</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.Trajectory.momentum_sum"><code class="docutils literal notranslate"><span class="pre">Trajectory.momentum_sum</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.Trajectory.num_states"><code class="docutils literal notranslate"><span class="pre">Trajectory.num_states</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.append_to_trajectory"><code class="docutils literal notranslate"><span class="pre">append_to_trajectory()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.reorder_trajectories"><code class="docutils literal notranslate"><span class="pre">reorder_trajectories()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.merge_trajectories"><code class="docutils literal notranslate"><span class="pre">merge_trajectories()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.static_integration"><code class="docutils literal notranslate"><span class="pre">static_integration()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.DynamicIntegrationState"><code class="docutils literal notranslate"><span class="pre">DynamicIntegrationState</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.DynamicIntegrationState.step"><code class="docutils literal notranslate"><span class="pre">DynamicIntegrationState.step</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.DynamicIntegrationState.proposal"><code class="docutils literal notranslate"><span class="pre">DynamicIntegrationState.proposal</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.DynamicIntegrationState.trajectory"><code class="docutils literal notranslate"><span class="pre">DynamicIntegrationState.trajectory</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.DynamicIntegrationState.termination_state"><code class="docutils literal notranslate"><span class="pre">DynamicIntegrationState.termination_state</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.dynamic_progressive_integration"><code class="docutils literal notranslate"><span class="pre">dynamic_progressive_integration()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.dynamic_recursive_integration"><code class="docutils literal notranslate"><span class="pre">dynamic_recursive_integration()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.DynamicExpansionState"><code class="docutils literal notranslate"><span class="pre">DynamicExpansionState</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.DynamicExpansionState.step"><code class="docutils literal notranslate"><span class="pre">DynamicExpansionState.step</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.DynamicExpansionState.proposal"><code class="docutils literal notranslate"><span class="pre">DynamicExpansionState.proposal</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.DynamicExpansionState.trajectory"><code class="docutils literal notranslate"><span class="pre">DynamicExpansionState.trajectory</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.DynamicExpansionState.termination_state"><code class="docutils literal notranslate"><span class="pre">DynamicExpansionState.termination_state</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.dynamic_multiplicative_expansion"><code class="docutils literal notranslate"><span class="pre">dynamic_multiplicative_expansion()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.hmc_energy"><code class="docutils literal notranslate"><span class="pre">hmc_energy()</span></code></a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-blackjax.mcmc.trajectory">
+<span id="blackjax-mcmc-trajectory"></span><h1>blackjax.mcmc.trajectory<a class="headerlink" href="#module-blackjax.mcmc.trajectory" title="Link to this heading">#</a></h1>
+<p>Procedures to build trajectories for algorithms in the HMC family.</p>
+<p>To propose a new state, algorithms in the HMC family generally proceed by
+<span id="id1">[<a class="reference internal" href="../../../../bib.html#id25" title="Michael Betancourt. A conceptual introduction to hamiltonian monte carlo. arXiv preprint arXiv:1701.02434, 2017.">Bet17</a>]</span>:</p>
+<ol class="arabic simple">
+<li><p>Sampling a trajectory starting from the initial point;</p></li>
+<li><p>Sampling a new state from this sampled trajectory.</p></li>
+</ol>
+<p>Step (1) ensures that the process is reversible and thus that detailed balance
+is respected. The traditional implementation of HMC does not sample a
+trajectory, but instead takes a fixed number of steps in the same direction and
+flips the momentum of the last state.</p>
+<p>We distinguish here between two different methods to sample trajectories: static
+and dynamic sampling. In the static setting we sample trajectories with a fixed
+number of steps, while in the dynamic setting the total number of steps is
+determined by a dynamic termination criterion. Traditional HMC falls in the
+former category, NUTS in the latter.</p>
+<p>There are also two methods to sample proposals from these trajectories. In the
+static setting we first build the trajectory and then sample a proposal from
+this trajectory. In the progressive setting we update the proposal as the
+trajectory is being sampled. While the former is faster, we risk saturating the
+memory by keeping states that will subsequently be discarded.</p>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.mcmc.trajectory.Trajectory" title="blackjax.mcmc.trajectory.Trajectory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Trajectory</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#blackjax.mcmc.trajectory.DynamicIntegrationState" title="blackjax.mcmc.trajectory.DynamicIntegrationState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DynamicIntegrationState</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.mcmc.trajectory.DynamicExpansionState" title="blackjax.mcmc.trajectory.DynamicExpansionState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DynamicExpansionState</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.mcmc.trajectory.append_to_trajectory" title="blackjax.mcmc.trajectory.append_to_trajectory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">append_to_trajectory</span></code></a>(→ Trajectory)</p></td>
+<td><p>Append a state to the (right of the) trajectory to form a new trajectory.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#blackjax.mcmc.trajectory.reorder_trajectories" title="blackjax.mcmc.trajectory.reorder_trajectories"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reorder_trajectories</span></code></a>(→ tuple[Trajectory, Trajectory])</p></td>
+<td><p>Order the two trajectories depending on the direction.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.mcmc.trajectory.merge_trajectories" title="blackjax.mcmc.trajectory.merge_trajectories"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge_trajectories</span></code></a>(left_trajectory, right_trajectory)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#blackjax.mcmc.trajectory.static_integration" title="blackjax.mcmc.trajectory.static_integration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">static_integration</span></code></a>(→ Callable)</p></td>
+<td><p>Generate a trajectory by integrating several times in one direction.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.mcmc.trajectory.dynamic_progressive_integration" title="blackjax.mcmc.trajectory.dynamic_progressive_integration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dynamic_progressive_integration</span></code></a>(integrator, ...)</p></td>
+<td><p>Integrate a trajectory and update the proposal sequentially in one direction</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#blackjax.mcmc.trajectory.dynamic_recursive_integration" title="blackjax.mcmc.trajectory.dynamic_recursive_integration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dynamic_recursive_integration</span></code></a>(integrator, ...[, ...])</p></td>
+<td><p>Integrate a trajectory and update the proposal recursively in Python</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.mcmc.trajectory.dynamic_multiplicative_expansion" title="blackjax.mcmc.trajectory.dynamic_multiplicative_expansion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dynamic_multiplicative_expansion</span></code></a>(→ Callable)</p></td>
+<td><p>Sample a trajectory and update the proposal sequentially</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#blackjax.mcmc.trajectory.hmc_energy" title="blackjax.mcmc.trajectory.hmc_energy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hmc_energy</span></code></a>(kinetic_energy)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.Trajectory">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Trajectory</span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#Trajectory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.Trajectory" title="Link to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.Trajectory.leftmost_state">
+<span class="sig-name descname"><span class="pre">leftmost_state</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.mcmc.integrators.IntegratorState</span></em><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#Trajectory.leftmost_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.Trajectory.leftmost_state" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.Trajectory.rightmost_state">
+<span class="sig-name descname"><span class="pre">rightmost_state</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.mcmc.integrators.IntegratorState</span></em><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#Trajectory.rightmost_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.Trajectory.rightmost_state" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.Trajectory.momentum_sum">
+<span class="sig-name descname"><span class="pre">momentum_sum</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.ArrayTree</span></em><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#Trajectory.momentum_sum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.Trajectory.momentum_sum" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.Trajectory.num_states">
+<span class="sig-name descname"><span class="pre">num_states</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></em><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#Trajectory.num_states"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.Trajectory.num_states" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.append_to_trajectory">
+<span class="sig-name descname"><span class="pre">append_to_trajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#blackjax.mcmc.trajectory.Trajectory" title="blackjax.mcmc.trajectory.Trajectory"><span class="pre">Trajectory</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">blackjax.mcmc.integrators.IntegratorState</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#blackjax.mcmc.trajectory.Trajectory" title="blackjax.mcmc.trajectory.Trajectory"><span class="pre">Trajectory</span></a></span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#append_to_trajectory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.append_to_trajectory" title="Link to this definition">#</a></dt>
+<dd><p>Append a state to the (right of the) trajectory to form a new trajectory.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.reorder_trajectories">
+<span class="sig-name descname"><span class="pre">reorder_trajectories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">trajectory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#blackjax.mcmc.trajectory.Trajectory" title="blackjax.mcmc.trajectory.Trajectory"><span class="pre">Trajectory</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_trajectory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#blackjax.mcmc.trajectory.Trajectory" title="blackjax.mcmc.trajectory.Trajectory"><span class="pre">Trajectory</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#blackjax.mcmc.trajectory.Trajectory" title="blackjax.mcmc.trajectory.Trajectory"><span class="pre">Trajectory</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#blackjax.mcmc.trajectory.Trajectory" title="blackjax.mcmc.trajectory.Trajectory"><span class="pre">Trajectory</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#reorder_trajectories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.reorder_trajectories" title="Link to this definition">#</a></dt>
+<dd><p>Order the two trajectories depending on the direction.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.merge_trajectories">
+<span class="sig-name descname"><span class="pre">merge_trajectories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left_trajectory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#blackjax.mcmc.trajectory.Trajectory" title="blackjax.mcmc.trajectory.Trajectory"><span class="pre">Trajectory</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_trajectory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#blackjax.mcmc.trajectory.Trajectory" title="blackjax.mcmc.trajectory.Trajectory"><span class="pre">Trajectory</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#merge_trajectories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.merge_trajectories" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.static_integration">
+<span class="sig-name descname"><span class="pre">static_integration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">integrator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span></span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#static_integration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.static_integration" title="Link to this definition">#</a></dt>
+<dd><p>Generate a trajectory by integrating several times in one direction.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.DynamicIntegrationState">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DynamicIntegrationState</span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#DynamicIntegrationState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.DynamicIntegrationState" title="Link to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.DynamicIntegrationState.step">
+<span class="sig-name descname"><span class="pre">step</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></em><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#DynamicIntegrationState.step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.DynamicIntegrationState.step" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.DynamicIntegrationState.proposal">
+<span class="sig-name descname"><span class="pre">proposal</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../proposal/index.html#blackjax.mcmc.proposal.Proposal" title="blackjax.mcmc.proposal.Proposal"><span class="pre">blackjax.mcmc.proposal.Proposal</span></a></em><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#DynamicIntegrationState.proposal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.DynamicIntegrationState.proposal" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.DynamicIntegrationState.trajectory">
+<span class="sig-name descname"><span class="pre">trajectory</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#blackjax.mcmc.trajectory.Trajectory" title="blackjax.mcmc.trajectory.Trajectory"><span class="pre">Trajectory</span></a></em><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#DynamicIntegrationState.trajectory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.DynamicIntegrationState.trajectory" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.DynamicIntegrationState.termination_state">
+<span class="sig-name descname"><span class="pre">termination_state</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">NamedTuple</span></em><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#DynamicIntegrationState.termination_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.DynamicIntegrationState.termination_state" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.dynamic_progressive_integration">
+<span class="sig-name descname"><span class="pre">dynamic_progressive_integration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">integrator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kinetic_energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_termination_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_criterion_met</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">divergence_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#dynamic_progressive_integration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.dynamic_progressive_integration" title="Link to this definition">#</a></dt>
+<dd><p>Integrate a trajectory and update the proposal sequentially in one direction
+until the termination criterion is met.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>integrator</strong> – The symplectic integrator used to integrate the hamiltonian trajectory.</p></li>
+<li><p><strong>kinetic_energy</strong> – Function to compute the current value of the kinetic energy.</p></li>
+<li><p><strong>update_termination_state</strong> – Updates the state of the termination mechanism.</p></li>
+<li><p><strong>is_criterion_met</strong> – Determines whether the termination criterion has been met.</p></li>
+<li><p><strong>divergence_threshold</strong> – Value of the difference of energy between two consecutive states above
+which we say a transition is divergent.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.dynamic_recursive_integration">
+<span class="sig-name descname"><span class="pre">dynamic_recursive_integration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">integrator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kinetic_energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uturn_check_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">divergence_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_robust_uturn_check</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#dynamic_recursive_integration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.dynamic_recursive_integration" title="Link to this definition">#</a></dt>
+<dd><p>Integrate a trajectory and update the proposal recursively in Python
+until the termination criterion is met.</p>
+<p>This is the implementation of Algorithm 6 from <span id="id2">[<a class="reference internal" href="../../../../bib.html#id16" title="Matthew D Hoffman, Andrew Gelman, and others. The no-u-turn sampler: adaptively setting path lengths in hamiltonian monte carlo. J. Mach. Learn. Res., 15(1):1593–1623, 2014.">HG+14</a>]</span> with
+multinomial sampling. The implemenation here is mostly for validating the
+progressive implementation to make sure the two are equivalent. The recursive
+implementation should not be used for actually sampling as it cannot be jitted and
+thus likely slow.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>integrator</strong> – The symplectic integrator used to integrate the hamiltonian trajectory.</p></li>
+<li><p><strong>kinetic_energy</strong> – Function to compute the current value of the kinetic energy.</p></li>
+<li><p><strong>uturn_check_fn</strong> – Determines whether the termination criterion has been met.</p></li>
+<li><p><strong>divergence_threshold</strong> – Value of the difference of energy between two consecutive states above which we
+say a transition is divergent.</p></li>
+<li><p><strong>use_robust_uturn_check</strong> – Bool to indicate whether to perform additional U turn check between two
+trajectory.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.DynamicExpansionState">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DynamicExpansionState</span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#DynamicExpansionState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.DynamicExpansionState" title="Link to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.DynamicExpansionState.step">
+<span class="sig-name descname"><span class="pre">step</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></em><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#DynamicExpansionState.step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.DynamicExpansionState.step" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.DynamicExpansionState.proposal">
+<span class="sig-name descname"><span class="pre">proposal</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../proposal/index.html#blackjax.mcmc.proposal.Proposal" title="blackjax.mcmc.proposal.Proposal"><span class="pre">blackjax.mcmc.proposal.Proposal</span></a></em><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#DynamicExpansionState.proposal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.DynamicExpansionState.proposal" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.DynamicExpansionState.trajectory">
+<span class="sig-name descname"><span class="pre">trajectory</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#blackjax.mcmc.trajectory.Trajectory" title="blackjax.mcmc.trajectory.Trajectory"><span class="pre">Trajectory</span></a></em><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#DynamicExpansionState.trajectory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.DynamicExpansionState.trajectory" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.DynamicExpansionState.termination_state">
+<span class="sig-name descname"><span class="pre">termination_state</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">NamedTuple</span></em><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#DynamicExpansionState.termination_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.DynamicExpansionState.termination_state" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.dynamic_multiplicative_expansion">
+<span class="sig-name descname"><span class="pre">dynamic_multiplicative_expansion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectory_integrator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uturn_check_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_expansions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span></span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#dynamic_multiplicative_expansion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.dynamic_multiplicative_expansion" title="Link to this definition">#</a></dt>
+<dd><p>Sample a trajectory and update the proposal sequentially
+until the termination criterion is met.</p>
+<p>The trajectory is sampled with the following procedure:
+1. Pick a direction at random;
+2. Integrate <cite>num_step</cite> steps in this direction;
+3. If the integration has stopped prematurely, do not update the proposal;
+4. Else if the trajectory is performing a U-turn, return current proposal;
+5. Else update proposal, <cite>num_steps = num_steps ** rate</cite> and repeat from (1).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trajectory_integrator</strong> – A function that runs the symplectic integrators and returns a new proposal
+and the integrated trajectory.</p></li>
+<li><p><strong>uturn_check_fn</strong> – Function used to check the U-Turn criterion.</p></li>
+<li><p><strong>step_size</strong> – The step size used by the symplectic integrator.</p></li>
+<li><p><strong>max_num_expansions</strong> – The maximum number of trajectory expansions until the proposal is returned.</p></li>
+<li><p><strong>rate</strong> – The rate of the geometrical expansion. Typically 2 in NUTS, this is why
+the literature often refers to “tree doubling”.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.mcmc.trajectory.hmc_energy">
+<span class="sig-name descname"><span class="pre">hmc_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kinetic_energy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/trajectory.html#hmc_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.trajectory.hmc_energy" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../termination/index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">blackjax.mcmc.termination</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../../sgmcmc/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">blackjax.sgmcmc</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classes">Classes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module Contents</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.Trajectory"><code class="docutils literal notranslate"><span class="pre">Trajectory</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.Trajectory.leftmost_state"><code class="docutils literal notranslate"><span class="pre">Trajectory.leftmost_state</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.Trajectory.rightmost_state"><code class="docutils literal notranslate"><span class="pre">Trajectory.rightmost_state</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.Trajectory.momentum_sum"><code class="docutils literal notranslate"><span class="pre">Trajectory.momentum_sum</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.Trajectory.num_states"><code class="docutils literal notranslate"><span class="pre">Trajectory.num_states</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.append_to_trajectory"><code class="docutils literal notranslate"><span class="pre">append_to_trajectory()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.reorder_trajectories"><code class="docutils literal notranslate"><span class="pre">reorder_trajectories()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.merge_trajectories"><code class="docutils literal notranslate"><span class="pre">merge_trajectories()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.static_integration"><code class="docutils literal notranslate"><span class="pre">static_integration()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.DynamicIntegrationState"><code class="docutils literal notranslate"><span class="pre">DynamicIntegrationState</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.DynamicIntegrationState.step"><code class="docutils literal notranslate"><span class="pre">DynamicIntegrationState.step</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.DynamicIntegrationState.proposal"><code class="docutils literal notranslate"><span class="pre">DynamicIntegrationState.proposal</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.DynamicIntegrationState.trajectory"><code class="docutils literal notranslate"><span class="pre">DynamicIntegrationState.trajectory</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.DynamicIntegrationState.termination_state"><code class="docutils literal notranslate"><span class="pre">DynamicIntegrationState.termination_state</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.dynamic_progressive_integration"><code class="docutils literal notranslate"><span class="pre">dynamic_progressive_integration()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.dynamic_recursive_integration"><code class="docutils literal notranslate"><span class="pre">dynamic_recursive_integration()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.DynamicExpansionState"><code class="docutils literal notranslate"><span class="pre">DynamicExpansionState</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.DynamicExpansionState.step"><code class="docutils literal notranslate"><span class="pre">DynamicExpansionState.step</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.DynamicExpansionState.proposal"><code class="docutils literal notranslate"><span class="pre">DynamicExpansionState.proposal</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.DynamicExpansionState.trajectory"><code class="docutils literal notranslate"><span class="pre">DynamicExpansionState.trajectory</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.DynamicExpansionState.termination_state"><code class="docutils literal notranslate"><span class="pre">DynamicExpansionState.termination_state</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.dynamic_multiplicative_expansion"><code class="docutils literal notranslate"><span class="pre">dynamic_multiplicative_expansion()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.trajectory.hmc_energy"><code class="docutils literal notranslate"><span class="pre">hmc_energy()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By The Blackjax developers
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, The Blackjax developers.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

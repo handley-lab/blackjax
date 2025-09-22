@@ -1,0 +1,889 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>blackjax.mcmc.random_walk</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=e37d73aa" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'autoapi/blackjax/mcmc/random_walk/index';</script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="blackjax.mcmc.rmhmc" href="../rmhmc/index.html" />
+    <link rel="prev" title="blackjax.mcmc.proposal" href="../proposal/index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/blackjax.png" class="logo__image only-light" alt=" - Home"/>
+    <script>document.write(`<img src="../../../../_static/blackjax.png" class="logo__image only-dark" alt=" - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/quickstart.html">Quickstart</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">PPL INTEGRATION</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_aesara.html">Aesara</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_numpyro.html">Numpyro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_oryx.html">Oryx</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_pymc.html">PyMC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_tfp.html">Tensorflow-Probability</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">HOW TO</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_sample_multiple_chains.html">Sample with multiple chains?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_custom_gradients.html">Use custom gradients?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_other_frameworks.html">Use non-JAX log-prob functions?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_metropolis_within_gibbs.html">Build a Metropolis-Within-Gibbs sampler?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_reproduce_the_blackjax_image.html">Sample from the word BlackJAX using BlackJAX?</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">LEARN BY EXAMPLE</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference external" href="https://blackjax-devs.github.io/sampling-book">The Sampling Book</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">API Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../adaptation/index.html">blackjax.adaptation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/adjusted_mclmc_adaptation/index.html">blackjax.adaptation.adjusted_mclmc_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/base/index.html">blackjax.adaptation.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/chees_adaptation/index.html">blackjax.adaptation.chees_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/mass_matrix/index.html">blackjax.adaptation.mass_matrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/mclmc_adaptation/index.html">blackjax.adaptation.mclmc_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/meads_adaptation/index.html">blackjax.adaptation.meads_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/pathfinder_adaptation/index.html">blackjax.adaptation.pathfinder_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/step_size/index.html">blackjax.adaptation.step_size</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/window_adaptation/index.html">blackjax.adaptation.window_adaptation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../diagnostics/index.html">blackjax.diagnostics</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../index.html">blackjax.mcmc</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../adjusted_mclmc/index.html">blackjax.mcmc.adjusted_mclmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../adjusted_mclmc_dynamic/index.html">blackjax.mcmc.adjusted_mclmc_dynamic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../barker/index.html">blackjax.mcmc.barker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../diffusions/index.html">blackjax.mcmc.diffusions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dynamic_hmc/index.html">blackjax.mcmc.dynamic_hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elliptical_slice/index.html">blackjax.mcmc.elliptical_slice</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ghmc/index.html">blackjax.mcmc.ghmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hmc/index.html">blackjax.mcmc.hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../integrators/index.html">blackjax.mcmc.integrators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mala/index.html">blackjax.mcmc.mala</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../marginal_latent_gaussian/index.html">blackjax.mcmc.marginal_latent_gaussian</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mclmc/index.html">blackjax.mcmc.mclmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../metrics/index.html">blackjax.mcmc.metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../nuts/index.html">blackjax.mcmc.nuts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../periodic_orbital/index.html">blackjax.mcmc.periodic_orbital</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../proposal/index.html">blackjax.mcmc.proposal</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">blackjax.mcmc.random_walk</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rmhmc/index.html">blackjax.mcmc.rmhmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../termination/index.html">blackjax.mcmc.termination</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trajectory/index.html">blackjax.mcmc.trajectory</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../sgmcmc/index.html">blackjax.sgmcmc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../sgmcmc/csgld/index.html">blackjax.sgmcmc.csgld</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../sgmcmc/diffusions/index.html">blackjax.sgmcmc.diffusions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../sgmcmc/gradients/index.html">blackjax.sgmcmc.gradients</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../sgmcmc/sghmc/index.html">blackjax.sgmcmc.sghmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../sgmcmc/sgld/index.html">blackjax.sgmcmc.sgld</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../sgmcmc/sgnht/index.html">blackjax.sgmcmc.sgnht</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../smc/index.html">blackjax.smc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/adaptive_tempered/index.html">blackjax.smc.adaptive_tempered</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/base/index.html">blackjax.smc.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/ess/index.html">blackjax.smc.ess</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/from_mcmc/index.html">blackjax.smc.from_mcmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/inner_kernel_tuning/index.html">blackjax.smc.inner_kernel_tuning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/partial_posteriors_path/index.html">blackjax.smc.partial_posteriors_path</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/pretuning/index.html">blackjax.smc.pretuning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/resampling/index.html">blackjax.smc.resampling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/solver/index.html">blackjax.smc.solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/tempered/index.html">blackjax.smc.tempered</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../smc/tuning/index.html">blackjax.smc.tuning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../smc/tuning/from_kernel_info/index.html">blackjax.smc.tuning.from_kernel_info</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../smc/tuning/from_particles/index.html">blackjax.smc.tuning.from_particles</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/waste_free/index.html">blackjax.smc.waste_free</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../vi/index.html">blackjax.vi</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../vi/meanfield_vi/index.html">blackjax.vi.meanfield_vi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../vi/pathfinder/index.html">blackjax.vi.pathfinder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../vi/schrodinger_follmer/index.html">blackjax.vi.schrodinger_follmer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../vi/svgd/index.html">blackjax.vi.svgd</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../bib.html">Bibliography</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/blackjax-devs/blackjax" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>blackjax.mcmc.random_walk</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classes">Classes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module Contents</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.normal"><code class="docutils literal notranslate"><span class="pre">normal()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.RWState"><code class="docutils literal notranslate"><span class="pre">RWState</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.RWState.position"><code class="docutils literal notranslate"><span class="pre">RWState.position</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.RWState.logdensity"><code class="docutils literal notranslate"><span class="pre">RWState.logdensity</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.RWInfo"><code class="docutils literal notranslate"><span class="pre">RWInfo</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.RWInfo.acceptance_rate"><code class="docutils literal notranslate"><span class="pre">RWInfo.acceptance_rate</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.RWInfo.is_accepted"><code class="docutils literal notranslate"><span class="pre">RWInfo.is_accepted</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.RWInfo.proposal"><code class="docutils literal notranslate"><span class="pre">RWInfo.proposal</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.build_additive_step"><code class="docutils literal notranslate"><span class="pre">build_additive_step()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.normal_random_walk"><code class="docutils literal notranslate"><span class="pre">normal_random_walk()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.additive_step_random_walk"><code class="docutils literal notranslate"><span class="pre">additive_step_random_walk()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.build_irmh"><code class="docutils literal notranslate"><span class="pre">build_irmh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.irmh_as_top_level_api"><code class="docutils literal notranslate"><span class="pre">irmh_as_top_level_api()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.build_rmh"><code class="docutils literal notranslate"><span class="pre">build_rmh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.rmh_as_top_level_api"><code class="docutils literal notranslate"><span class="pre">rmh_as_top_level_api()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.build_rmh_transition_energy"><code class="docutils literal notranslate"><span class="pre">build_rmh_transition_energy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.rmh_proposal"><code class="docutils literal notranslate"><span class="pre">rmh_proposal()</span></code></a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-blackjax.mcmc.random_walk">
+<span id="blackjax-mcmc-random-walk"></span><h1>blackjax.mcmc.random_walk<a class="headerlink" href="#module-blackjax.mcmc.random_walk" title="Link to this heading">#</a></h1>
+<p>Implements the (basic) user interfaces for Random Walk Rosenbluth-Metropolis-Hastings kernels.
+Some interfaces are exposed here for convenience and for entry level users, who might be familiar
+with simpler versions of the algorithms, but in all cases they are particular instantiations
+of the Random Walk Rosenbluth-Metropolis-Hastings.</p>
+<p>Let’s note <span class="math notranslate nohighlight">\(x_{t-1}\)</span> to the previous position and <span class="math notranslate nohighlight">\(x_t\)</span> to the newly sampled one.</p>
+<p>The variants offered are:</p>
+<ol class="arabic">
+<li><p>Proposal distribution as addition of random noice from previous position. This means
+<span class="math notranslate nohighlight">\(x_t = x_{t-1} + step\)</span>.</p>
+<blockquote>
+<div><p>Function: <cite>additive_step</cite></p>
+</div></blockquote>
+</li>
+<li><p>Independent proposal distribution: <span class="math notranslate nohighlight">\(P(x_t)\)</span> doesn’t depend on <span class="math notranslate nohighlight">\(x_{t_1}\)</span>.</p>
+<blockquote>
+<div><p>Function: <cite>irmh</cite></p>
+</div></blockquote>
+</li>
+<li><p>Proposal distribution using a symmetric function. That means <span class="math notranslate nohighlight">\(P(x_t|x_{t-1}) = P(x_{t-1}|x_t)\)</span>.
+See ‘Metropolis Algorithm’ in [1].</p>
+<blockquote>
+<div><p>Function: <cite>rmh</cite> without proposal_logdensity_fn.</p>
+</div></blockquote>
+</li>
+<li><p>Asymmetric proposal distribution. See ‘Metropolis-Hastings’ Algorithm in [1].</p>
+<blockquote>
+<div><p>Function: <cite>rmh</cite> with proposal_logdensity_fn.</p>
+</div></blockquote>
+</li>
+</ol>
+<p>Reference: <span id="id1">[<a class="reference internal" href="../../../../bib.html#id42" title="Andrew Gelman, John B Carlin, Hal S Stern, and Donald B Rubin. Bayesian data analysis. Chapman and Hall/CRC, 2014.">GCSR14</a>]</span> Section 11.2</p>
+<p class="rubric">Examples</p>
+<p>The simplest case is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">random_walk</span> <span class="o">=</span> <span class="n">blackjax</span><span class="o">.</span><span class="n">additive_step_random_walk</span><span class="p">(</span><span class="n">logdensity_fn</span><span class="p">,</span> <span class="n">blackjax</span><span class="o">.</span><span class="n">mcmc</span><span class="o">.</span><span class="n">random_walk</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">sigma</span><span class="p">))</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">random_walk</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+<span class="n">new_state</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">random_walk</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In all cases we can JIT-compile the step function for better performance</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">step</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">random_walk</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
+<span class="n">new_state</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">step</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.mcmc.random_walk.RWState" title="blackjax.mcmc.random_walk.RWState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RWState</span></code></a></p></td>
+<td><p>State of the RW chain.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#blackjax.mcmc.random_walk.RWInfo" title="blackjax.mcmc.random_walk.RWInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RWInfo</span></code></a></p></td>
+<td><p>Additional information on the RW chain.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.mcmc.random_walk.normal" title="blackjax.mcmc.random_walk.normal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normal</span></code></a>(→ Callable)</p></td>
+<td><p>Normal Random Walk proposal.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#blackjax.mcmc.random_walk.build_additive_step" title="blackjax.mcmc.random_walk.build_additive_step"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_additive_step</span></code></a>()</p></td>
+<td><p>Build a Random Walk Rosenbluth-Metropolis-Hastings kernel</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.mcmc.random_walk.normal_random_walk" title="blackjax.mcmc.random_walk.normal_random_walk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normal_random_walk</span></code></a>(logdensity_fn, sigma)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#blackjax.mcmc.random_walk.additive_step_random_walk" title="blackjax.mcmc.random_walk.additive_step_random_walk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">additive_step_random_walk</span></code></a>(...)</p></td>
+<td><p>Implements the user interface for the Additive Step RMH</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.mcmc.random_walk.build_irmh" title="blackjax.mcmc.random_walk.build_irmh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_irmh</span></code></a>(→ Callable)</p></td>
+<td><p>Build an Independent Random Walk Rosenbluth-Metropolis-Hastings kernel. This implies</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#blackjax.mcmc.random_walk.irmh_as_top_level_api" title="blackjax.mcmc.random_walk.irmh_as_top_level_api"><code class="xref py py-obj docutils literal notranslate"><span class="pre">irmh_as_top_level_api</span></code></a>(→ blackjax.base.SamplingAlgorithm)</p></td>
+<td><p>Implements the (basic) user interface for the independent RMH.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.mcmc.random_walk.build_rmh" title="blackjax.mcmc.random_walk.build_rmh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_rmh</span></code></a>()</p></td>
+<td><p>Build a Rosenbluth-Metropolis-Hastings kernel.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#blackjax.mcmc.random_walk.rmh_as_top_level_api" title="blackjax.mcmc.random_walk.rmh_as_top_level_api"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rmh_as_top_level_api</span></code></a>(→ blackjax.base.SamplingAlgorithm)</p></td>
+<td><p>Implements the user interface for the RMH.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.mcmc.random_walk.build_rmh_transition_energy" title="blackjax.mcmc.random_walk.build_rmh_transition_energy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_rmh_transition_energy</span></code></a>(→ Callable)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#blackjax.mcmc.random_walk.rmh_proposal" title="blackjax.mcmc.random_walk.rmh_proposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rmh_proposal</span></code></a>(→ Callable)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.mcmc.random_walk.normal">
+<span class="sig-name descname"><span class="pre">normal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">blackjax.types.Array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span></span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/random_walk.html#normal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.random_walk.normal" title="Link to this definition">#</a></dt>
+<dd><p>Normal Random Walk proposal.</p>
+<p>Propose a new position such that its distance to the current position is
+normally distributed. Suitable for continuous variables.</p>
+<section id="parameter">
+<h3>Parameter<a class="headerlink" href="#parameter" title="Link to this heading">#</a></h3>
+<dl class="simple">
+<dt>sigma:</dt><dd><p>vector or matrix that contains the standard deviation of the centered
+normal distribution from which we draw the move proposals.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="blackjax.mcmc.random_walk.RWState">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RWState</span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/random_walk.html#RWState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.random_walk.RWState" title="Link to this definition">#</a></dt>
+<dd><p>State of the RW chain.</p>
+<dl class="simple">
+<dt>position</dt><dd><p>Current position of the chain.</p>
+</dd>
+<dt>log_density</dt><dd><p>Current value of the log-density</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.mcmc.random_walk.RWState.position">
+<span class="sig-name descname"><span class="pre">position</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.ArrayTree</span></em><a class="reference internal" href="../../../../_modules/blackjax/mcmc/random_walk.html#RWState.position"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.random_walk.RWState.position" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.mcmc.random_walk.RWState.logdensity">
+<span class="sig-name descname"><span class="pre">logdensity</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><a class="reference internal" href="../../../../_modules/blackjax/mcmc/random_walk.html#RWState.logdensity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.random_walk.RWState.logdensity" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="blackjax.mcmc.random_walk.RWInfo">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RWInfo</span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/random_walk.html#RWInfo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.random_walk.RWInfo" title="Link to this definition">#</a></dt>
+<dd><p>Additional information on the RW chain.</p>
+<p>This additional information can be used for debugging or computing
+diagnostics.</p>
+<dl class="simple">
+<dt>acceptance_rate</dt><dd><p>The acceptance probability of the transition, linked to the energy
+difference between the original and the proposed states.</p>
+</dd>
+<dt>is_accepted</dt><dd><p>Whether the proposed position was accepted or the original position
+was returned.</p>
+</dd>
+<dt>proposal</dt><dd><p>The state proposed by the proposal.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.mcmc.random_walk.RWInfo.acceptance_rate">
+<span class="sig-name descname"><span class="pre">acceptance_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><a class="reference internal" href="../../../../_modules/blackjax/mcmc/random_walk.html#RWInfo.acceptance_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.random_walk.RWInfo.acceptance_rate" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.mcmc.random_walk.RWInfo.is_accepted">
+<span class="sig-name descname"><span class="pre">is_accepted</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></em><a class="reference internal" href="../../../../_modules/blackjax/mcmc/random_walk.html#RWInfo.is_accepted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.random_walk.RWInfo.is_accepted" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.mcmc.random_walk.RWInfo.proposal">
+<span class="sig-name descname"><span class="pre">proposal</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#blackjax.mcmc.random_walk.RWState" title="blackjax.mcmc.random_walk.RWState"><span class="pre">RWState</span></a></em><a class="reference internal" href="../../../../_modules/blackjax/mcmc/random_walk.html#RWInfo.proposal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.random_walk.RWInfo.proposal" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.mcmc.random_walk.build_additive_step">
+<span class="sig-name descname"><span class="pre">build_additive_step</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/random_walk.html#build_additive_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.random_walk.build_additive_step" title="Link to this definition">#</a></dt>
+<dd><p>Build a Random Walk Rosenbluth-Metropolis-Hastings kernel</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>A kernel that takes a rng_key and a Pytree that contains the current state</em></p></li>
+<li><p><em>of the chain and that returns a new state of the chain along with</em></p></li>
+<li><p><em>information about the transition.</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.mcmc.random_walk.normal_random_walk">
+<span class="sig-name descname"><span class="pre">normal_random_walk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logdensity_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/random_walk.html#normal_random_walk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.random_walk.normal_random_walk" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logdensity_fn</strong> – The log density probability density function from which we wish to sample.</p></li>
+<li><p><strong>sigma</strong> – The value of the covariance matrix of the gaussian proposal distribution.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <code class="docutils literal notranslate"><span class="pre">SamplingAlgorithm</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.mcmc.random_walk.additive_step_random_walk">
+<span class="sig-name descname"><span class="pre">additive_step_random_walk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logdensity_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">blackjax.base.SamplingAlgorithm</span></span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/random_walk.html#additive_step_random_walk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.random_walk.additive_step_random_walk" title="Link to this definition">#</a></dt>
+<dd><p>Implements the user interface for the Additive Step RMH</p>
+<p class="rubric">Examples</p>
+<p>A new kernel can be initialized and used with the following code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rw</span> <span class="o">=</span> <span class="n">blackjax</span><span class="o">.</span><span class="n">additive_step_random_walk</span><span class="p">(</span><span class="n">logdensity_fn</span><span class="p">,</span> <span class="n">random_step</span><span class="p">)</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">rw</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+<span class="n">new_state</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">rw</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The specific case of a Gaussian <cite>random_step</cite> is already implemented, either with independent components
+when <cite>covariance_matrix</cite> is a one dimensional array or with dependent components if a two dimensional array:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rw_gaussian</span> <span class="o">=</span> <span class="n">blackjax</span><span class="o">.</span><span class="n">additive_step_random_walk</span><span class="o">.</span><span class="n">normal_random_walk</span><span class="p">(</span><span class="n">logdensity_fn</span><span class="p">,</span> <span class="n">covariance_matrix</span><span class="p">)</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">rw_gaussian</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+<span class="n">new_state</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">rw_gaussian</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logdensity_fn</strong> – The log density probability density function from which we wish to sample.</p></li>
+<li><p><strong>random_step</strong> – A Callable that takes a random number generator and the current state and produces a step,
+which will be added to the current position to obtain a new position. Must be symmetric
+to maintain detailed balance. This means that P(step|position) = P(-step | position+step)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <code class="docutils literal notranslate"><span class="pre">SamplingAlgorithm</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.mcmc.random_walk.build_irmh">
+<span class="sig-name descname"><span class="pre">build_irmh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span></span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/random_walk.html#build_irmh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.random_walk.build_irmh" title="Link to this definition">#</a></dt>
+<dd><p>Build an Independent Random Walk Rosenbluth-Metropolis-Hastings kernel. This implies
+that the proposal distribution does not depend on the particle being mutated <span id="id2">[<a class="reference internal" href="../../../../bib.html#id41" title="Guanyang Wang. Exact convergence analysis of the independent metropolis-hastings algorithms. Bernoulli, 28(3):2012–2033, 2022.">Wan22</a>]</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>A kernel that takes a rng_key and a Pytree that contains the current state</em></p></li>
+<li><p><em>of the chain and that returns a new state of the chain along with</em></p></li>
+<li><p><em>information about the transition.</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.mcmc.random_walk.irmh_as_top_level_api">
+<span class="sig-name descname"><span class="pre">irmh_as_top_level_api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logdensity_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal_distribution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal_logdensity_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">blackjax.base.SamplingAlgorithm</span></span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/random_walk.html#irmh_as_top_level_api"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.random_walk.irmh_as_top_level_api" title="Link to this definition">#</a></dt>
+<dd><p>Implements the (basic) user interface for the independent RMH.</p>
+<p class="rubric">Examples</p>
+<p>A new kernel can be initialized and used with the following code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rmh</span> <span class="o">=</span> <span class="n">blackjax</span><span class="o">.</span><span class="n">irmh</span><span class="p">(</span><span class="n">logdensity_fn</span><span class="p">,</span> <span class="n">proposal_distribution</span><span class="p">)</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">rmh</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+<span class="n">new_state</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">rmh</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We can JIT-compile the step function for better performance</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">step</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">rmh</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
+<span class="n">new_state</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">step</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logdensity_fn</strong> – The log density probability density function from which we wish to sample.</p></li>
+<li><p><strong>proposal_distribution</strong> – A Callable that takes a random number generator and produces a new proposal. The
+proposal is independent of the sampler’s current state.</p></li>
+<li><p><strong>proposal_logdensity_fn</strong> – For non-symmetric proposals, a function that returns the log-density
+to obtain a given proposal knowing the current state. If it is not
+provided we assume the proposal is symmetric.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <code class="docutils literal notranslate"><span class="pre">SamplingAlgorithm</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.mcmc.random_walk.build_rmh">
+<span class="sig-name descname"><span class="pre">build_rmh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/random_walk.html#build_rmh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.random_walk.build_rmh" title="Link to this definition">#</a></dt>
+<dd><p>Build a Rosenbluth-Metropolis-Hastings kernel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>A kernel that takes a rng_key and a Pytree that contains the current state</em></p></li>
+<li><p><em>of the chain and that returns a new state of the chain along with</em></p></li>
+<li><p><em>information about the transition.</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.mcmc.random_walk.rmh_as_top_level_api">
+<span class="sig-name descname"><span class="pre">rmh_as_top_level_api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logdensity_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal_generator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">blackjax.types.PRNGKey</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">blackjax.types.ArrayLikeTree</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">blackjax.types.ArrayTree</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal_logdensity_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">blackjax.types.ArrayLikeTree</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">blackjax.types.ArrayTree</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">blackjax.base.SamplingAlgorithm</span></span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/random_walk.html#rmh_as_top_level_api"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.random_walk.rmh_as_top_level_api" title="Link to this definition">#</a></dt>
+<dd><p>Implements the user interface for the RMH.</p>
+<p class="rubric">Examples</p>
+<p>A new kernel can be initialized and used with the following code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rmh</span> <span class="o">=</span> <span class="n">blackjax</span><span class="o">.</span><span class="n">rmh</span><span class="p">(</span><span class="n">logdensity_fn</span><span class="p">,</span> <span class="n">proposal_generator</span><span class="p">)</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">rmh</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+<span class="n">new_state</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">rmh</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We can JIT-compile the step function for better performance</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">step</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">rmh</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
+<span class="n">new_state</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">step</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logdensity_fn</strong> – The log density probability density function from which we wish to sample.</p></li>
+<li><p><strong>proposal_generator</strong> – A Callable that takes a random number generator and the current state and produces a new proposal.</p></li>
+<li><p><strong>proposal_logdensity_fn</strong> – <dl class="simple">
+<dt>The logdensity function associated to the proposal_generator. If the generator is non-symmetric,</dt><dd><p>P(x_t|x_t-1) is not equal to P(x_t-1|x_t), then this parameter must be not None in order to apply
+the Metropolis-Hastings correction for detailed balance.</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <code class="docutils literal notranslate"><span class="pre">SamplingAlgorithm</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.mcmc.random_walk.build_rmh_transition_energy">
+<span class="sig-name descname"><span class="pre">build_rmh_transition_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proposal_logdensity_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span></span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/random_walk.html#build_rmh_transition_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.random_walk.build_rmh_transition_energy" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.mcmc.random_walk.rmh_proposal">
+<span class="sig-name descname"><span class="pre">rmh_proposal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logdensity_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transition_distribution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_acceptance_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_proposal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">proposal.static_binomial_sampling</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span></span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/random_walk.html#rmh_proposal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.random_walk.rmh_proposal" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../proposal/index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">blackjax.mcmc.proposal</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../rmhmc/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">blackjax.mcmc.rmhmc</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classes">Classes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module Contents</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.normal"><code class="docutils literal notranslate"><span class="pre">normal()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.RWState"><code class="docutils literal notranslate"><span class="pre">RWState</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.RWState.position"><code class="docutils literal notranslate"><span class="pre">RWState.position</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.RWState.logdensity"><code class="docutils literal notranslate"><span class="pre">RWState.logdensity</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.RWInfo"><code class="docutils literal notranslate"><span class="pre">RWInfo</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.RWInfo.acceptance_rate"><code class="docutils literal notranslate"><span class="pre">RWInfo.acceptance_rate</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.RWInfo.is_accepted"><code class="docutils literal notranslate"><span class="pre">RWInfo.is_accepted</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.RWInfo.proposal"><code class="docutils literal notranslate"><span class="pre">RWInfo.proposal</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.build_additive_step"><code class="docutils literal notranslate"><span class="pre">build_additive_step()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.normal_random_walk"><code class="docutils literal notranslate"><span class="pre">normal_random_walk()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.additive_step_random_walk"><code class="docutils literal notranslate"><span class="pre">additive_step_random_walk()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.build_irmh"><code class="docutils literal notranslate"><span class="pre">build_irmh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.irmh_as_top_level_api"><code class="docutils literal notranslate"><span class="pre">irmh_as_top_level_api()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.build_rmh"><code class="docutils literal notranslate"><span class="pre">build_rmh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.rmh_as_top_level_api"><code class="docutils literal notranslate"><span class="pre">rmh_as_top_level_api()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.build_rmh_transition_energy"><code class="docutils literal notranslate"><span class="pre">build_rmh_transition_energy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.random_walk.rmh_proposal"><code class="docutils literal notranslate"><span class="pre">rmh_proposal()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By The Blackjax developers
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, The Blackjax developers.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

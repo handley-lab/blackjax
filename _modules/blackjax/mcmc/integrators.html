@@ -1,0 +1,1050 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>blackjax.mcmc.integrators</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=e37d73aa" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/blackjax/mcmc/integrators';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/blackjax.png" class="logo__image only-light" alt=" - Home"/>
+    <script>document.write(`<img src="../../../_static/blackjax.png" class="logo__image only-dark" alt=" - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/quickstart.html">Quickstart</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">PPL INTEGRATION</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_aesara.html">Aesara</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_numpyro.html">Numpyro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_oryx.html">Oryx</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_pymc.html">PyMC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_tfp.html">Tensorflow-Probability</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">HOW TO</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_sample_multiple_chains.html">Sample with multiple chains?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_custom_gradients.html">Use custom gradients?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_other_frameworks.html">Use non-JAX log-prob functions?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_metropolis_within_gibbs.html">Build a Metropolis-Within-Gibbs sampler?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_reproduce_the_blackjax_image.html">Sample from the word BlackJAX using BlackJAX?</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">LEARN BY EXAMPLE</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference external" href="https://blackjax-devs.github.io/sampling-book">The Sampling Book</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../autoapi/blackjax/index.html">API Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/index.html">blackjax.adaptation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/adjusted_mclmc_adaptation/index.html">blackjax.adaptation.adjusted_mclmc_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/base/index.html">blackjax.adaptation.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/chees_adaptation/index.html">blackjax.adaptation.chees_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/mass_matrix/index.html">blackjax.adaptation.mass_matrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/mclmc_adaptation/index.html">blackjax.adaptation.mclmc_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/meads_adaptation/index.html">blackjax.adaptation.meads_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/pathfinder_adaptation/index.html">blackjax.adaptation.pathfinder_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/step_size/index.html">blackjax.adaptation.step_size</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/window_adaptation/index.html">blackjax.adaptation.window_adaptation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../autoapi/blackjax/diagnostics/index.html">blackjax.diagnostics</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/index.html">blackjax.mcmc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/adjusted_mclmc/index.html">blackjax.mcmc.adjusted_mclmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/adjusted_mclmc_dynamic/index.html">blackjax.mcmc.adjusted_mclmc_dynamic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/barker/index.html">blackjax.mcmc.barker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/diffusions/index.html">blackjax.mcmc.diffusions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/dynamic_hmc/index.html">blackjax.mcmc.dynamic_hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/elliptical_slice/index.html">blackjax.mcmc.elliptical_slice</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/ghmc/index.html">blackjax.mcmc.ghmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/hmc/index.html">blackjax.mcmc.hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/integrators/index.html">blackjax.mcmc.integrators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/mala/index.html">blackjax.mcmc.mala</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/marginal_latent_gaussian/index.html">blackjax.mcmc.marginal_latent_gaussian</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/mclmc/index.html">blackjax.mcmc.mclmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/metrics/index.html">blackjax.mcmc.metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/nuts/index.html">blackjax.mcmc.nuts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/periodic_orbital/index.html">blackjax.mcmc.periodic_orbital</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/proposal/index.html">blackjax.mcmc.proposal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/random_walk/index.html">blackjax.mcmc.random_walk</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/rmhmc/index.html">blackjax.mcmc.rmhmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/termination/index.html">blackjax.mcmc.termination</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/trajectory/index.html">blackjax.mcmc.trajectory</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../autoapi/blackjax/sgmcmc/index.html">blackjax.sgmcmc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/sgmcmc/csgld/index.html">blackjax.sgmcmc.csgld</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/sgmcmc/diffusions/index.html">blackjax.sgmcmc.diffusions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/sgmcmc/gradients/index.html">blackjax.sgmcmc.gradients</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/sgmcmc/sghmc/index.html">blackjax.sgmcmc.sghmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/sgmcmc/sgld/index.html">blackjax.sgmcmc.sgld</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/sgmcmc/sgnht/index.html">blackjax.sgmcmc.sgnht</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../autoapi/blackjax/smc/index.html">blackjax.smc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/adaptive_tempered/index.html">blackjax.smc.adaptive_tempered</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/base/index.html">blackjax.smc.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/ess/index.html">blackjax.smc.ess</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/from_mcmc/index.html">blackjax.smc.from_mcmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/inner_kernel_tuning/index.html">blackjax.smc.inner_kernel_tuning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/partial_posteriors_path/index.html">blackjax.smc.partial_posteriors_path</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/pretuning/index.html">blackjax.smc.pretuning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/resampling/index.html">blackjax.smc.resampling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/solver/index.html">blackjax.smc.solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/tempered/index.html">blackjax.smc.tempered</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../autoapi/blackjax/smc/tuning/index.html">blackjax.smc.tuning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../autoapi/blackjax/smc/tuning/from_kernel_info/index.html">blackjax.smc.tuning.from_kernel_info</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../autoapi/blackjax/smc/tuning/from_particles/index.html">blackjax.smc.tuning.from_particles</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/waste_free/index.html">blackjax.smc.waste_free</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../autoapi/blackjax/vi/index.html">blackjax.vi</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/vi/meanfield_vi/index.html">blackjax.vi.meanfield_vi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/vi/pathfinder/index.html">blackjax.vi.pathfinder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/vi/schrodinger_follmer/index.html">blackjax.vi.schrodinger_follmer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/vi/svgd/index.html">blackjax.vi.svgd</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../bib.html">Bibliography</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/blackjax-devs/blackjax" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for blackjax.mcmc.integrators</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2020- The Blackjax Authors.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;Symplectic, time-reversible, integrators for Hamiltonian trajectories.&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jax.flatten_util</span><span class="w"> </span><span class="kn">import</span> <span class="n">ravel_pytree</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jax.random</span><span class="w"> </span><span class="kn">import</span> <span class="n">normal</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">blackjax.mcmc.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">KineticEnergy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blackjax.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArrayTree</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;mclachlan&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;omelyan&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;velocity_verlet&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;yoshida&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;with_isokinetic_maruyama&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;isokinetic_velocity_verlet&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;isokinetic_mclachlan&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;isokinetic_omelyan&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;isokinetic_yoshida&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;implicit_midpoint&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">IntegratorState</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;State of the trajectory integration.</span>
+
+<span class="sd">    We keep the gradient of the logdensity function (negative potential energy)</span>
+<span class="sd">    to speedup computations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">position</span><span class="p">:</span> <span class="n">ArrayTree</span>
+    <span class="n">momentum</span><span class="p">:</span> <span class="n">ArrayTree</span>
+    <span class="n">logdensity</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">logdensity_grad</span><span class="p">:</span> <span class="n">ArrayTree</span>
+
+
+<span class="n">Integrator</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">IntegratorState</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">IntegratorState</span><span class="p">]</span>
+<span class="n">GeneralIntegrator</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[</span>
+    <span class="p">[</span><span class="n">IntegratorState</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">IntegratorState</span><span class="p">,</span> <span class="n">ArrayTree</span><span class="p">]</span>
+<span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">generalized_two_stage_integrator</span><span class="p">(</span>
+    <span class="n">operator1</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">operator2</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">coefficients</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="n">format_output_fn</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generalized numerical integrator for solving ODEs.</span>
+
+<span class="sd">    The generalized integrator performs numerical integration of a ODE system by</span>
+<span class="sd">    alernating between stage 1 and stage 2 updates.</span>
+<span class="sd">    The update scheme is decided by the coefficients, The scheme should be palindromic,</span>
+<span class="sd">    i.e. the coefficients of the update scheme should be symmetric with respect to the</span>
+<span class="sd">    middle of the scheme.</span>
+
+<span class="sd">    For instance, for *any* differential equation of the form:</span>
+
+<span class="sd">    .. math:: \\frac{d}{dt}f = (O_1+O_2)f</span>
+
+<span class="sd">    The velocity_verlet operator can be seen as approximating :math:`e^{\\epsilon(O_1 + O_2)}`</span>
+<span class="sd">    by :math:`e^{\\epsilon O_1/2}e^{\\epsilon O_2}e^{\\epsilon O_1/2}`.</span>
+
+<span class="sd">    In a standard Hamiltonian, the forms of :math:`e^{\\epsilon O_2}` and</span>
+<span class="sd">    :math:`e^{\\epsilon O_1}` are simple, but for other differential equations,</span>
+<span class="sd">    they may be more complex.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    operator1</span>
+<span class="sd">        Stage 1 operator, a function that updates the momentum.</span>
+<span class="sd">    operator2</span>
+<span class="sd">        Stage 2 operator, a function that updates the position.</span>
+<span class="sd">    coefficients</span>
+<span class="sd">        Coefficients of the integrator.</span>
+<span class="sd">    format_output_fn</span>
+<span class="sd">        Function that formats the output of the integrator.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    integrator</span>
+<span class="sd">        Integrator function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">one_step</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">IntegratorState</span><span class="p">,</span> <span class="n">step_size</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="n">position</span><span class="p">,</span> <span class="n">momentum</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">logdensity_grad</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="c1"># auxiliary infomation generated during integration for diagnostics. It is</span>
+        <span class="c1"># updated by the operator1 and operator2 at each call.</span>
+        <span class="n">momentum_update_info</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">position_update_info</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">coef</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">coefficients</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">momentum</span><span class="p">,</span> <span class="n">kinetic_grad</span><span class="p">,</span> <span class="n">momentum_update_info</span> <span class="o">=</span> <span class="n">operator1</span><span class="p">(</span>
+                    <span class="n">momentum</span><span class="p">,</span>
+                    <span class="n">logdensity_grad</span><span class="p">,</span>
+                    <span class="n">step_size</span><span class="p">,</span>
+                    <span class="n">coef</span><span class="p">,</span>
+                    <span class="n">momentum_update_info</span><span class="p">,</span>
+                    <span class="n">is_last_call</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="p">(</span>
+                    <span class="n">position</span><span class="p">,</span>
+                    <span class="n">logdensity</span><span class="p">,</span>
+                    <span class="n">logdensity_grad</span><span class="p">,</span>
+                    <span class="n">position_update_info</span><span class="p">,</span>
+                <span class="p">)</span> <span class="o">=</span> <span class="n">operator2</span><span class="p">(</span>
+                    <span class="n">position</span><span class="p">,</span>
+                    <span class="n">kinetic_grad</span><span class="p">,</span>
+                    <span class="n">step_size</span><span class="p">,</span>
+                    <span class="n">coef</span><span class="p">,</span>
+                    <span class="n">position_update_info</span><span class="p">,</span>
+                <span class="p">)</span>
+        <span class="c1"># Separate the last steps to short circuit the computation of the kinetic_grad.</span>
+        <span class="n">momentum</span><span class="p">,</span> <span class="n">kinetic_grad</span><span class="p">,</span> <span class="n">momentum_update_info</span> <span class="o">=</span> <span class="n">operator1</span><span class="p">(</span>
+            <span class="n">momentum</span><span class="p">,</span>
+            <span class="n">logdensity_grad</span><span class="p">,</span>
+            <span class="n">step_size</span><span class="p">,</span>
+            <span class="n">coefficients</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">momentum_update_info</span><span class="p">,</span>
+            <span class="n">is_last_call</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">format_output_fn</span><span class="p">(</span>
+            <span class="n">position</span><span class="p">,</span>
+            <span class="n">momentum</span><span class="p">,</span>
+            <span class="n">logdensity</span><span class="p">,</span>
+            <span class="n">logdensity_grad</span><span class="p">,</span>
+            <span class="n">kinetic_grad</span><span class="p">,</span>
+            <span class="n">position_update_info</span><span class="p">,</span>
+            <span class="n">momentum_update_info</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">one_step</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">new_integrator_state</span><span class="p">(</span><span class="n">logdensity_fn</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">momentum</span><span class="p">):</span>
+    <span class="n">logdensity</span><span class="p">,</span> <span class="n">logdensity_grad</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">value_and_grad</span><span class="p">(</span><span class="n">logdensity_fn</span><span class="p">)(</span><span class="n">position</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">IntegratorState</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">momentum</span><span class="p">,</span> <span class="n">logdensity</span><span class="p">,</span> <span class="n">logdensity_grad</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">euclidean_position_update_fn</span><span class="p">(</span><span class="n">logdensity_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+    <span class="n">logdensity_and_grad_fn</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">value_and_grad</span><span class="p">(</span><span class="n">logdensity_fn</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span>
+        <span class="n">position</span><span class="p">:</span> <span class="n">ArrayTree</span><span class="p">,</span>
+        <span class="n">kinetic_grad</span><span class="p">:</span> <span class="n">ArrayTree</span><span class="p">,</span>
+        <span class="n">step_size</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">coef</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">auxiliary_info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">del</span> <span class="n">auxiliary_info</span>
+        <span class="n">new_position</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">grad</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">step_size</span> <span class="o">*</span> <span class="n">coef</span> <span class="o">*</span> <span class="n">grad</span><span class="p">,</span>
+            <span class="n">position</span><span class="p">,</span>
+            <span class="n">kinetic_grad</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">logdensity</span><span class="p">,</span> <span class="n">logdensity_grad</span> <span class="o">=</span> <span class="n">logdensity_and_grad_fn</span><span class="p">(</span><span class="n">new_position</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_position</span><span class="p">,</span> <span class="n">logdensity</span><span class="p">,</span> <span class="n">logdensity_grad</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">update</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">euclidean_momentum_update_fn</span><span class="p">(</span><span class="n">kinetic_energy_fn</span><span class="p">:</span> <span class="n">KineticEnergy</span><span class="p">):</span>
+    <span class="n">kinetic_energy_grad_fn</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">kinetic_energy_fn</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span>
+        <span class="n">momentum</span><span class="p">:</span> <span class="n">ArrayTree</span><span class="p">,</span>
+        <span class="n">logdensity_grad</span><span class="p">:</span> <span class="n">ArrayTree</span><span class="p">,</span>
+        <span class="n">step_size</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">coef</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">auxiliary_info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">is_last_call</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">del</span> <span class="n">auxiliary_info</span>
+        <span class="n">new_momentum</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">grad</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">step_size</span> <span class="o">*</span> <span class="n">coef</span> <span class="o">*</span> <span class="n">grad</span><span class="p">,</span>
+            <span class="n">momentum</span><span class="p">,</span>
+            <span class="n">logdensity_grad</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_last_call</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">new_momentum</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">kinetic_grad</span> <span class="o">=</span> <span class="n">kinetic_energy_grad_fn</span><span class="p">(</span><span class="n">new_momentum</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_momentum</span><span class="p">,</span> <span class="n">kinetic_grad</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">update</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">format_euclidean_state_output</span><span class="p">(</span>
+    <span class="n">position</span><span class="p">,</span>
+    <span class="n">momentum</span><span class="p">,</span>
+    <span class="n">logdensity</span><span class="p">,</span>
+    <span class="n">logdensity_grad</span><span class="p">,</span>
+    <span class="n">kinetic_grad</span><span class="p">,</span>
+    <span class="n">position_update_info</span><span class="p">,</span>
+    <span class="n">momentum_update_info</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="k">del</span> <span class="n">kinetic_grad</span><span class="p">,</span> <span class="n">position_update_info</span><span class="p">,</span> <span class="n">momentum_update_info</span>
+    <span class="k">return</span> <span class="n">IntegratorState</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">momentum</span><span class="p">,</span> <span class="n">logdensity</span><span class="p">,</span> <span class="n">logdensity_grad</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_euclidean_integrator</span><span class="p">(</span><span class="n">coefficients</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate symplectic integrator for solving a Hamiltonian system.</span>
+
+<span class="sd">    The resulting integrator is volume-preserve and preserves the symplectic structure</span>
+<span class="sd">    of phase space.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">euclidean_integrator</span><span class="p">(</span>
+        <span class="n">logdensity_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">kinetic_energy_fn</span><span class="p">:</span> <span class="n">KineticEnergy</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Integrator</span><span class="p">:</span>
+        <span class="n">position_update_fn</span> <span class="o">=</span> <span class="n">euclidean_position_update_fn</span><span class="p">(</span><span class="n">logdensity_fn</span><span class="p">)</span>
+        <span class="n">momentum_update_fn</span> <span class="o">=</span> <span class="n">euclidean_momentum_update_fn</span><span class="p">(</span><span class="n">kinetic_energy_fn</span><span class="p">)</span>
+        <span class="n">one_step</span> <span class="o">=</span> <span class="n">generalized_two_stage_integrator</span><span class="p">(</span>
+            <span class="n">momentum_update_fn</span><span class="p">,</span>
+            <span class="n">position_update_fn</span><span class="p">,</span>
+            <span class="n">coefficients</span><span class="p">,</span>
+            <span class="n">format_output_fn</span><span class="o">=</span><span class="n">format_euclidean_state_output</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">one_step</span>
+
+    <span class="k">return</span> <span class="n">euclidean_integrator</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The velocity Verlet (or Verlet-Störmer) integrator.</span>
+
+<span class="sd">The velocity Verlet is a two-stage palindromic integrator :cite:p:`bou2018geometric`</span>
+<span class="sd">of the form (a1, b1, a2, b1, a1) with a1 = 0. It is numerically stable for values of</span>
+<span class="sd">the step size that range between 0 and 2 (when the mass matrix is the identity).</span>
+
+<span class="sd">While the position (a1 = 0.5) and velocity Verlet are the most commonly used</span>
+<span class="sd">in samplers, it is known in the numerical computation literature that the value</span>
+<span class="sd">$a1 \approx 0.1932$ leads to a lower integration error :cite:p:`mclachlan1995numerical,schlick2010molecular`.</span>
+<span class="sd">The authors of :cite:p:`bou2018geometric` show that the value $a1 \approx 0.21132$</span>
+<span class="sd">leads to an even higher step acceptance rate, up to 3 times higher</span>
+<span class="sd">than with the standard position verlet (p.22, Fig.4).</span>
+
+<span class="sd">By choosing the velocity verlet we avoid two computations of the gradient</span>
+<span class="sd">of the kinetic energy. We are trading accuracy in exchange, and it is not</span>
+<span class="sd">clear whether this is the right tradeoff.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">velocity_verlet_coefficients</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
+<div class="viewcode-block" id="velocity_verlet">
+<a class="viewcode-back" href="../../../autoapi/blackjax/mcmc/integrators/index.html#blackjax.mcmc.integrators.velocity_verlet">[docs]</a>
+<span class="n">velocity_verlet</span> <span class="o">=</span> <span class="n">generate_euclidean_integrator</span><span class="p">(</span><span class="n">velocity_verlet_coefficients</span><span class="p">)</span></div>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Two-stage palindromic symplectic integrator derived in :cite:p:`blanes2014numerical`.</span>
+
+<span class="sd">The integrator is of the form (b1, a1, b2, a1, b1). The choice of the parameters</span>
+<span class="sd">determine both the bound on the integration error and the stability of the</span>
+<span class="sd">method with respect to the value of `step_size`. The values used here are</span>
+<span class="sd">the ones derived in :cite:p:`mclachlan1995numerical`; note that :cite:p:`blanes2014numerical`</span>
+<span class="sd">is more focused on stability and derives different values.</span>
+
+<span class="sd">Also known as the minimal norm integrator.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">b1</span> <span class="o">=</span> <span class="mf">0.1931833275037836</span>
+<span class="n">a1</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">b2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">b1</span>
+<span class="n">mclachlan_coefficients</span> <span class="o">=</span> <span class="p">[</span><span class="n">b1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">]</span>
+<div class="viewcode-block" id="mclachlan">
+<a class="viewcode-back" href="../../../autoapi/blackjax/mcmc/integrators/index.html#blackjax.mcmc.integrators.mclachlan">[docs]</a>
+<span class="n">mclachlan</span> <span class="o">=</span> <span class="n">generate_euclidean_integrator</span><span class="p">(</span><span class="n">mclachlan_coefficients</span><span class="p">)</span></div>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Three stages palindromic symplectic integrator derived in :cite:p:`mclachlan1995numerical`</span>
+
+<span class="sd">The integrator is of the form (b1, a1, b2, a2, b2, a1, b1). The choice of</span>
+<span class="sd">the parameters determine both the bound on the integration error and the</span>
+<span class="sd">stability of the method with respect to the value of `step_size`. The</span>
+<span class="sd">values used here are the ones derived in :cite:p:`mclachlan1995numerical` which</span>
+<span class="sd">guarantees a stability interval length approximately equal to 4.67.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">b1</span> <span class="o">=</span> <span class="mf">0.11888010966548</span>
+<span class="n">a1</span> <span class="o">=</span> <span class="mf">0.29619504261126</span>
+<span class="n">b2</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">-</span> <span class="n">b1</span>
+<span class="n">a2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">a1</span>
+<span class="n">yoshida_coefficients</span> <span class="o">=</span> <span class="p">[</span><span class="n">b1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">]</span>
+<div class="viewcode-block" id="yoshida">
+<a class="viewcode-back" href="../../../autoapi/blackjax/mcmc/integrators/index.html#blackjax.mcmc.integrators.yoshida">[docs]</a>
+<span class="n">yoshida</span> <span class="o">=</span> <span class="n">generate_euclidean_integrator</span><span class="p">(</span><span class="n">yoshida_coefficients</span><span class="p">)</span></div>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Eleven-stage palindromic symplectic integrator derived in :cite:p:`omelyan2003symplectic`.</span>
+
+<span class="sd">Popular in LQCD, see also :cite:p:`takaishi2006testing`.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">b1</span> <span class="o">=</span> <span class="mf">0.08398315262876693</span>
+<span class="n">a1</span> <span class="o">=</span> <span class="mf">0.2539785108410595</span>
+<span class="n">b2</span> <span class="o">=</span> <span class="mf">0.6822365335719091</span>
+<span class="n">a2</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.03230286765269967</span>
+<span class="n">b3</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">-</span> <span class="n">b1</span> <span class="o">-</span> <span class="n">b2</span>
+<span class="n">a3</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">a1</span> <span class="o">+</span> <span class="n">a2</span><span class="p">)</span>
+<span class="n">omelyan_coefficients</span> <span class="o">=</span> <span class="p">[</span><span class="n">b1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b3</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">b3</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">]</span>
+<div class="viewcode-block" id="omelyan">
+<a class="viewcode-back" href="../../../autoapi/blackjax/mcmc/integrators/index.html#blackjax.mcmc.integrators.omelyan">[docs]</a>
+<span class="n">omelyan</span> <span class="o">=</span> <span class="n">generate_euclidean_integrator</span><span class="p">(</span><span class="n">omelyan_coefficients</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># Intergrators with non Euclidean updates</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_normalized_flatten_array</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-13</span><span class="p">):</span>
+    <span class="n">norm</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">norm</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">,</span> <span class="n">x</span> <span class="o">/</span> <span class="n">norm</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">norm</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">esh_dynamics_momentum_update_one_step</span><span class="p">(</span><span class="n">inverse_mass_matrix</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="n">sqrt_inverse_mass_matrix</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">inverse_mass_matrix</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span>
+        <span class="n">momentum</span><span class="p">:</span> <span class="n">ArrayTree</span><span class="p">,</span>
+        <span class="n">logdensity_grad</span><span class="p">:</span> <span class="n">ArrayTree</span><span class="p">,</span>
+        <span class="n">step_size</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">coef</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">previous_kinetic_energy_change</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">is_last_call</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Momentum update based on Esh dynamics.</span>
+
+<span class="sd">        The momentum updating map of the esh dynamics as derived in :cite:p:`steeg2021hamiltonian`</span>
+<span class="sd">        There are no exponentials e^delta, which prevents overflows when the gradient norm</span>
+<span class="sd">        is large.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">del</span> <span class="n">is_last_call</span>
+
+        <span class="n">logdensity_grad</span> <span class="o">=</span> <span class="n">logdensity_grad</span>
+        <span class="n">flatten_grads</span><span class="p">,</span> <span class="n">unravel_fn</span> <span class="o">=</span> <span class="n">ravel_pytree</span><span class="p">(</span><span class="n">logdensity_grad</span><span class="p">)</span>
+        <span class="n">flatten_grads</span> <span class="o">=</span> <span class="n">flatten_grads</span> <span class="o">*</span> <span class="n">sqrt_inverse_mass_matrix</span>
+        <span class="n">flatten_momentum</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ravel_pytree</span><span class="p">(</span><span class="n">momentum</span><span class="p">)</span>
+        <span class="n">dims</span> <span class="o">=</span> <span class="n">flatten_momentum</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">normalized_gradient</span><span class="p">,</span> <span class="n">gradient_norm</span> <span class="o">=</span> <span class="n">_normalized_flatten_array</span><span class="p">(</span><span class="n">flatten_grads</span><span class="p">)</span>
+        <span class="n">momentum_proj</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">flatten_momentum</span><span class="p">,</span> <span class="n">normalized_gradient</span><span class="p">)</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">step_size</span> <span class="o">*</span> <span class="n">coef</span> <span class="o">*</span> <span class="n">gradient_norm</span> <span class="o">/</span> <span class="p">(</span><span class="n">dims</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">zeta</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">delta</span><span class="p">)</span>
+        <span class="n">new_momentum_raw</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">normalized_gradient</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">zeta</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">zeta</span> <span class="o">+</span> <span class="n">momentum_proj</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">zeta</span><span class="p">))</span>
+            <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">zeta</span> <span class="o">*</span> <span class="n">flatten_momentum</span>
+        <span class="p">)</span>
+        <span class="n">new_momentum_normalized</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_normalized_flatten_array</span><span class="p">(</span><span class="n">new_momentum_raw</span><span class="p">)</span>
+        <span class="n">gr</span> <span class="o">=</span> <span class="n">unravel_fn</span><span class="p">(</span><span class="n">new_momentum_normalized</span> <span class="o">*</span> <span class="n">sqrt_inverse_mass_matrix</span><span class="p">)</span>
+        <span class="n">next_momentum</span> <span class="o">=</span> <span class="n">unravel_fn</span><span class="p">(</span><span class="n">new_momentum_normalized</span><span class="p">)</span>
+        <span class="n">kinetic_energy_change</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">delta</span>
+            <span class="o">-</span> <span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">momentum_proj</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">momentum_proj</span><span class="p">)</span> <span class="o">*</span> <span class="n">zeta</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">dims</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">previous_kinetic_energy_change</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kinetic_energy_change</span> <span class="o">+=</span> <span class="n">previous_kinetic_energy_change</span>
+        <span class="k">return</span> <span class="n">next_momentum</span><span class="p">,</span> <span class="n">gr</span><span class="p">,</span> <span class="n">kinetic_energy_change</span>
+
+    <span class="k">return</span> <span class="n">update</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">format_isokinetic_state_output</span><span class="p">(</span>
+    <span class="n">position</span><span class="p">,</span>
+    <span class="n">momentum</span><span class="p">,</span>
+    <span class="n">logdensity</span><span class="p">,</span>
+    <span class="n">logdensity_grad</span><span class="p">,</span>
+    <span class="n">kinetic_grad</span><span class="p">,</span>
+    <span class="n">position_update_info</span><span class="p">,</span>
+    <span class="n">momentum_update_info</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="k">del</span> <span class="n">kinetic_grad</span><span class="p">,</span> <span class="n">position_update_info</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">IntegratorState</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">momentum</span><span class="p">,</span> <span class="n">logdensity</span><span class="p">,</span> <span class="n">logdensity_grad</span><span class="p">),</span>
+        <span class="n">momentum_update_info</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_isokinetic_integrator</span><span class="p">(</span><span class="n">coefficients</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isokinetic_integrator</span><span class="p">(</span>
+        <span class="n">logdensity_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">inverse_mass_matrix</span><span class="p">:</span> <span class="n">ArrayTree</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GeneralIntegrator</span><span class="p">:</span>
+        <span class="n">position_update_fn</span> <span class="o">=</span> <span class="n">euclidean_position_update_fn</span><span class="p">(</span><span class="n">logdensity_fn</span><span class="p">)</span>
+        <span class="n">one_step</span> <span class="o">=</span> <span class="n">generalized_two_stage_integrator</span><span class="p">(</span>
+            <span class="n">esh_dynamics_momentum_update_one_step</span><span class="p">(</span><span class="n">inverse_mass_matrix</span><span class="p">),</span>
+            <span class="n">position_update_fn</span><span class="p">,</span>
+            <span class="n">coefficients</span><span class="p">,</span>
+            <span class="n">format_output_fn</span><span class="o">=</span><span class="n">format_isokinetic_state_output</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">one_step</span>
+
+    <span class="k">return</span> <span class="n">isokinetic_integrator</span>
+
+
+<div class="viewcode-block" id="isokinetic_velocity_verlet">
+<a class="viewcode-back" href="../../../autoapi/blackjax/mcmc/integrators/index.html#blackjax.mcmc.integrators.isokinetic_velocity_verlet">[docs]</a>
+<span class="n">isokinetic_velocity_verlet</span> <span class="o">=</span> <span class="n">generate_isokinetic_integrator</span><span class="p">(</span>
+    <span class="n">velocity_verlet_coefficients</span>
+<span class="p">)</span></div>
+
+<div class="viewcode-block" id="isokinetic_yoshida">
+<a class="viewcode-back" href="../../../autoapi/blackjax/mcmc/integrators/index.html#blackjax.mcmc.integrators.isokinetic_yoshida">[docs]</a>
+<span class="n">isokinetic_yoshida</span> <span class="o">=</span> <span class="n">generate_isokinetic_integrator</span><span class="p">(</span><span class="n">yoshida_coefficients</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="isokinetic_mclachlan">
+<a class="viewcode-back" href="../../../autoapi/blackjax/mcmc/integrators/index.html#blackjax.mcmc.integrators.isokinetic_mclachlan">[docs]</a>
+<span class="n">isokinetic_mclachlan</span> <span class="o">=</span> <span class="n">generate_isokinetic_integrator</span><span class="p">(</span><span class="n">mclachlan_coefficients</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="isokinetic_omelyan">
+<a class="viewcode-back" href="../../../autoapi/blackjax/mcmc/integrators/index.html#blackjax.mcmc.integrators.isokinetic_omelyan">[docs]</a>
+<span class="n">isokinetic_omelyan</span> <span class="o">=</span> <span class="n">generate_isokinetic_integrator</span><span class="p">(</span><span class="n">omelyan_coefficients</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">partially_refresh_momentum</span><span class="p">(</span><span class="n">momentum</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">,</span> <span class="n">step_size</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds a small noise to momentum and normalizes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rng_key</span>
+<span class="sd">        The pseudo-random number generator key used to generate random numbers.</span>
+<span class="sd">    momentum</span>
+<span class="sd">        PyTree that the structure the output should to match.</span>
+<span class="sd">    step_size</span>
+<span class="sd">        Step size</span>
+<span class="sd">    L</span>
+<span class="sd">        controls rate of momentum change</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    momentum with random change in angle</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">m</span><span class="p">,</span> <span class="n">unravel_fn</span> <span class="o">=</span> <span class="n">ravel_pytree</span><span class="p">(</span><span class="n">momentum</span><span class="p">)</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">nu</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">step_size</span> <span class="o">/</span> <span class="n">L</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">/</span> <span class="n">dim</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">nu</span> <span class="o">*</span> <span class="n">normal</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">new_momentum</span> <span class="o">=</span> <span class="n">unravel_fn</span><span class="p">((</span><span class="n">m</span> <span class="o">+</span> <span class="n">z</span><span class="p">)</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="n">z</span><span class="p">))</span>
+    <span class="c1"># return new_momentum</span>
+    <span class="k">return</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">cond</span><span class="p">(</span>
+        <span class="n">jnp</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">L</span><span class="p">),</span>
+        <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">momentum</span><span class="p">,</span>
+        <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">new_momentum</span><span class="p">,</span>
+        <span class="n">operand</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="with_isokinetic_maruyama">
+<a class="viewcode-back" href="../../../autoapi/blackjax/mcmc/integrators/index.html#blackjax.mcmc.integrators.with_isokinetic_maruyama">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">with_isokinetic_maruyama</span><span class="p">(</span><span class="n">integrator</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stochastic_integrator</span><span class="p">(</span><span class="n">init_state</span><span class="p">,</span> <span class="n">step_size</span><span class="p">,</span> <span class="n">L_proposal</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">):</span>
+        <span class="n">key1</span><span class="p">,</span> <span class="n">key2</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rng_key</span><span class="p">)</span>
+        <span class="c1"># partial refreshment</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">init_state</span><span class="o">.</span><span class="n">_replace</span><span class="p">(</span>
+            <span class="n">momentum</span><span class="o">=</span><span class="n">partially_refresh_momentum</span><span class="p">(</span>
+                <span class="n">momentum</span><span class="o">=</span><span class="n">init_state</span><span class="o">.</span><span class="n">momentum</span><span class="p">,</span>
+                <span class="n">rng_key</span><span class="o">=</span><span class="n">key1</span><span class="p">,</span>
+                <span class="n">L</span><span class="o">=</span><span class="n">L_proposal</span><span class="p">,</span>
+                <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="c1"># one step of the deterministic dynamics</span>
+        <span class="n">state</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">integrator</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">step_size</span><span class="p">)</span>
+
+        <span class="c1"># partial refreshment</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">_replace</span><span class="p">(</span>
+            <span class="n">momentum</span><span class="o">=</span><span class="n">partially_refresh_momentum</span><span class="p">(</span>
+                <span class="n">momentum</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">momentum</span><span class="p">,</span>
+                <span class="n">rng_key</span><span class="o">=</span><span class="n">key2</span><span class="p">,</span>
+                <span class="n">L</span><span class="o">=</span><span class="n">L_proposal</span><span class="p">,</span>
+                <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">state</span><span class="p">,</span> <span class="n">info</span>
+
+    <span class="k">return</span> <span class="n">stochastic_integrator</span></div>
+
+
+
+<span class="n">FixedPointSolver</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[</span>
+    <span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">ArrayTree</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ArrayTree</span><span class="p">,</span> <span class="n">ArrayTree</span><span class="p">]],</span> <span class="n">ArrayTree</span><span class="p">],</span>
+    <span class="n">Tuple</span><span class="p">[</span><span class="n">ArrayTree</span><span class="p">,</span> <span class="n">ArrayTree</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+<span class="p">]</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">FixedPointIterationInfo</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="n">success</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">norm</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">iters</span><span class="p">:</span> <span class="nb">int</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_fixed_point_iteration</span><span class="p">(</span>
+    <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ArrayTree</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ArrayTree</span><span class="p">,</span> <span class="n">ArrayTree</span><span class="p">]],</span>
+    <span class="n">x0</span><span class="p">:</span> <span class="n">ArrayTree</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">convergence_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
+    <span class="n">divergence_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e10</span><span class="p">,</span>
+    <span class="n">max_iters</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="n">norm_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ArrayTree</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ArrayTree</span><span class="p">,</span> <span class="n">ArrayTree</span><span class="p">,</span> <span class="n">FixedPointIterationInfo</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Solve for x = func(x) using a fixed point iteration&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_norm</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">ArrayTree</span><span class="p">,</span> <span class="n">xp</span><span class="p">:</span> <span class="n">ArrayTree</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">norm_fn</span><span class="p">(</span><span class="n">ravel_pytree</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">subtract</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">xp</span><span class="p">))[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">cond_fn</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">ArrayTree</span><span class="p">,</span> <span class="n">ArrayTree</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">n</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="n">max_iters</span><span class="p">)</span>
+            <span class="o">&amp;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">norm</span><span class="p">)</span>
+            <span class="o">&amp;</span> <span class="p">(</span><span class="n">norm</span> <span class="o">&lt;</span> <span class="n">divergence_tol</span><span class="p">)</span>
+            <span class="o">&amp;</span> <span class="p">(</span><span class="n">norm</span> <span class="o">&gt;</span> <span class="n">convergence_tol</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">body_fn</span><span class="p">(</span>
+        <span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">ArrayTree</span><span class="p">,</span> <span class="n">ArrayTree</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">ArrayTree</span><span class="p">,</span> <span class="n">ArrayTree</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+        <span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="n">xn</span><span class="p">,</span> <span class="n">aux</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">norm</span> <span class="o">=</span> <span class="n">compute_norm</span><span class="p">(</span><span class="n">xn</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">xn</span><span class="p">,</span> <span class="n">aux</span><span class="p">,</span> <span class="n">norm</span>
+
+    <span class="n">x</span><span class="p">,</span> <span class="n">aux</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+    <span class="n">iters</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">aux</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">while_loop</span><span class="p">(</span>
+        <span class="n">cond_fn</span><span class="p">,</span> <span class="n">body_fn</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">aux</span><span class="p">,</span> <span class="n">compute_norm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x0</span><span class="p">))</span>
+    <span class="p">)</span>
+    <span class="n">success</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">norm</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">norm</span> <span class="o">&lt;=</span> <span class="n">convergence_tol</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">aux</span><span class="p">,</span> <span class="n">FixedPointIterationInfo</span><span class="p">(</span><span class="n">success</span><span class="p">,</span> <span class="n">norm</span><span class="p">,</span> <span class="n">iters</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="implicit_midpoint">
+<a class="viewcode-back" href="../../../autoapi/blackjax/mcmc/integrators/index.html#blackjax.mcmc.integrators.implicit_midpoint">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">implicit_midpoint</span><span class="p">(</span>
+    <span class="n">logdensity_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">kinetic_energy_fn</span><span class="p">:</span> <span class="n">KineticEnergy</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">solver</span><span class="p">:</span> <span class="n">FixedPointSolver</span> <span class="o">=</span> <span class="n">solve_fixed_point_iteration</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">solver_kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Integrator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The implicit midpoint integrator with support for non-stationary kinetic energy</span>
+
+<span class="sd">    This is an integrator based on :cite:t:`brofos2021evaluating`, which provides</span>
+<span class="sd">    support for kinetic energies that depend on position. This integrator requires that</span>
+<span class="sd">    the kinetic energy function takes two arguments: position and momentum.</span>
+
+<span class="sd">    The ``solver`` parameter allows overloading of the fixed point solver. By default, a</span>
+<span class="sd">    simple fixed point iteration is used, but more advanced solvers could be implemented</span>
+<span class="sd">    in the future.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logdensity_and_grad_fn</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">value_and_grad</span><span class="p">(</span><span class="n">logdensity_fn</span><span class="p">)</span>
+    <span class="n">kinetic_energy_grad_fn</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">q</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">kinetic_energy_fn</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">q</span><span class="p">),</span> <span class="n">argnums</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">one_step</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">IntegratorState</span><span class="p">,</span> <span class="n">step_size</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntegratorState</span><span class="p">:</span>
+        <span class="n">position</span><span class="p">,</span> <span class="n">momentum</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">state</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_update</span><span class="p">(</span>
+            <span class="n">q</span><span class="p">:</span> <span class="n">ArrayTree</span><span class="p">,</span>
+            <span class="n">p</span><span class="p">:</span> <span class="n">ArrayTree</span><span class="p">,</span>
+            <span class="n">dUdq</span><span class="p">:</span> <span class="n">ArrayTree</span><span class="p">,</span>
+            <span class="n">initial</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ArrayTree</span><span class="p">,</span> <span class="n">ArrayTree</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">momentum</span><span class="p">),</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ArrayTree</span><span class="p">,</span> <span class="n">ArrayTree</span><span class="p">]:</span>
+            <span class="n">dTdq</span><span class="p">,</span> <span class="n">dHdp</span> <span class="o">=</span> <span class="n">kinetic_energy_grad_fn</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+            <span class="n">dHdq</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">subtract</span><span class="p">,</span> <span class="n">dTdq</span><span class="p">,</span> <span class="n">dUdq</span><span class="p">)</span>
+
+            <span class="c1"># Take a step from the _initial coordinates_ using the gradients of the</span>
+            <span class="c1"># Hamiltonian evaluated at the current guess for the midpoint</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">q_</span><span class="p">,</span> <span class="n">d_</span><span class="p">:</span> <span class="n">q_</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">step_size</span> <span class="o">*</span> <span class="n">d_</span><span class="p">,</span> <span class="n">initial</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dHdp</span>
+            <span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">p_</span><span class="p">,</span> <span class="n">d_</span><span class="p">:</span> <span class="n">p_</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">step_size</span> <span class="o">*</span> <span class="n">d_</span><span class="p">,</span> <span class="n">initial</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dHdq</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">q</span><span class="p">,</span> <span class="n">p</span>
+
+        <span class="c1"># Solve for the midpoint numerically</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_step</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">ArrayTree</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ArrayTree</span><span class="p">,</span> <span class="n">ArrayTree</span><span class="p">]:</span>
+            <span class="n">q</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">args</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">dLdq</span> <span class="o">=</span> <span class="n">logdensity_and_grad_fn</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">_update</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">dLdq</span><span class="p">),</span> <span class="n">dLdq</span>
+
+        <span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">p</span><span class="p">),</span> <span class="n">dLdq</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">solver</span><span class="p">(</span><span class="n">_step</span><span class="p">,</span> <span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">momentum</span><span class="p">),</span> <span class="o">**</span><span class="n">solver_kwargs</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">info</span>  <span class="c1"># TODO: Track the returned info</span>
+
+        <span class="c1"># Take an explicit update as recommended by Brofos &amp; Lederman</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">dLdq</span> <span class="o">=</span> <span class="n">logdensity_and_grad_fn</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="n">q</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">_update</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">dLdq</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">IntegratorState</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="o">*</span><span class="n">logdensity_and_grad_fn</span><span class="p">(</span><span class="n">q</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">one_step</span></div>
+
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By The Blackjax developers
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, The Blackjax developers.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

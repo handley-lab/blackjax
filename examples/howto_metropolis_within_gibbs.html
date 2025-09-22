@@ -1,0 +1,903 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>How to build a Metropolis-Within-Gibbs sampler?</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=e37d73aa" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/howto_metropolis_within_gibbs';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Reproducing the front page image of the repository" href="howto_reproduce_the_blackjax_image.html" />
+    <link rel="prev" title="Use a logdensity function that is not compatible with JAX’s primitives" href="howto_other_frameworks.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/blackjax.png" class="logo__image only-light" alt=" - Home"/>
+    <script>document.write(`<img src="../_static/blackjax.png" class="logo__image only-dark" alt=" - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">PPL INTEGRATION</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="howto_use_aesara.html">Aesara</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto_use_numpyro.html">Numpyro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto_use_oryx.html">Oryx</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto_use_pymc.html">PyMC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto_use_tfp.html">Tensorflow-Probability</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">HOW TO</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="howto_sample_multiple_chains.html">Sample with multiple chains?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto_custom_gradients.html">Use custom gradients?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto_other_frameworks.html">Use non-JAX log-prob functions?</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Build a Metropolis-Within-Gibbs sampler?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto_reproduce_the_blackjax_image.html">Sample from the word BlackJAX using BlackJAX?</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">LEARN BY EXAMPLE</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference external" href="https://blackjax-devs.github.io/sampling-book">The Sampling Book</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../autoapi/blackjax/index.html">API Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../autoapi/blackjax/adaptation/index.html">blackjax.adaptation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/adaptation/adjusted_mclmc_adaptation/index.html">blackjax.adaptation.adjusted_mclmc_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/adaptation/base/index.html">blackjax.adaptation.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/adaptation/chees_adaptation/index.html">blackjax.adaptation.chees_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/adaptation/mass_matrix/index.html">blackjax.adaptation.mass_matrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/adaptation/mclmc_adaptation/index.html">blackjax.adaptation.mclmc_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/adaptation/meads_adaptation/index.html">blackjax.adaptation.meads_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/adaptation/pathfinder_adaptation/index.html">blackjax.adaptation.pathfinder_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/adaptation/step_size/index.html">blackjax.adaptation.step_size</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/adaptation/window_adaptation/index.html">blackjax.adaptation.window_adaptation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../autoapi/blackjax/diagnostics/index.html">blackjax.diagnostics</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../autoapi/blackjax/mcmc/index.html">blackjax.mcmc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/adjusted_mclmc/index.html">blackjax.mcmc.adjusted_mclmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/adjusted_mclmc_dynamic/index.html">blackjax.mcmc.adjusted_mclmc_dynamic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/barker/index.html">blackjax.mcmc.barker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/diffusions/index.html">blackjax.mcmc.diffusions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/dynamic_hmc/index.html">blackjax.mcmc.dynamic_hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/elliptical_slice/index.html">blackjax.mcmc.elliptical_slice</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/ghmc/index.html">blackjax.mcmc.ghmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/hmc/index.html">blackjax.mcmc.hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/integrators/index.html">blackjax.mcmc.integrators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/mala/index.html">blackjax.mcmc.mala</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/marginal_latent_gaussian/index.html">blackjax.mcmc.marginal_latent_gaussian</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/mclmc/index.html">blackjax.mcmc.mclmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/metrics/index.html">blackjax.mcmc.metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/nuts/index.html">blackjax.mcmc.nuts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/periodic_orbital/index.html">blackjax.mcmc.periodic_orbital</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/proposal/index.html">blackjax.mcmc.proposal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/random_walk/index.html">blackjax.mcmc.random_walk</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/rmhmc/index.html">blackjax.mcmc.rmhmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/termination/index.html">blackjax.mcmc.termination</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/trajectory/index.html">blackjax.mcmc.trajectory</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../autoapi/blackjax/sgmcmc/index.html">blackjax.sgmcmc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/sgmcmc/csgld/index.html">blackjax.sgmcmc.csgld</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/sgmcmc/diffusions/index.html">blackjax.sgmcmc.diffusions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/sgmcmc/gradients/index.html">blackjax.sgmcmc.gradients</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/sgmcmc/sghmc/index.html">blackjax.sgmcmc.sghmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/sgmcmc/sgld/index.html">blackjax.sgmcmc.sgld</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/sgmcmc/sgnht/index.html">blackjax.sgmcmc.sgnht</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../autoapi/blackjax/smc/index.html">blackjax.smc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/adaptive_tempered/index.html">blackjax.smc.adaptive_tempered</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/base/index.html">blackjax.smc.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/ess/index.html">blackjax.smc.ess</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/from_mcmc/index.html">blackjax.smc.from_mcmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/inner_kernel_tuning/index.html">blackjax.smc.inner_kernel_tuning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/partial_posteriors_path/index.html">blackjax.smc.partial_posteriors_path</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/pretuning/index.html">blackjax.smc.pretuning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/resampling/index.html">blackjax.smc.resampling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/solver/index.html">blackjax.smc.solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/tempered/index.html">blackjax.smc.tempered</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../autoapi/blackjax/smc/tuning/index.html">blackjax.smc.tuning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../autoapi/blackjax/smc/tuning/from_kernel_info/index.html">blackjax.smc.tuning.from_kernel_info</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../autoapi/blackjax/smc/tuning/from_particles/index.html">blackjax.smc.tuning.from_particles</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/waste_free/index.html">blackjax.smc.waste_free</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../autoapi/blackjax/vi/index.html">blackjax.vi</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/vi/meanfield_vi/index.html">blackjax.vi.meanfield_vi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/vi/pathfinder/index.html">blackjax.vi.pathfinder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/vi/schrodinger_follmer/index.html">blackjax.vi.schrodinger_follmer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/vi/svgd/index.html">blackjax.vi.svgd</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../bib.html">Bibliography</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/blackjax-devs/blackjax" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>How to build a Metropolis-Within-Gibbs sampler?</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-model">The Model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mwg-sampling-in-blackjax">MWG Sampling in BlackJAX</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#construct-the-mwg-kernel">Construct the MWG Kernel</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sampler-parameters">Sampler Parameters</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#set-the-initial-state-of-each-algorithm">Set the Initial State of Each Algorithm</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#build-the-sampling-loop">Build the Sampling Loop</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sampling">Sampling</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#general-mwg-kernel">General MWG Kernel</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Build the Sampling Loop</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Sampling</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#check-result">Check Result</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#developer-notes">Developer Notes</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="how-to-build-a-metropolis-within-gibbs-sampler">
+<h1>How to build a Metropolis-Within-Gibbs sampler?<a class="headerlink" href="#how-to-build-a-metropolis-within-gibbs-sampler" title="Link to this heading">#</a></h1>
+<p>Gibbs sampling is an MCMC technique where sampling from a joint probability distribution <span class="math notranslate nohighlight">\(\newcommand{\xx}{\boldsymbol{x}}\newcommand{\yy}{\boldsymbol{y}}p(\xx, \yy)\)</span> is achieved by alternately sampling from <span class="math notranslate nohighlight">\(\xx \sim p(\xx \mid \yy)\)</span> and <span class="math notranslate nohighlight">\(\yy \sim p(\yy \mid \xx)\)</span>.  Ideally these conditional distributions can be sampled from analytically.  In general however they must each be updated using any MCMC kernel appropriate to the conditional distribution at hand.   This technique is referred to as Metropolis-within-Gibbs (MWG) sampling.  The idea can be applied to an arbitrary number of blocks of variables <span class="math notranslate nohighlight">\(p(\xx_1, \ldots, \xx_n)\)</span>.  For simplicity in this notebook we focus on a two-block example.</p>
+<div class="cell tag_remove-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.scipy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jsp</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">blackjax</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span>
+<span class="n">rng_key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">key</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="the-model">
+<h2>The Model<a class="headerlink" href="#the-model" title="Link to this heading">#</a></h2>
+<p>Suppose that <span class="math notranslate nohighlight">\((\xx, \yy)\)</span> are drawn from a multivariate normal distribution</p>
+<p>$$
+(\xx, \yy) \sim \operatorname{MvNormal}(\boldsymbol{0}, \boldsymbol{\Sigma}).
+$$</p>
+<p>The corresponding log-probability function is implemented below.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">logdensity_fn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">Sigma</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Log-pdf of ``(x, y) ~ MvNormal(0, Sigma)``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">jsp</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">z</span><span class="p">,</span>
+        <span class="n">mean</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">z</span><span class="p">),</span>
+        <span class="n">cov</span><span class="o">=</span><span class="n">Sigma</span>
+    <span class="p">)</span>
+
+<span class="c1"># Specific example with x.shape == y.shape == (2,)</span>
+<span class="n">Sigma</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+    <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">.8</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">.8</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">.8</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">.8</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">]</span>
+<span class="p">])</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">logdensity</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">logdensity_fn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">Sigma</span><span class="o">=</span><span class="n">Sigma</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="mwg-sampling-in-blackjax">
+<h2>MWG Sampling in BlackJAX<a class="headerlink" href="#mwg-sampling-in-blackjax" title="Link to this heading">#</a></h2>
+<p>In this case the conditional distributions <span class="math notranslate nohighlight">\(p(\xx \mid \yy)\)</span> and <span class="math notranslate nohighlight">\(p(\yy \mid \xx)\)</span> can be drawn from analytically (they are normal distributions).  However, for illustrative purposes we’ll use an MCMC kernel to draw from each.  Specifically, we’ll use an RMH kernel to draw from <span class="math notranslate nohighlight">\(p(\xx \mid \yy)\)</span> and an HMC kernel to draw from <span class="math notranslate nohighlight">\(p(\yy \mid \xx)\)</span>.  To implement the corresponding MWG algorithm in BlackJAX, we’ll write an <code class="docutils literal notranslate"><span class="pre">mwg_kernel()</span></code> for the problem which will do the following:</p>
+<ol class="arabic simple">
+<li><p>Maintain separate MCMC kernels to update each component of <span class="math notranslate nohighlight">\(p(\xx, \yy)\)</span> while holding the other fixed.</p></li>
+<li><p>Apply the kernel updates correctly.</p></li>
+</ol>
+<p>The issue with (2) is that each kernel update for a given MCMC <code class="docutils literal notranslate"><span class="pre">Algorithm</span></code> in BlackJAX refers to an algorithm-specific <code class="docutils literal notranslate"><span class="pre">AlgorithmState</span></code>.  For example, <code class="docutils literal notranslate"><span class="pre">RWState</span></code> is a <code class="docutils literal notranslate"><span class="pre">typing.NamedTuple</span></code> class containing elements <code class="docutils literal notranslate"><span class="pre">position</span></code> and <code class="docutils literal notranslate"><span class="pre">log_probability</span></code>.  In our MWG sampling problem at the beginning of step <span class="math notranslate nohighlight">\(t\)</span>, <code class="docutils literal notranslate"><span class="pre">RWState.log_probability</span></code> will consist of <span class="math notranslate nohighlight">\(\log p(\xx_{t-1}, \yy_{t-1})\)</span>.  After updating <span class="math notranslate nohighlight">\(\xx\)</span>, it will consist of <span class="math notranslate nohighlight">\(\log p(\xx_{t}, \yy_{t-1})\)</span>.  This happens automatically when we call <code class="docutils literal notranslate"><span class="pre">blackjax.rmh.build_kernel()</span></code>.  However, after updating <span class="math notranslate nohighlight">\(\yy\)</span> (via HMC), we must manually update <code class="docutils literal notranslate"><span class="pre">RWState.log_probability</span></code> to consist of <span class="math notranslate nohighlight">\(\log p(\xx_{t}, \yy_{t})\)</span>.</p>
+<p>A general way of performing this manual update is to use the <code class="docutils literal notranslate"><span class="pre">blackjax.algorithm.init()</span></code> function of the given component’s MCMC algorithm to update the <code class="docutils literal notranslate"><span class="pre">AlgorithmState</span></code>.  This function has arguments <code class="docutils literal notranslate"><span class="pre">position</span></code> and <code class="docutils literal notranslate"><span class="pre">logdensity_fn</span></code>.  For example with the HMC component, after obtaining <span class="math notranslate nohighlight">\(\xx_t\)</span> but before drawing <span class="math notranslate nohighlight">\(\yy_t\)</span>, the <code class="docutils literal notranslate"><span class="pre">position</span></code> would be <span class="math notranslate nohighlight">\(\yy_{t-1}\)</span> and the <code class="docutils literal notranslate"><span class="pre">logdensity_fn</span></code> function would be <span class="math notranslate nohighlight">\(\log p(\xx_t, \cdot )\)</span>.</p>
+<p>Using this approach, we now are now ready to implement the Gibbs sampling kernel in the code below.</p>
+<section id="construct-the-mwg-kernel">
+<h3>Construct the MWG Kernel<a class="headerlink" href="#construct-the-mwg-kernel" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># MCMC initializers for each set of paramters</span>
+<span class="n">mwg_init_x</span> <span class="o">=</span> <span class="n">blackjax</span><span class="o">.</span><span class="n">rmh</span><span class="o">.</span><span class="n">init</span>
+<span class="n">mwg_init_y</span> <span class="o">=</span> <span class="n">blackjax</span><span class="o">.</span><span class="n">hmc</span><span class="o">.</span><span class="n">init</span>
+
+<span class="c1"># MCMC updaters</span>
+<span class="n">mwg_step_fn_x</span> <span class="o">=</span> <span class="n">blackjax</span><span class="o">.</span><span class="n">rmh</span><span class="o">.</span><span class="n">build_kernel</span><span class="p">()</span>
+<span class="n">mwg_step_fn_y</span> <span class="o">=</span> <span class="n">blackjax</span><span class="o">.</span><span class="n">hmc</span><span class="o">.</span><span class="n">build_kernel</span><span class="p">()</span>  <span class="c1"># default integrator, etc.</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mwg_kernel</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    MWG kernel with RMH for ``x ~ p(x | y)`` and HMC for ``y ~ p(y | x)``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rng_key</span>
+<span class="sd">        The PRNG key.</span>
+<span class="sd">    state</span>
+<span class="sd">        Dictionary with elements `x` and `y`, where the former is an ``RMCState`` object</span>
+<span class="sd">        and the latter is an ``HMCState`` object.</span>
+<span class="sd">    parameters</span>
+<span class="sd">        Dictionary with elements `x` and `y`, each of which is a dictionary of the parameters</span>
+<span class="sd">        to the corresponding algorithm&#39;s ``step_fn()``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Dictionary containing the updated ``state``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rng_key_x</span><span class="p">,</span> <span class="n">rng_key_y</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># avoid modifying argument state as JAX functions should be pure</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># --- update for x ---</span>
+    <span class="c1"># conditional logdensity of x given y</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">logdensity_x</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="k">return</span> <span class="n">logdensity</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">state</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+
+    <span class="c1"># give state[&quot;x&quot;] the right log_density</span>
+    <span class="n">state</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mwg_init_x</span><span class="p">(</span>
+        <span class="n">position</span><span class="o">=</span><span class="n">state</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">position</span><span class="p">,</span>
+        <span class="n">logdensity_fn</span><span class="o">=</span><span class="n">logdensity_x</span>
+    <span class="p">)</span>
+    <span class="c1"># update state[&quot;x&quot;]</span>
+    <span class="n">state</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">mwg_step_fn_x</span><span class="p">(</span>
+        <span class="n">rng_key</span><span class="o">=</span><span class="n">rng_key_x</span><span class="p">,</span>
+        <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span>
+        <span class="n">logdensity_fn</span><span class="o">=</span><span class="n">logdensity_x</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="c1"># --- update for y ---</span>
+    <span class="c1"># conditional logdensity of y given x</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">logdensity_y</span><span class="p">(</span><span class="n">y</span><span class="p">):</span> <span class="k">return</span> <span class="n">logdensity</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">state</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+
+    <span class="c1"># give state[&quot;y&quot;] the right log_density</span>
+    <span class="n">state</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mwg_init_y</span><span class="p">(</span>
+        <span class="n">position</span><span class="o">=</span><span class="n">state</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">position</span><span class="p">,</span>
+        <span class="n">logdensity_fn</span><span class="o">=</span><span class="n">logdensity_y</span>
+    <span class="p">)</span>
+    <span class="c1"># update state[&quot;y&quot;]</span>
+    <span class="n">state</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">mwg_step_fn_y</span><span class="p">(</span>
+        <span class="n">rng_key</span><span class="o">=</span><span class="n">rng_key_y</span><span class="p">,</span>
+        <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span>
+        <span class="n">logdensity_fn</span><span class="o">=</span><span class="n">logdensity_y</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">state</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="sampler-parameters">
+<h3>Sampler Parameters<a class="headerlink" href="#sampler-parameters" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;transition_generator&quot;</span><span class="p">:</span> <span class="n">blackjax</span><span class="o">.</span><span class="n">mcmc</span><span class="o">.</span><span class="n">random_walk</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">.2</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;inverse_mass_matrix&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">]),</span>
+        <span class="s2">&quot;num_integration_steps&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="s2">&quot;step_size&quot;</span><span class="p">:</span> <span class="mf">1e-2</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="set-the-initial-state-of-each-algorithm">
+<h3>Set the Initial State of Each Algorithm<a class="headerlink" href="#set-the-initial-state-of-each-algorithm" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">initial_state</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">mwg_init_x</span><span class="p">(</span>
+        <span class="n">position</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]),</span>
+        <span class="n">logdensity_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">logdensity</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]))</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">mwg_init_y</span><span class="p">(</span>
+        <span class="n">position</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]),</span>
+        <span class="n">logdensity_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="n">logdensity</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]))</span>
+    <span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="build-the-sampling-loop">
+<h3>Build the Sampling Loop<a class="headerlink" href="#build-the-sampling-loop" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">sampling_loop</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">):</span>
+    <span class="nd">@jax</span><span class="o">.</span><span class="n">jit</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">one_step</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">):</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">mwg_kernel</span><span class="p">(</span>
+            <span class="n">rng_key</span><span class="o">=</span><span class="n">rng_key</span><span class="p">,</span>
+            <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">,</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span>
+        <span class="p">)</span>
+        <span class="n">positions</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">state</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="n">state</span><span class="p">,</span> <span class="n">positions</span>
+
+    <span class="n">keys</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">positions</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">one_step</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">,</span> <span class="n">keys</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">positions</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="sampling">
+<h3>Sampling<a class="headerlink" href="#sampling" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="n">rng_key</span><span class="p">,</span> <span class="n">sample_key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rng_key</span><span class="p">)</span>
+<span class="n">positions</span> <span class="o">=</span> <span class="n">sampling_loop</span><span class="p">(</span><span class="n">sample_key</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="mi">10_000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 1.26 s, sys: 46.9 ms, total: 1.31 s
+Wall time: 660 ms
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">arviz</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">az</span>
+
+<span class="n">idata</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">posterior</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">positions</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
+<span class="n">az</span><span class="o">.</span><span class="n">plot_pair</span><span class="p">(</span><span class="n">idata</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;hexbin&#39;</span><span class="p">,</span> <span class="n">marginals</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/199f9cfc9b8178b81c1c0f2c004fda6f55dfd6f517bd97b793eaaab77368b294.png" src="../_images/199f9cfc9b8178b81c1c0f2c004fda6f55dfd6f517bd97b793eaaab77368b294.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="general-mwg-kernel">
+<h2>General MWG Kernel<a class="headerlink" href="#general-mwg-kernel" title="Link to this heading">#</a></h2>
+<p>The following code attempts to generalize the <code class="docutils literal notranslate"><span class="pre">mwg_kernel()</span></code> above to an arbitrary number of components <span class="math notranslate nohighlight">\(p(\xx_1, \ldots, \xx_n)\)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">mwg_kernel_general</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">logdensity_fn</span><span class="p">,</span> <span class="n">step_fn</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    General MWG kernel.</span>
+
+<span class="sd">    Updates each component of ``state`` conditioned on all the others using a component-specific MCMC algorithm</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rng_key</span>
+<span class="sd">        The PRNG key.</span>
+<span class="sd">    state</span>
+<span class="sd">        Dictionary where each item is the state of an MCMC algorithm, i.e., an object of type ``AlgorithmState``.</span>
+<span class="sd">    logdensity_fn</span>
+<span class="sd">        The log-density function on all components, where the arguments are the keys of ``state``.</span>
+<span class="sd">    step_fn</span>
+<span class="sd">        Dictionary with the same keys as ``state``,</span>
+<span class="sd">        each element of which is an MCMC stepping functions on the corresponding component.</span>
+<span class="sd">    init</span>
+<span class="sd">        Dictionary with the same keys as ``state``,</span>
+<span class="sd">        each elemtn of chi is an MCMC initializer corresponding to the stepping functions in `step_fn`.</span>
+<span class="sd">    parameters</span>
+<span class="sd">        Dictionary with the same keys as ``state``, each of which is a dictionary of parameters to</span>
+<span class="sd">        the MCMC algorithm for the corresponding component.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Dictionary containing the updated ``state``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rng_keys</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+    <span class="n">rng_keys</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">rng_keys</span><span class="p">))</span>
+
+    <span class="c1"># avoid modifying argument state as JAX functions should be pure</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="c1"># logdensity of component k conditioned on all other components in state</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">logdensity_k</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">_k</span><span class="p">:</span> <span class="n">state</span><span class="p">[</span><span class="n">_k</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="k">for</span> <span class="n">_k</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">return</span> <span class="n">logdensity_fn</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># give state[k] the right log_density</span>
+        <span class="n">state</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">init</span><span class="p">[</span><span class="n">k</span><span class="p">](</span>
+            <span class="n">position</span><span class="o">=</span><span class="n">state</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">position</span><span class="p">,</span>
+            <span class="n">logdensity_fn</span><span class="o">=</span><span class="n">logdensity_k</span>
+        <span class="p">)</span>
+
+        <span class="c1"># update state[k]</span>
+        <span class="n">state</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">step_fn</span><span class="p">[</span><span class="n">k</span><span class="p">](</span>
+            <span class="n">rng_key</span><span class="o">=</span><span class="n">rng_keys</span><span class="p">[</span><span class="n">k</span><span class="p">],</span>
+            <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">[</span><span class="n">k</span><span class="p">],</span>
+            <span class="n">logdensity_fn</span><span class="o">=</span><span class="n">logdensity_k</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">parameters</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">state</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="id1">
+<h3>Build the Sampling Loop<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">sampling_loop_general</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">,</span> <span class="n">logdensity_fn</span><span class="p">,</span> <span class="n">step_fn</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">):</span>
+    <span class="nd">@jax</span><span class="o">.</span><span class="n">jit</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">one_step</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">):</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">mwg_kernel_general</span><span class="p">(</span>
+            <span class="n">rng_key</span><span class="o">=</span><span class="n">rng_key</span><span class="p">,</span>
+            <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">,</span>
+            <span class="n">logdensity_fn</span><span class="o">=</span><span class="n">logdensity_fn</span><span class="p">,</span>
+            <span class="n">step_fn</span><span class="o">=</span><span class="n">step_fn</span><span class="p">,</span>
+            <span class="n">init</span><span class="o">=</span><span class="n">init</span><span class="p">,</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span>
+        <span class="p">)</span>
+        <span class="n">positions</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">state</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="n">state</span><span class="p">,</span> <span class="n">positions</span>
+
+    <span class="n">keys</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">positions</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">one_step</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">,</span> <span class="n">keys</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">positions</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id2">
+<h3>Sampling<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="n">positions_general</span> <span class="o">=</span> <span class="n">sampling_loop_general</span><span class="p">(</span>
+    <span class="n">rng_key</span><span class="o">=</span><span class="n">sample_key</span><span class="p">,</span>  <span class="c1"># reuse PRNG key from above</span>
+    <span class="n">initial_state</span><span class="o">=</span><span class="n">initial_state</span><span class="p">,</span>
+    <span class="n">logdensity_fn</span><span class="o">=</span><span class="n">logdensity</span><span class="p">,</span>
+    <span class="n">step_fn</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">mwg_step_fn_x</span><span class="p">,</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">mwg_step_fn_y</span>
+    <span class="p">},</span>
+    <span class="n">init</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">mwg_init_x</span><span class="p">,</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">mwg_init_y</span>
+    <span class="p">},</span>
+    <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span>
+    <span class="n">num_samples</span><span class="o">=</span><span class="mi">10_000</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 828 ms, sys: 35.2 ms, total: 863 ms
+Wall time: 410 ms
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="check-result">
+<h3>Check Result<a class="headerlink" href="#check-result" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">y</span><span class="p">)),</span> <span class="n">positions</span><span class="p">,</span> <span class="n">positions_general</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;x&#39;: Array(0., dtype=float32), &#39;y&#39;: Array(0., dtype=float32)}
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="developer-notes">
+<h2>Developer Notes<a class="headerlink" href="#developer-notes" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>The update method above (using <code class="docutils literal notranslate"><span class="pre">blackjax.algorithm.init()</span></code>) should work out-of-the-box for most (if not all) MCMC algorithms in BlackJAX.  However, it is not optimally efficient.  For example for the RMH update, after obtaining <span class="math notranslate nohighlight">\(\yy_{t-1}\)</span> but before drawing <span class="math notranslate nohighlight">\(\xx_t\)</span>, the method above would calculate <code class="docutils literal notranslate"><span class="pre">RWState.log_density</span></code> to be <span class="math notranslate nohighlight">\(\log p(\xx_{t-1}, \yy_{t-1})\)</span>.  But we’ve already calculated this value from the previous HMC update of <span class="math notranslate nohighlight">\(\yy_{t-1} \sim p(\yy \mid \xx_{t-1})\)</span>.  So, we could save ourselves the cost of calculating the log-density twice, at the expense of a deeper understanding of the low-level components of the algorithms at hand and less generalizable code.</p></li>
+<li><p>The general MWG kernel prototyped above should be adequate for problems with a small number of components.  However, the for-loop over the components of <code class="docutils literal notranslate"><span class="pre">state</span></code> gets unrolled by the JAX JIT compiler (as discussed <a class="reference external" href="https://jax.readthedocs.io/en/latest/notebooks/Common_Gotchas_in_JAX.html#structured-control-flow-primitives">here</a>), which can cause long compilation times when the number of components is large.  To mitigate this problem, the for-loop could be replaced by a <code class="docutils literal notranslate"><span class="pre">lax.scan()</span></code> primitive.  For the sake of simplicity this approach is not fully developed here.</p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="howto_other_frameworks.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Use a logdensity function that is not compatible with JAX’s primitives</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="howto_reproduce_the_blackjax_image.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Reproducing the front page image of the repository</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-model">The Model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mwg-sampling-in-blackjax">MWG Sampling in BlackJAX</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#construct-the-mwg-kernel">Construct the MWG Kernel</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sampler-parameters">Sampler Parameters</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#set-the-initial-state-of-each-algorithm">Set the Initial State of Each Algorithm</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#build-the-sampling-loop">Build the Sampling Loop</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sampling">Sampling</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#general-mwg-kernel">General MWG Kernel</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Build the Sampling Loop</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Sampling</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#check-result">Check Result</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#developer-notes">Developer Notes</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By The Blackjax developers
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, The Blackjax developers.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

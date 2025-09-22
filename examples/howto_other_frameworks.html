@@ -1,0 +1,851 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Use a logdensity function that is not compatible with JAX’s primitives</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=e37d73aa" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/howto_other_frameworks';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="How to build a Metropolis-Within-Gibbs sampler?" href="howto_metropolis_within_gibbs.html" />
+    <link rel="prev" title="Use custom gradients" href="howto_custom_gradients.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/blackjax.png" class="logo__image only-light" alt=" - Home"/>
+    <script>document.write(`<img src="../_static/blackjax.png" class="logo__image only-dark" alt=" - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">PPL INTEGRATION</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="howto_use_aesara.html">Aesara</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto_use_numpyro.html">Numpyro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto_use_oryx.html">Oryx</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto_use_pymc.html">PyMC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto_use_tfp.html">Tensorflow-Probability</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">HOW TO</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="howto_sample_multiple_chains.html">Sample with multiple chains?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto_custom_gradients.html">Use custom gradients?</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Use non-JAX log-prob functions?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto_metropolis_within_gibbs.html">Build a Metropolis-Within-Gibbs sampler?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto_reproduce_the_blackjax_image.html">Sample from the word BlackJAX using BlackJAX?</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">LEARN BY EXAMPLE</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference external" href="https://blackjax-devs.github.io/sampling-book">The Sampling Book</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../autoapi/blackjax/index.html">API Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../autoapi/blackjax/adaptation/index.html">blackjax.adaptation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/adaptation/adjusted_mclmc_adaptation/index.html">blackjax.adaptation.adjusted_mclmc_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/adaptation/base/index.html">blackjax.adaptation.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/adaptation/chees_adaptation/index.html">blackjax.adaptation.chees_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/adaptation/mass_matrix/index.html">blackjax.adaptation.mass_matrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/adaptation/mclmc_adaptation/index.html">blackjax.adaptation.mclmc_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/adaptation/meads_adaptation/index.html">blackjax.adaptation.meads_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/adaptation/pathfinder_adaptation/index.html">blackjax.adaptation.pathfinder_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/adaptation/step_size/index.html">blackjax.adaptation.step_size</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/adaptation/window_adaptation/index.html">blackjax.adaptation.window_adaptation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../autoapi/blackjax/diagnostics/index.html">blackjax.diagnostics</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../autoapi/blackjax/mcmc/index.html">blackjax.mcmc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/adjusted_mclmc/index.html">blackjax.mcmc.adjusted_mclmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/adjusted_mclmc_dynamic/index.html">blackjax.mcmc.adjusted_mclmc_dynamic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/barker/index.html">blackjax.mcmc.barker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/diffusions/index.html">blackjax.mcmc.diffusions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/dynamic_hmc/index.html">blackjax.mcmc.dynamic_hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/elliptical_slice/index.html">blackjax.mcmc.elliptical_slice</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/ghmc/index.html">blackjax.mcmc.ghmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/hmc/index.html">blackjax.mcmc.hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/integrators/index.html">blackjax.mcmc.integrators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/mala/index.html">blackjax.mcmc.mala</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/marginal_latent_gaussian/index.html">blackjax.mcmc.marginal_latent_gaussian</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/mclmc/index.html">blackjax.mcmc.mclmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/metrics/index.html">blackjax.mcmc.metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/nuts/index.html">blackjax.mcmc.nuts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/periodic_orbital/index.html">blackjax.mcmc.periodic_orbital</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/proposal/index.html">blackjax.mcmc.proposal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/random_walk/index.html">blackjax.mcmc.random_walk</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/rmhmc/index.html">blackjax.mcmc.rmhmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/termination/index.html">blackjax.mcmc.termination</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/mcmc/trajectory/index.html">blackjax.mcmc.trajectory</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../autoapi/blackjax/sgmcmc/index.html">blackjax.sgmcmc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/sgmcmc/csgld/index.html">blackjax.sgmcmc.csgld</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/sgmcmc/diffusions/index.html">blackjax.sgmcmc.diffusions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/sgmcmc/gradients/index.html">blackjax.sgmcmc.gradients</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/sgmcmc/sghmc/index.html">blackjax.sgmcmc.sghmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/sgmcmc/sgld/index.html">blackjax.sgmcmc.sgld</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/sgmcmc/sgnht/index.html">blackjax.sgmcmc.sgnht</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../autoapi/blackjax/smc/index.html">blackjax.smc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/adaptive_tempered/index.html">blackjax.smc.adaptive_tempered</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/base/index.html">blackjax.smc.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/ess/index.html">blackjax.smc.ess</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/from_mcmc/index.html">blackjax.smc.from_mcmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/inner_kernel_tuning/index.html">blackjax.smc.inner_kernel_tuning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/partial_posteriors_path/index.html">blackjax.smc.partial_posteriors_path</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/pretuning/index.html">blackjax.smc.pretuning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/resampling/index.html">blackjax.smc.resampling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/solver/index.html">blackjax.smc.solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/tempered/index.html">blackjax.smc.tempered</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../autoapi/blackjax/smc/tuning/index.html">blackjax.smc.tuning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../autoapi/blackjax/smc/tuning/from_kernel_info/index.html">blackjax.smc.tuning.from_kernel_info</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../autoapi/blackjax/smc/tuning/from_particles/index.html">blackjax.smc.tuning.from_particles</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/smc/waste_free/index.html">blackjax.smc.waste_free</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../autoapi/blackjax/vi/index.html">blackjax.vi</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/vi/meanfield_vi/index.html">blackjax.vi.meanfield_vi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/vi/pathfinder/index.html">blackjax.vi.pathfinder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/vi/schrodinger_follmer/index.html">blackjax.vi.schrodinger_follmer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/blackjax/vi/svgd/index.html">blackjax.vi.svgd</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../bib.html">Bibliography</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/blackjax-devs/blackjax" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Use a logdensity function that is not compatible with JAX’s primitives</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#aesara-model-compiled-to-numba">Aesara model compiled to Numba</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#use-jax-experimental-host-callback-to-call-numba-functions">Use <code class="docutils literal notranslate"><span class="pre">jax.experimental.host_callback</span></code> to call Numba functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#use-custom-xla-calls-to-call-numba-functions-faster">Use custom XLA calls to call Numba functions faster</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="use-a-logdensity-function-that-is-not-compatible-with-jax-s-primitives">
+<h1>Use a logdensity function that is not compatible with JAX’s primitives<a class="headerlink" href="#use-a-logdensity-function-that-is-not-compatible-with-jax-s-primitives" title="Link to this heading">#</a></h1>
+<p>We obviously recommend to use Blackjax with log-probability functions that are compatible with JAX’s primitives. These can be built manually or with Aesara, Numpyro, Oryx, PyMC, TensorFlow-Probability.</p>
+<p>Nevertheless, you may have a good reason to use a function that is incompatible with JAX’s primitives, whether it is for performance reasons or for compatiblity with an already-implemented model. Who are we to judge?</p>
+<p>In this example we will show you how this can be done using JAX’s experimental <code class="docutils literal notranslate"><span class="pre">host_callback</span></code> API, and hint at a faster solution.</p>
+<div class="cell tag_remove-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span>
+<span class="n">rng_key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">key</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="aesara-model-compiled-to-numba">
+<h2>Aesara model compiled to Numba<a class="headerlink" href="#aesara-model-compiled-to-numba" title="Link to this heading">#</a></h2>
+<p>The following example builds a logdensity function with <a class="reference external" href="https://github.com/aesara-devs/aesara">Aesara</a>, compiles it with <a class="reference external" href="https://numba.pydata.org/">Numba</a> and uses Blackjax to sample from the posterior distribution of the model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">aesara.tensor</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">at</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">srng</span> <span class="o">=</span> <span class="n">at</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomStream</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">loc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">])</span>
+<span class="n">scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">2.8</span><span class="p">])</span>
+<span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">])</span>
+
+<span class="n">N_rv</span> <span class="o">=</span> <span class="n">srng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;N&quot;</span><span class="p">)</span>
+<span class="n">I_rv</span> <span class="o">=</span> <span class="n">srng</span><span class="o">.</span><span class="n">categorical</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;I&quot;</span><span class="p">)</span>
+<span class="n">Y_rv</span> <span class="o">=</span> <span class="n">N_rv</span><span class="p">[</span><span class="n">I_rv</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/numpy/distutils/system_info.py:2159: UserWarning: 
+    Optimized (vendor) Blas libraries are not found.
+    Falls back to netlib Blas library which has worse performance.
+    A better performance should be easily gained by switching
+    Blas library.
+  if self._calc_info(blas):
+/opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/numpy/distutils/system_info.py:2159: UserWarning: 
+    Blas (http://www.netlib.org/blas/) libraries not found.
+    Directories to search for the libraries can be specified in the
+    numpy/distutils/site.cfg file (section [blas]) or by setting
+    the BLAS environment variable.
+  if self._calc_info(blas):
+/opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/numpy/distutils/system_info.py:2159: UserWarning: 
+    Blas (http://www.netlib.org/blas/) sources not found.
+    Directories to search for the sources can be specified in the
+    numpy/distutils/site.cfg file (section [blas_src]) or by setting
+    the BLAS_SRC environment variable.
+  if self._calc_info(blas):
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>WARNING (aesara.tensor.blas): Using NumPy C-API based implementation for BLAS functions.
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can sample from the prior predictive distribution to make sure the model is correctly implemented:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">aesara</span>
+
+<span class="n">sampling_fn</span> <span class="o">=</span> <span class="n">aesara</span><span class="o">.</span><span class="n">function</span><span class="p">((),</span> <span class="n">Y_rv</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">sampling_fn</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">sampling_fn</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2.516455713134264
+0.1609480326942554
+</pre></div>
+</div>
+</div>
+</div>
+<p>We do not care about the posterior distribution of the indicator variable <code class="docutils literal notranslate"><span class="pre">I_rv</span></code> so we marginalize it out, and subsequently build the logdensity’s graph:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">aeppl</span><span class="w"> </span><span class="kn">import</span> <span class="n">joint_logprob</span>
+
+<span class="n">y_vv</span> <span class="o">=</span> <span class="n">Y_rv</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+<span class="n">i_vv</span> <span class="o">=</span> <span class="n">I_rv</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+
+<span class="n">logdensity</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+    <span class="n">i_vv</span> <span class="o">=</span> <span class="n">at</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int64&quot;</span><span class="p">)</span>
+    <span class="n">component_logdensity</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">joint_logprob</span><span class="p">(</span><span class="n">realized</span><span class="o">=</span><span class="p">{</span><span class="n">Y_rv</span><span class="p">:</span> <span class="n">y_vv</span><span class="p">,</span> <span class="n">I_rv</span><span class="p">:</span> <span class="n">i_vv</span><span class="p">})</span>
+    <span class="n">logdensity</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">component_logdensity</span><span class="p">)</span>
+<span class="n">logdensity</span> <span class="o">=</span> <span class="n">at</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">logdensity</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">total_logdensity</span> <span class="o">=</span> <span class="n">at</span><span class="o">.</span><span class="n">logsumexp</span><span class="p">(</span><span class="n">at</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">+</span> <span class="n">logdensity</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We are now ready to compile the logdensity to Numba:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">logdensity_fn</span> <span class="o">=</span> <span class="n">aesara</span><span class="o">.</span><span class="n">function</span><span class="p">((</span><span class="n">y_vv</span><span class="p">,),</span> <span class="n">total_logdensity</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;NUMBA&quot;</span><span class="p">)</span>
+<span class="n">logdensity_fn</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">TypeError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">logdensity_fn</span> <span class="o">=</span> <span class="n">aesara</span><span class="o">.</span><span class="n">function</span><span class="p">((</span><span class="n">y_vv</span><span class="p">,),</span> <span class="n">total_logdensity</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;NUMBA&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">logdensity_fn</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/aesara/compile/function/__init__.py:317,</span> in <span class="ni">function</span><span class="nt">(inputs, outputs, mode, updates, givens, no_default_updates, accept_inplace, name, rebuild_strict, allow_input_downcast, profile, on_unused_input)</span>
+<span class="g g-Whitespace">    </span><span class="mi">311</span>     <span class="n">fn</span> <span class="o">=</span> <span class="n">orig_function</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">312</span>         <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="n">accept_inplace</span><span class="o">=</span><span class="n">accept_inplace</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span>
+<span class="g g-Whitespace">    </span><span class="mi">313</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">314</span> <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">315</span>     <span class="c1"># note: pfunc will also call orig_function -- orig_function is</span>
+<span class="g g-Whitespace">    </span><span class="mi">316</span>     <span class="c1">#      a choke point that all compilation must pass through</span>
+<span class="ne">--&gt; </span><span class="mi">317</span>     <span class="n">fn</span> <span class="o">=</span> <span class="n">pfunc</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">318</span>         <span class="n">params</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">319</span>         <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">320</span>         <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">321</span>         <span class="n">updates</span><span class="o">=</span><span class="n">updates</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">322</span>         <span class="n">givens</span><span class="o">=</span><span class="n">givens</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">323</span>         <span class="n">no_default_updates</span><span class="o">=</span><span class="n">no_default_updates</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">324</span>         <span class="n">accept_inplace</span><span class="o">=</span><span class="n">accept_inplace</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">325</span>         <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">326</span>         <span class="n">rebuild_strict</span><span class="o">=</span><span class="n">rebuild_strict</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">327</span>         <span class="n">allow_input_downcast</span><span class="o">=</span><span class="n">allow_input_downcast</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">328</span>         <span class="n">on_unused_input</span><span class="o">=</span><span class="n">on_unused_input</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">329</span>         <span class="n">profile</span><span class="o">=</span><span class="n">profile</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">330</span>         <span class="n">output_keys</span><span class="o">=</span><span class="n">output_keys</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">331</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">332</span> <span class="k">return</span> <span class="n">fn</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/aesara/compile/function/pfunc.py:367,</span> in <span class="ni">pfunc</span><span class="nt">(params, outputs, mode, updates, givens, no_default_updates, accept_inplace, name, rebuild_strict, allow_input_downcast, profile, on_unused_input, output_keys, fgraph)</span>
+<span class="g g-Whitespace">    </span><span class="mi">353</span>     <span class="n">profile</span> <span class="o">=</span> <span class="n">ProfileStats</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">profile</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">355</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">cloned_outputs</span> <span class="o">=</span> <span class="n">construct_pfunc_ins_and_outs</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">356</span>     <span class="n">params</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">357</span>     <span class="n">outputs</span><span class="p">,</span>
+   <span class="p">(</span><span class="o">...</span><span class="p">)</span>    <span class="mi">364</span>     <span class="n">fgraph</span><span class="o">=</span><span class="n">fgraph</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">365</span> <span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">367</span> <span class="k">return</span> <span class="n">orig_function</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">368</span>     <span class="n">inputs</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">369</span>     <span class="n">cloned_outputs</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">370</span>     <span class="n">mode</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">371</span>     <span class="n">accept_inplace</span><span class="o">=</span><span class="n">accept_inplace</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">372</span>     <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">373</span>     <span class="n">profile</span><span class="o">=</span><span class="n">profile</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">374</span>     <span class="n">on_unused_input</span><span class="o">=</span><span class="n">on_unused_input</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">375</span>     <span class="n">output_keys</span><span class="o">=</span><span class="n">output_keys</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">376</span>     <span class="n">fgraph</span><span class="o">=</span><span class="n">fgraph</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">377</span> <span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/aesara/compile/function/types.py:1815,</span> in <span class="ni">orig_function</span><span class="nt">(inputs, outputs, mode, accept_inplace, name, profile, on_unused_input, output_keys, fgraph)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1803</span>     <span class="n">m</span> <span class="o">=</span> <span class="n">Maker</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1804</span>         <span class="n">inputs</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1805</span>         <span class="n">outputs</span><span class="p">,</span>
+   <span class="p">(</span><span class="o">...</span><span class="p">)</span>   <span class="mi">1812</span>         <span class="n">fgraph</span><span class="o">=</span><span class="n">fgraph</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1813</span>     <span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1814</span>     <span class="k">with</span> <span class="n">config</span><span class="o">.</span><span class="n">change_flags</span><span class="p">(</span><span class="n">compute_test_value</span><span class="o">=</span><span class="s2">&quot;off&quot;</span><span class="p">):</span>
+<span class="ne">-&gt; </span><span class="mi">1815</span>         <span class="n">fn</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">defaults</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1816</span> <span class="k">finally</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1817</span>     <span class="n">t2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/aesara/compile/function/types.py:1708,</span> in <span class="ni">FunctionMaker.create</span><span class="nt">(self, input_storage, trustme, storage_map)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1705</span> <span class="n">start_import_time</span> <span class="o">=</span> <span class="n">aesara</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">cmodule</span><span class="o">.</span><span class="n">import_time</span>
+<span class="g g-Whitespace">   </span><span class="mi">1707</span> <span class="k">with</span> <span class="n">config</span><span class="o">.</span><span class="n">change_flags</span><span class="p">(</span><span class="n">traceback__limit</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">traceback__compile_limit</span><span class="p">):</span>
+<span class="ne">-&gt; </span><span class="mi">1708</span>     <span class="n">_fn</span><span class="p">,</span> <span class="n">_i</span><span class="p">,</span> <span class="n">_o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linker</span><span class="o">.</span><span class="n">make_thunk</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1709</span>         <span class="n">input_storage</span><span class="o">=</span><span class="n">input_storage_lists</span><span class="p">,</span> <span class="n">storage_map</span><span class="o">=</span><span class="n">storage_map</span>
+<span class="g g-Whitespace">   </span><span class="mi">1710</span>     <span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1712</span> <span class="n">end_linker</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+<span class="g g-Whitespace">   </span><span class="mi">1714</span> <span class="n">linker_time</span> <span class="o">=</span> <span class="n">end_linker</span> <span class="o">-</span> <span class="n">start_linker</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/aesara/link/basic.py:254,</span> in <span class="ni">LocalLinker.make_thunk</span><span class="nt">(self, input_storage, output_storage, storage_map, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">247</span> <span class="k">def</span><span class="w"> </span><span class="nf">make_thunk</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">248</span>     <span class="bp">self</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">249</span>     <span class="n">input_storage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;InputStorageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+   <span class="p">(</span><span class="o">...</span><span class="p">)</span>    <span class="mi">252</span>     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">253</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="s2">&quot;BasicThunkType&quot;</span><span class="p">,</span> <span class="s2">&quot;InputStorageType&quot;</span><span class="p">,</span> <span class="s2">&quot;OutputStorageType&quot;</span><span class="p">]:</span>
+<span class="ne">--&gt; </span><span class="mi">254</span>     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_all</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">255</span>         <span class="n">input_storage</span><span class="o">=</span><span class="n">input_storage</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">256</span>         <span class="n">output_storage</span><span class="o">=</span><span class="n">output_storage</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">257</span>         <span class="n">storage_map</span><span class="o">=</span><span class="n">storage_map</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">258</span>     <span class="p">)[:</span><span class="mi">3</span><span class="p">]</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/aesara/link/basic.py:697,</span> in <span class="ni">JITLinker.make_all</span><span class="nt">(self, input_storage, output_storage, storage_map)</span>
+<span class="g g-Whitespace">    </span><span class="mi">694</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">storage_map</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">695</span>     <span class="n">compute_map</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span><span class="o">.</span><span class="n">owner</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">]</span>
+<span class="ne">--&gt; </span><span class="mi">697</span> <span class="n">thunks</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">jit_fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_jitable_thunk</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">698</span>     <span class="n">compute_map</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">input_storage</span><span class="p">,</span> <span class="n">output_storage</span><span class="p">,</span> <span class="n">storage_map</span>
+<span class="g g-Whitespace">    </span><span class="mi">699</span> <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">701</span> <span class="n">computed</span><span class="p">,</span> <span class="n">last_user</span> <span class="o">=</span> <span class="n">gc_helper</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">703</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">allow_gc</span><span class="p">:</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/aesara/link/basic.py:647,</span> in <span class="ni">JITLinker.create_jitable_thunk</span><span class="nt">(self, compute_map, order, input_storage, output_storage, storage_map)</span>
+<span class="g g-Whitespace">    </span><span class="mi">644</span> <span class="c1"># This is a bit hackish, but we only return one of the output nodes</span>
+<span class="g g-Whitespace">    </span><span class="mi">645</span> <span class="n">output_nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">owner</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fgraph</span><span class="o">.</span><span class="n">outputs</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">owner</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">][:</span><span class="mi">1</span><span class="p">]</span>
+<span class="ne">--&gt; </span><span class="mi">647</span> <span class="n">converted_fgraph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fgraph_convert</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">648</span>     <span class="bp">self</span><span class="o">.</span><span class="n">fgraph</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">649</span>     <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">650</span>     <span class="n">input_storage</span><span class="o">=</span><span class="n">input_storage</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">651</span>     <span class="n">output_storage</span><span class="o">=</span><span class="n">output_storage</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">652</span>     <span class="n">storage_map</span><span class="o">=</span><span class="n">storage_map</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">653</span> <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">655</span> <span class="n">thunk_inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_thunk_inputs</span><span class="p">(</span><span class="n">storage_map</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">657</span> <span class="n">thunks</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/aesara/link/numba/linker.py:25,</span> in <span class="ni">NumbaLinker.fgraph_convert</span><span class="nt">(self, fgraph, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">24</span> <span class="k">def</span><span class="w"> </span><span class="nf">fgraph_convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fgraph</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="ne">---&gt; </span><span class="mi">25</span>     <span class="kn">from</span><span class="w"> </span><span class="nn">aesara.link.numba.dispatch</span><span class="w"> </span><span class="kn">import</span> <span class="n">numba_funcify</span>
+<span class="g g-Whitespace">     </span><span class="mi">27</span>     <span class="k">return</span> <span class="n">numba_funcify</span><span class="p">(</span><span class="n">fgraph</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.13</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">aesara</span><span class="o">/</span><span class="n">link</span><span class="o">/</span><span class="n">numba</span><span class="o">/</span><span class="n">dispatch</span><span class="o">/</span><span class="fm">__init__</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">2</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># isort: off</span>
+<span class="ne">----&gt; </span><span class="mi">2</span> <span class="kn">from</span><span class="w"> </span><span class="nn">aesara.link.numba.dispatch.basic</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="n">numba_funcify</span><span class="p">,</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="n">numba_const_convert</span><span class="p">,</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span>     <span class="n">numba_njit</span><span class="p">,</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="c1"># Load dispatch specializations</span>
+<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="kn">import</span><span class="w"> </span><span class="nn">aesara.link.numba.dispatch.scalar</span>
+
+<span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.13</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">aesara</span><span class="o">/</span><span class="n">link</span><span class="o">/</span><span class="n">numba</span><span class="o">/</span><span class="n">dispatch</span><span class="o">/</span><span class="n">basic</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">198</span>
+<span class="g g-Whitespace">    </span><span class="mi">192</span>             <span class="k">return</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="kc">False</span>
+<span class="g g-Whitespace">    </span><span class="mi">195</span> <span class="n">enable_slice_boxing</span><span class="p">()</span>
+<span class="ne">--&gt; </span><span class="mi">198</span> <span class="nd">@generated_jit</span>
+<span class="g g-Whitespace">    </span><span class="mi">199</span> <span class="k">def</span><span class="w"> </span><span class="nf">to_scalar</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">200</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="n">numba</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">Number</span><span class="p">,</span> <span class="n">numba</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">Boolean</span><span class="p">)):</span>
+<span class="g g-Whitespace">    </span><span class="mi">201</span>         <span class="k">return</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/numba/core/decorators.py:223,</span> in <span class="ni">_jit.&lt;locals&gt;.wrapper</span><span class="nt">(func)</span>
+<span class="g g-Whitespace">    </span><span class="mi">221</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">DISABLE_JIT</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">target</span> <span class="o">==</span> <span class="s1">&#39;npyufunc&#39;</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">222</span>     <span class="k">return</span> <span class="n">func</span>
+<span class="ne">--&gt; </span><span class="mi">223</span> <span class="n">disp</span> <span class="o">=</span> <span class="n">dispatcher</span><span class="p">(</span><span class="n">py_func</span><span class="o">=</span><span class="n">func</span><span class="p">,</span> <span class="nb">locals</span><span class="o">=</span><span class="nb">locals</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">224</span>                   <span class="n">targetoptions</span><span class="o">=</span><span class="n">targetoptions</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">225</span>                   <span class="o">**</span><span class="n">dispatcher_args</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">226</span> <span class="k">if</span> <span class="n">cache</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">227</span>     <span class="n">disp</span><span class="o">.</span><span class="n">enable_caching</span><span class="p">()</span>
+
+<span class="ne">TypeError</span>: Dispatcher.__init__() got an unexpected keyword argument &#39;impl_kind&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>As is we cannot use these functions within jit-compiled functions written with JAX, or apply <code class="docutils literal notranslate"><span class="pre">jax.grad</span></code> to get the function’s gradients:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">logdensity_fn</span><span class="p">)(</span><span class="mf">1.</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;JAX raised an exception while jit-compiling!&quot;</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">logdensity_fn</span><span class="p">)(</span><span class="mf">1.</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;JAX raised an exception while differentiating!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Indeed, a function written with Numba is incompatible with JAX’s primitives. Luckily Aesara can build the model’s gradient graph and compile it to Numba as well:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">total_logdensity_grad</span> <span class="o">=</span> <span class="n">at</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">total_logdensity</span><span class="p">,</span> <span class="n">y_vv</span><span class="p">)</span>
+<span class="n">logdensity_grad_fn</span> <span class="o">=</span> <span class="n">aesara</span><span class="o">.</span><span class="n">function</span><span class="p">((</span><span class="n">y_vv</span><span class="p">,),</span> <span class="n">total_logdensity_grad</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;NUMBA&quot;</span><span class="p">)</span>
+<span class="n">logdensity_grad_fn</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="use-jax-experimental-host-callback-to-call-numba-functions">
+<h2>Use <code class="docutils literal notranslate"><span class="pre">jax.experimental.host_callback</span></code> to call Numba functions<a class="headerlink" href="#use-jax-experimental-host-callback-to-call-numba-functions" title="Link to this heading">#</a></h2>
+<p>In order to be able to call <code class="docutils literal notranslate"><span class="pre">logdensity_fn</span></code> within JAX, we need to define a function that will call it via JAX’s <code class="docutils literal notranslate"><span class="pre">host_callback</span></code>. Yet, this wrapper function is not differentiable with JAX, and so we will also need to define this functions’ <code class="docutils literal notranslate"><span class="pre">custom_vjp</span></code>, and use <code class="docutils literal notranslate"><span class="pre">host_callback</span></code> to call the gradient-computing function as well:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax.experimental.host_callback</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">hcb</span>
+
+<span class="nd">@jax</span><span class="o">.</span><span class="n">custom_vjp</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">numba_logpdf</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">hcb</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">logdensity_fn</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">arg</span><span class="p">,</span> <span class="n">result_shape</span><span class="o">=</span><span class="n">arg</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">call_grad</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">hcb</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">logdensity_grad_fn</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">arg</span><span class="p">,</span> <span class="n">result_shape</span><span class="o">=</span><span class="n">arg</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">vjp_fwd</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">numba_logpdf</span><span class="p">(</span><span class="n">arg</span><span class="p">),</span> <span class="n">call_grad</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">vjp_bwd</span><span class="p">(</span><span class="n">grad_x</span><span class="p">,</span> <span class="n">y_bar</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">grad_x</span> <span class="o">*</span> <span class="n">y_bar</span><span class="p">,)</span>
+
+<span class="n">numba_logpdf</span><span class="o">.</span><span class="n">defvjp</span><span class="p">(</span><span class="n">vjp_fwd</span><span class="p">,</span> <span class="n">vjp_bwd</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And we can now call the function from a jitted function and apply <code class="docutils literal notranslate"><span class="pre">jax.grad</span></code> without JAX complaining:</p>
+<div class="cell tag_remove-stderr docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">numba_logpdf</span><span class="p">)(</span><span class="mf">1.</span><span class="p">),</span> <span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">numba_logpdf</span><span class="p">)(</span><span class="mf">1.</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And use Blackjax’s NUTS sampler to sample from the model’s posterior distribution:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">blackjax</span>
+
+<span class="n">inverse_mass_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">step_size</span><span class="o">=</span><span class="mf">1e-3</span>
+<span class="n">nuts</span> <span class="o">=</span> <span class="n">blackjax</span><span class="o">.</span><span class="n">nuts</span><span class="p">(</span><span class="n">numba_logpdf</span><span class="p">,</span> <span class="n">step_size</span><span class="p">,</span> <span class="n">inverse_mass_matrix</span><span class="p">)</span>
+<span class="n">init</span> <span class="o">=</span> <span class="n">nuts</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="mf">0.</span><span class="p">)</span>
+
+<span class="n">rng_key</span><span class="p">,</span> <span class="n">init_key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rng_key</span><span class="p">)</span>
+<span class="n">state</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">nuts</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">init_key</span><span class="p">,</span> <span class="n">init</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">rng_key</span><span class="p">,</span> <span class="n">nuts_key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rng_key</span><span class="p">)</span>
+    <span class="n">state</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">nuts</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">nuts_key</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>If you run this on your machine you will notice that this runs quite slowly compared to a pure-JAX equivalent, that’s because <code class="docutils literal notranslate"><span class="pre">host_callback</span></code> implied a lot of back-and-forth with Python. To see this let’s compare execution times between <em>pure Numba on the one hand</em>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100_000</span><span class="p">):</span>
+    <span class="n">logdensity_fn</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And <em>JAX on the other hand, with 100 times less iterations</em>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1_000</span><span class="p">):</span>
+    <span class="n">numba_logpdf</span><span class="p">(</span><span class="mf">100.</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>That’s a <strong>lot</strong> of overhead!</p>
+<p>So while the implementation is simple considering what we’re trying to achieve, it is only recommended for workloads where most of the time is spent evaluating the logdensity and its gradient, and where this overhead becomes irrelevant.</p>
+</section>
+<section id="use-custom-xla-calls-to-call-numba-functions-faster">
+<h2>Use custom XLA calls to call Numba functions faster<a class="headerlink" href="#use-custom-xla-calls-to-call-numba-functions-faster" title="Link to this heading">#</a></h2>
+<p>To avoid this kind overhead we can use an XLA custom call to execute Numba functions so there is no callback to Python in loops. Writing a function that performs such custom calls given a Numba function is a bit out of scope for this tutorial, but you can get inspiration from <a class="reference external" href="https://github.com/jax-ml/jax-triton/blob/main/jax_triton/triton_call.py">jax-triton</a> to implement a custom call to a Numba function. You will also need to register a custom vjp, but you already know how to do that.</p>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="howto_custom_gradients.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Use custom gradients</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="howto_metropolis_within_gibbs.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">How to build a Metropolis-Within-Gibbs sampler?</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#aesara-model-compiled-to-numba">Aesara model compiled to Numba</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#use-jax-experimental-host-callback-to-call-numba-functions">Use <code class="docutils literal notranslate"><span class="pre">jax.experimental.host_callback</span></code> to call Numba functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#use-custom-xla-calls-to-call-numba-functions-faster">Use custom XLA calls to call Numba functions faster</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By The Blackjax developers
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, The Blackjax developers.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
