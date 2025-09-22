@@ -151,25 +151,19 @@ def build_kernel(
         def slicer(t) -> tuple[SliceState, SliceInfo]:
             x, step_accepted = stepper_fn(state.position, d, t)
             new_state = init(x, logdensity_fn, constraint_fn)
-            constraints = jnp.where(
-                strict,
-                new_state.constraint > constraint,
-                new_state.constraint >= constraint
+            constraints_ok = jnp.all(
+                jnp.where(
+                    strict,
+                    new_state.constraint > constraint,
+                    new_state.constraint >= constraint
+                )
             )
-            constraints = jnp.append(constraints, new_state.logdensity >= logslice)
-            constraints = jnp.append(constraints, step_accepted)
-            is_accepted = jnp.all(constraints)
+            in_slice = new_state.logdensity >= logslice
+            is_accepted = in_slice & constraints_ok & step_accepted
             return new_state, is_accepted
 
         new_state, info = horizontal_slice(hs_key, slicer, state, max_steps, max_shrinkage)
         info = info._replace(is_accepted=info.is_accepted & vertical_is_accepted)
-
-        new_state = jax.lax.cond(
-                info.is_accepted,
-                lambda _: new_state,
-                lambda _: state,
-                operand=None,
-                )
         return new_state, info
 
     return kernel
@@ -228,8 +222,7 @@ def horizontal_slice(
         return i, s, t, is_accepted
 
     def step_cond_fun(carry):
-        is_accepted = carry[-1]
-        i = carry[0]
+        i, _, _, is_accepted = carry
         return is_accepted & (i > 0)
 
     j, _, l, _ = jax.lax.while_loop(step_cond_fun, step_body_fun, (j+1, -1, 1 - u, True))
@@ -251,18 +244,17 @@ def horizontal_slice(
         return n, rng_key, l, r, new_state, is_accepted
 
     def shrink_cond_fun(carry):
-        within = carry[-1]
-        n = carry[0]
-        return ~within & (n < max_shrinkage + 1)
+        n, _, _, _, _, is_accepted = carry
+        return ~is_accepted & (n < max_shrinkage)
 
     carry = 0, rng_key, l, r, state, False
     carry = jax.lax.while_loop(shrink_cond_fun, shrink_body_fun, carry)
-    n, _, _, _, end_state, is_accepted = carry
-    slice_state, (is_accepted, _, _) = static_binomial_sampling(
-        rng_key, jnp.log(n < max_shrinkage + 1), state, end_state
+    n, _, _, _, new_state, is_accepted = carry
+    new_state, (is_accepted, _, _) = static_binomial_sampling(
+        rng_key, jnp.log(is_accepted), state, new_state
     )
-    slice_info = SliceInfo(is_accepted, m - j - k, n)
-    return slice_state, slice_info
+    slice_info = SliceInfo(is_accepted, m + 1 - j - k, n)
+    return new_state, slice_info
 
 
 def build_hrss_kernel(
@@ -304,7 +296,7 @@ def build_hrss_kernel(
         d = generate_slice_direction_fn(prop_key)
         constraint_fn = lambda x: jnp.array([])
         constraint = jnp.array([])
-        strict = jnp.array([])
+        strict = jnp.array([], dtype=bool)
         return slice_kernel(
             rng_key, state, logdensity_fn, d, constraint_fn, constraint, strict
         )
