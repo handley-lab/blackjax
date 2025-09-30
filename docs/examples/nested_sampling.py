@@ -4,7 +4,7 @@ import tqdm
 from jax.scipy.linalg import inv, solve
 
 import blackjax
-from blackjax.ns.utils import finalise, log_weights
+from blackjax.ns.utils import converged, finalise, log_weights
 
 # jax.config.update("jax_enable_x64", True)
 
@@ -98,7 +98,7 @@ dead = []
 for _ in tqdm.trange(1000):
     # We track the estimate of the evidence in the live points as logZ_live, and the accumulated sum across all steps in logZ
     # this gives a handy termination that allows us to stop early
-    if live.logZ_live - live.logZ < -3:  # type: ignore[attr-defined]
+    if converged(live):  # type: ignore[attr-defined]
         break
     rng_key, subkey = jax.random.split(rng_key, 2)
     live, dead_info = step_fn(subkey, live)

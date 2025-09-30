@@ -396,3 +396,9 @@ def uniform_prior(
     particles = jax.vmap(prior_sample)(init_keys)
 
     return particles, logprior_fn
+
+
+def converged(live: NSState, precision_criterion: float = jnp.exp(-3)) -> bool:
+    all_same = jnp.max(live.loglikelihood) == jnp.min(live.loglikelihood)
+    live_evidence = live.logZ_live - live.logZ < jnp.log(precision_criterion)
+    return live_evidence | all_same

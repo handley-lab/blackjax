@@ -66,6 +66,14 @@ class NSState(NamedTuple):
         The accumulated log evidence estimate from the "dead" points .
     logZ_live
         The current estimate of the log evidence contribution from the live points.
+    logZ_error
+        The current estimate of the error on logZ.
+    H
+        The current estimate of the information (negative entropy) in nats.
+    i_eff
+        The effective number of iterations
+    n_eff
+        The effective sample size of the current set of live particles.
     inner_kernel_params
         A dictionary of parameters for the inner kernel.
     """
@@ -78,6 +86,10 @@ class NSState(NamedTuple):
     logX: Array  # The current log-volume estimate
     logZ: Array  # The accumulated evidence estimate
     logZ_live: Array  # The current evidence estimate
+    logZ_error: Array  # The current error estimate on logZ
+    H: Array  # The current information estimate
+    i_eff: Array  # The effective number of iterations
+    n_eff: Array  # The effective sample size of the current particles
     inner_kernel_params: Dict  # Parameters for the inner kernel
 
 
@@ -210,6 +222,10 @@ def init(
     loglikelihood_birth: Array = -jnp.nan,
     logX: Optional[Array] = 0.0,
     logZ: Optional[Array] = -jnp.inf,
+    logZ_error: Optional[Array] = 0.0,
+    H: Optional[Array] = 0.0,
+    i_eff: Optional[Array] = 0.0,
+    n_eff: Optional[Array] = 0.0,
 ) -> NSState:
     """Initializes the Nested Sampler state.
 
@@ -244,6 +260,11 @@ def init(
     logX = jnp.array(logX, dtype=dtype)
     logZ = jnp.array(logZ, dtype=dtype)
     logZ_live = logmeanexp(loglikelihood) + logX
+    logZ_error = jnp.array(logZ_error, dtype=dtype)
+    H = jnp.array(H, dtype=dtype)
+    i_eff = jnp.array(i_eff, dtype=dtype)
+    n_eff = jnp.array(n_eff, dtype=dtype)
+    n_eff = jnp.where(n_eff == 0.0, len(loglikelihood), n_eff)
     inner_kernel_params: Dict = {}
     return NSState(
         particles,
@@ -254,6 +275,10 @@ def init(
         logX,
         logZ,
         logZ_live,
+        logZ_error,
+        H,
+        i_eff,
+        n_eff,
         inner_kernel_params,
     )
 
@@ -350,8 +375,8 @@ def build_kernel(
         pid = state.pid.at[target_update_idx].set(state.pid[start_idx])
 
         # Update the run-time information
-        logX, logZ, logZ_live = update_ns_runtime_info(
-            state.logX, state.logZ, loglikelihood, dead_loglikelihood
+        logX, logZ, logZ_live, logZ_error, H, i_eff, n_eff = update_ns_runtime_info(
+            state, loglikelihood, dead_loglikelihood
         )
 
         # Return updated state and info
@@ -364,6 +389,10 @@ def build_kernel(
             logX,
             logZ,
             logZ_live,
+            logZ_error,
+            H,
+            i_eff,
+            n_eff,
             state.inner_kernel_params,
         )
         info = NSInfo(
@@ -428,20 +457,29 @@ def delete_fn(
 
 
 def update_ns_runtime_info(
-    logX: Array, logZ: Array, loglikelihood: Array, dead_loglikelihood: Array
-) -> tuple[Array, Array, Array]:
+    state: NSState, loglikelihood: Array, dead_loglikelihood: Array
+) -> tuple[Array, Array, Array, Array, Array, Array, Array]:
     num_particles = len(loglikelihood)
     num_deleted = len(dead_loglikelihood)
     num_live = jnp.arange(num_particles, num_particles - num_deleted, -1)
     delta_logX = -1 / num_live
-    logX = logX + jnp.cumsum(delta_logX)
-    log_delta_X = logX + jnp.log(1 - jnp.exp(delta_logX))
+    logX = state.logX + jnp.cumsum(delta_logX)
+    log_delta_X = logX + jnp.log1p(-jnp.exp(delta_logX))
     log_delta_Z = dead_loglikelihood + log_delta_X
-
     delta_logZ = logsumexp(log_delta_Z)
-    logZ = jnp.logaddexp(logZ, delta_logZ)
+    logZ = jnp.logaddexp(state.logZ, delta_logZ)
+    A = state.i_eff / state.n_eff + jnp.sum(1 / num_live)
+    B = state.i_eff / state.n_eff**2 + jnp.sum(1 / num_live**2)
+    i_eff = A**2 / B
+    n_eff = A / B
+    H = jnp.nan_to_num(jnp.exp(state.logZ - logZ) * (state.H + state.logZ), 0.0)
+    H += jnp.sum(jnp.exp(log_delta_Z - logZ) * dead_loglikelihood) - logZ
+    logZ_error = jnp.sqrt(H / n_eff)
     logZ_live = logmeanexp(loglikelihood) + logX[-1]
-    return logX[-1], logZ, logZ_live
+    return logX[-1], logZ, logZ_live, logZ_error, H, i_eff, n_eff
+
+
+# H ~ Σ 1/n ± sqrt(Σ 1/n^2)
 
 
 def logmeanexp(x: Array) -> Array:
