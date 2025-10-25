@@ -25,6 +25,16 @@ def loglikelihood_fn(x):
     return jax.scipy.stats.multivariate_normal.logpdf(x, mean=like_mean, cov=like_cov)
 
 
+def derived_fn(x):
+    """Compute derived parameters from position.
+
+    For this example, we compute simple derived quantities:
+    - norm: the L2 norm of the position vector
+    - sum: the sum of the position components
+    """
+    return {"norm": jnp.linalg.norm(x), "sum": jnp.sum(x)}
+
+
 def compute_logZ(mu_L, Sigma_L, logLmax=0, mu_pi=None, Sigma_pi=None):
     Sigma_P = inv(inv(Sigma_pi) + inv(Sigma_L))
     mu_P = jnp.dot(Sigma_P, (solve(Sigma_pi, mu_pi) + solve(Sigma_L, mu_L)))
@@ -67,6 +77,7 @@ num_inner_steps = d * 5
 algo = blackjax.nss(
     logprior_fn=logprior_fn,
     loglikelihood_fn=loglikelihood_fn,
+    derived_fn=derived_fn,
     num_delete=num_delete,
     num_inner_steps=num_inner_steps,
 )

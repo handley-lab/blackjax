@@ -121,11 +121,17 @@ def build_kernel(
     return kernel
 
 
+def default_derived_fn(x):
+    """Default derived function that returns empty dict."""
+    return {}
+
+
 def as_top_level_api(
     logprior_fn: Callable,
     loglikelihood_fn: Callable,
     num_inner_steps: int,
     num_delete: int = 1,
+    derived_fn: Callable = default_derived_fn,
     stepper_fn: Callable = default_stepper_fn,
     adapt_direction_params_fn: Callable = compute_covariance_from_particles,
     generate_slice_direction_fn: Callable = sample_direction_from_covariance,
@@ -152,6 +158,9 @@ def as_top_level_api(
     num_delete
         The number of particles to delete and replace at each NS step.
         Defaults to 1.
+    derived_fn
+        A function that computes derived parameters from a particle position.
+        Defaults to a function returning an empty dict.
     stepper_fn
         The stepper function `(x, direction, t) -> (x_new, is_accepted)` for the HRSS kernel.
         Defaults to `default_stepper_fn`.
@@ -181,6 +190,7 @@ def as_top_level_api(
         init_state_strategy_fn,
         logprior_fn=logprior_fn,
         loglikelihood_fn=loglikelihood_fn,
+        derived_fn=derived_fn,
     )
 
     kernel = build_kernel(

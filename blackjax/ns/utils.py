@@ -242,6 +242,7 @@ def finalise(live: NSState, dead: list[NSInfo]) -> NSInfo:
             live.loglikelihood,
             live.loglikelihood_birth,
             live.logprior,
+            live.derived,
             dead[-1].update_info,
         )
     ]

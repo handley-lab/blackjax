@@ -57,6 +57,8 @@ class NSState(NamedTuple):
         This is used for reconstructing the nested sampling path.
     logprior
         An array of log-prior values, one for each live particle.
+    derived
+        Optional PyTree of derived parameters for each particle, conditional on positions.
     pid
         Particle ID. An array of integers tracking the identity or lineage of
         particles, primarily for diagnostic purposes.
@@ -74,6 +76,7 @@ class NSState(NamedTuple):
     loglikelihood: Array  # The log-likelihood of the particles
     loglikelihood_birth: Array  # The log-likelihood threshold at particle birth
     logprior: Array  # The log-prior density of the particles
+    derived: ArrayLikeTree  # Derived parameters for particles
     pid: Array  # particle IDs
     logX: Array  # The current log-volume estimate
     logZ: Array  # The accumulated evidence estimate
@@ -95,6 +98,8 @@ class NSInfo(NamedTuple):
         The birth log-likelihood thresholds of the dead particles.
     logprior
         The log-prior values of the dead particles.
+    derived
+        Optional PyTree of derived parameters for the dead particles.
     update_info
         A NamedTuple (or any PyTree) containing information from the update step
         (inner kernel) used to generate new live particles. The content
@@ -105,6 +110,7 @@ class NSInfo(NamedTuple):
     loglikelihood: Array  # The log-likelihood of the particles
     loglikelihood_birth: Array  # The log-likelihood threshold at particle birth
     logprior: Array  # The log-prior density of the particles
+    derived: ArrayLikeTree  # Derived parameters for dead particles
     update_info: NamedTuple
 
 
@@ -122,21 +128,28 @@ class StateWithLogLikelihood(NamedTuple):
     position
         A PyTree of arrays representing the current positions of the particles.
         Each leaf array has a leading dimension corresponding to the number of particles.
-    logprior
+    logdensity
         An array of log-prior density values evaluated at the particle positions.
         Shape: (n_particles,)
     loglikelihood
         An array of log-likelihood values evaluated at the particle positions.
         Shape: (n_particles,)
+    derived
+        Optional PyTree of derived parameters that are conditional on the position.
+        These are computed from the position but not sampled directly.
     """
 
     position: ArrayLikeTree  # Current positions of particles in the inner kernel
     logdensity: Array  # Log-prior values for particles in the inner kernel
     loglikelihood: Array  # Log-likelihood values for particles in the inner kernel
+    derived: ArrayLikeTree  # Derived parameters conditional on position
 
 
 def init_state_strategy(
-    position: ArrayLikeTree, logprior_fn: Callable, loglikelihood_fn: Callable
+    position: ArrayLikeTree,
+    logprior_fn: Callable,
+    loglikelihood_fn: Callable,
+    derived_fn: Callable,
 ) -> StateWithLogLikelihood:
     """The default initialisation strategy for each state.
 
@@ -145,19 +158,26 @@ def init_state_strategy(
     position
         A PyTree of arrays representing the initial positions of the particles.
         Each leaf array has a leading dimension corresponding to the number of particles.
-    logprior
+    logprior_fn
         A function that computes the log-prior density for a single particle.
-    loglikelihood
+    loglikelihood_fn
         A function that computes the log-likelihood for a single particle.
+    derived_fn
+        Function that computes derived parameters from the position.
+        These are parameters conditional on the sampled position.
 
     Returns
     -------
-    PartitionedState
-        The initialized state containing positions, log-prior, and log-likelihood.
+    StateWithLogLikelihood
+        The initialized state containing positions, log-prior, log-likelihood,
+        and derived parameters.
     """
     logprior_values = logprior_fn(position)
     loglikelihood_values = loglikelihood_fn(position)
-    return StateWithLogLikelihood(position, logprior_values, loglikelihood_values)
+    derived_values = derived_fn(position)
+    return StateWithLogLikelihood(
+        position, logprior_values, loglikelihood_values, derived_values
+    )
 
 
 def init(
@@ -196,6 +216,7 @@ def init(
     loglikelihood = state.loglikelihood
     loglikelihood_birth = loglikelihood_birth * jnp.ones_like(loglikelihood)
     logprior = state.logdensity
+    derived = state.derived
     pid = jnp.arange(len(loglikelihood), dtype=jnp.int32)
     dtype = loglikelihood.dtype
     logX = jnp.array(logX, dtype=dtype)
@@ -207,6 +228,7 @@ def init(
         loglikelihood,
         loglikelihood_birth,
         logprior,
+        derived,
         pid,
         logX,
         logZ,
@@ -271,6 +293,7 @@ def build_kernel(
         dead_loglikelihood = state.loglikelihood[dead_idx]
         dead_loglikelihood_birth = state.loglikelihood_birth[dead_idx]
         dead_logprior = state.logprior[dead_idx]
+        dead_derived = jax.tree.map(lambda x: x[dead_idx], state.derived)
 
         # Resample the live particles
         loglikelihood_0 = dead_loglikelihood.max()
@@ -279,7 +302,8 @@ def build_kernel(
         particles = jax.tree.map(lambda x: x[start_idx], state.particles)
         logprior = state.logprior[start_idx]
         loglikelihood = state.loglikelihood[start_idx]
-        inner_state = StateWithLogLikelihood(particles, logprior, loglikelihood)
+        derived = jax.tree.map(lambda x: x[start_idx], state.derived)
+        inner_state = StateWithLogLikelihood(particles, logprior, loglikelihood, derived)
         new_inner_state, inner_update_info = inner_kernel(
             sample_keys,
             inner_state,
@@ -300,6 +324,11 @@ def build_kernel(
             loglikelihood_0
         )
         logprior = state.logprior.at[target_update_idx].set(new_inner_state.logdensity)
+        derived = jax.tree_util.tree_map(
+            lambda p, n: p.at[target_update_idx].set(n),
+            state.derived,
+            new_inner_state.derived,
+        )
         pid = state.pid.at[target_update_idx].set(state.pid[start_idx])
 
         # Update the run-time information
@@ -313,6 +342,7 @@ def build_kernel(
             loglikelihood,
             loglikelihood_birth,
             logprior,
+            derived,
             pid,
             logX,
             logZ,
@@ -324,6 +354,7 @@ def build_kernel(
             dead_loglikelihood,
             dead_loglikelihood_birth,
             dead_logprior,
+            dead_derived,
             inner_update_info,
         )
         return state, info

@@ -38,6 +38,8 @@ def init(
     particles: ArrayLikeTree,
     init_state_fn: Callable,
     loglikelihood_birth: Array = -jnp.nan,
+    logX: Optional[Array] = 0.0,
+    logZ: Optional[Array] = -jnp.inf,
     update_inner_kernel_params_fn: Optional[Callable] = None,
 ) -> NSState:
     """Initializes the Nested Sampler state.
@@ -65,7 +67,7 @@ def init(
     NSState
         The initial state of the Nested Sampler.
     """
-    state = base_init(particles, init_state_fn, loglikelihood_birth)
+    state = base_init(particles, init_state_fn, loglikelihood_birth, logX, logZ)
     if update_inner_kernel_params_fn is not None:
         inner_kernel_params = update_inner_kernel_params_fn(state, None, {})
         state = state._replace(inner_kernel_params=inner_kernel_params)
