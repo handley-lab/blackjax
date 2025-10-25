@@ -23,11 +23,12 @@ def update_with_mcmc_take_last(
     """
 
     def update_function(rng_key, state, loglikelihood_0, step_parameters):
-        shared_mcmc_step_fn = partial(
-            constrained_mcmc_step_fn,
-            loglikelihood_0=loglikelihood_0,
-            **step_parameters,
-        )
+        # shared_mcmc_step_fn = partial(
+        #     constrained_mcmc_step_fn,
+        #     loglikelihood_0=loglikelihood_0,
+        #     **step_parameters,
+        # )
+        shared_mcmc_step_fn = constrained_mcmc_step_fn
 
         def mcmc_kernel(rng_key, state):
             def body_fn(state, rng_key):
@@ -38,7 +39,9 @@ def update_with_mcmc_take_last(
             final_state, infos = jax.lax.scan(body_fn, state, keys)
             return final_state, infos  # MCMCUpdateInfo(infos[0], infos[1])
 
-        return jax.vmap(mcmc_kernel)(rng_key, state)
+        return jax.vmap(mcmc_kernel, in_axes=(0, 0, None, None))(
+            rng_key, state, loglikelihood_0, step_parameters
+        )
 
     return update_function
 
