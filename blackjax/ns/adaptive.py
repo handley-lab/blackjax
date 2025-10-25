@@ -50,10 +50,8 @@ def init(
         An initial set of particles (PyTree of arrays) drawn from the prior
         distribution. The leading dimension of each leaf array must be equal to
         the number of particles.
-    loglikelihood_fn
-        A function that computes the log-likelihood of a single particle.
-    logprior_fn
-        A function that computes the log-prior of a single particle.
+    init_state_fn
+        A function that initializes a StateWithLogLikelihood from particles.
     loglikelihood_birth
         The initial log-likelihood birth threshold. Defaults to -NaN, which
         implies no initial likelihood constraint beyond the prior.
@@ -90,10 +88,6 @@ def build_kernel(
 
     Parameters
     ----------
-    logprior_fn
-        A function that computes the log-prior probability of a single particle.
-    loglikelihood_fn
-        A function that computes the log-likelihood of a single particle.
     delete_fn
         this particle deletion function has the signature
         `(rng_key, current_state) -> (dead_idx, target_update_idx, start_idx)`
@@ -102,7 +96,7 @@ def build_kernel(
         for new particle generation.
     inner_kernel
         This kernel function has the signature
-        `(rng_key, inner_state, logprior_fn, loglikelihood_fn, loglikelihood_0, inner_kernel_params) -> (new_inner_state, inner_info)`,
+        `(rng_keys, inner_state, loglikelihood_0, inner_kernel_params) -> (new_inner_state, inner_info)`,
         and is used to generate new particles.
     update_inner_kernel_params_fn
         A function that takes the `NSState`, `NSInfo` from the completed NS

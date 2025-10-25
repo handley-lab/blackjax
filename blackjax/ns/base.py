@@ -58,7 +58,7 @@ class NSState(NamedTuple):
     logprior
         An array of log-prior values, one for each live particle.
     derived
-        Optional PyTree of derived parameters for each particle, conditional on positions.
+        PyTree of derived parameters for each particle, conditional on positions.
     pid
         Particle ID. An array of integers tracking the identity or lineage of
         particles, primarily for diagnostic purposes.
@@ -99,7 +99,7 @@ class NSInfo(NamedTuple):
     logprior
         The log-prior values of the dead particles.
     derived
-        Optional PyTree of derived parameters for the dead particles.
+        PyTree of derived parameters for the dead particles.
     update_info
         A NamedTuple (or any PyTree) containing information from the update step
         (inner kernel) used to generate new live particles. The content
@@ -135,7 +135,7 @@ class StateWithLogLikelihood(NamedTuple):
         An array of log-likelihood values evaluated at the particle positions.
         Shape: (n_particles,)
     derived
-        Optional PyTree of derived parameters that are conditional on the position.
+        PyTree of derived parameters that are conditional on the position.
         These are computed from the position but not sampled directly.
     """
 
@@ -195,10 +195,8 @@ def init(
         An initial set of particles (PyTree of arrays) drawn from the prior
         distribution. The leading dimension of each leaf array must be equal to
         the number of particles.
-    logprior_fn
-        A function that computes the log-prior of a single particle.
-    loglikelihood_fn
-        A function that computes the log-likelihood of a single particle.
+    init_state_fn
+        A function that initializes a StateWithLogLikelihood from particles.
     loglikelihood_birth
         The initial log-likelihood birth threshold. Defaults to -NaN, which
         implies no initial likelihood constraint beyond the prior.
@@ -263,10 +261,6 @@ def build_kernel(
 
     Parameters
     ----------
-    logprior_fn
-        A function that computes the log-prior probability of a single particle.
-    loglikelihood_fn
-        A function that computes the log-likelihood of a single particle.
     delete_fn
         this particle deletion function has the signature
         `(rng_key, current_state) -> (dead_idx, target_update_idx, start_idx)`
@@ -275,7 +269,7 @@ def build_kernel(
         for new particle generation.
     inner_kernel
         This kernel function has the signature
-        `(rng_key, inner_state, logprior_fn, loglikelihood_fn, loglikelihood_0, params) -> (new_inner_state, inner_info)`,
+        `(rng_keys, inner_state, loglikelihood_0, params) -> (new_inner_state, inner_info)`,
         and is used to generate new particles.
 
     Returns
