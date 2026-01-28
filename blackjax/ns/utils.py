@@ -147,21 +147,26 @@ def logX(rng_key: PRNGKey, dead_info: NSInfo, shape: int = 100) -> tuple[Array, 
           `dX_i` is approximately `X_i - X_{i+1}`.
     """
     rng_key, subkey = jax.random.split(rng_key)
-    min_val = jnp.finfo(dead_info.loglikelihood.dtype).tiny
-    r = jnp.log(
-        jax.random.uniform(
-            subkey, shape=(dead_info.loglikelihood.shape[0], shape)
-        ).clip(min_val, 1 - min_val)
-    )
+    r = -jax.random.exponential(subkey, shape=(dead_info.loglikelihood.shape[0], shape))
 
     num_live = compute_num_live(dead_info)
     t = r / num_live[:, jnp.newaxis]
+
+    # Standard cumulative sum
     logX = jnp.cumsum(t, axis=0)
 
     logXp = jnp.concatenate([jnp.zeros((1, logX.shape[1])), logX[:-1]], axis=0)
     logXm = jnp.concatenate([logX[1:], jnp.full((1, logX.shape[1]), -jnp.inf)], axis=0)
     log_diff = logXm - logXp
-    logdX = log1mexp(log_diff) + logXp - jnp.log(2)
+
+    # When log_diff = 0 due to precision limits, the volume element approaches 0
+    # Instead of getting -inf from log1mexp(0), use a large negative value
+    # that represents the precision limit
+    precision_floor = jnp.log(jnp.finfo(logX.dtype).eps)
+    safe_log_diff = jnp.where(log_diff == 0.0, precision_floor, log_diff)
+
+    logdX = log1mexp(safe_log_diff) + logXp - jnp.log(2)
+
     return logX, logdX
 
 
@@ -229,22 +234,37 @@ def finalise(live: NSState, dead: list[NSInfo]) -> NSInfo:
         The `update_info` from the last element of `dead` is used
         for the final live points' `update_info` (as a placeholder).
     """
-
-    all_pytrees_to_combine = dead + [
-        NSInfo(
+    if not dead:
+        return NSInfo(
             live.particles,
             live.loglikelihood,
             live.loglikelihood_birth,
             live.logprior,
-            dead[-1].inner_kernel_info,
+            {},  # type: ignore
         )
-    ]
-    combined_dead_info = jax.tree.map(
-        lambda *args: jnp.concatenate(args),
-        all_pytrees_to_combine[0],
-        *all_pytrees_to_combine[1:],
+
+    all_particles = [d.particles for d in dead] + [live.particles]
+    combined_particles = jax.tree.map(
+        lambda *args: jnp.concatenate(args, axis=0), *all_particles  # type: ignore
     )
-    return combined_dead_info
+
+    all_loglikelihood = [d.loglikelihood for d in dead] + [live.loglikelihood]
+    all_loglikelihood_birth = [d.loglikelihood_birth for d in dead] + [
+        live.loglikelihood_birth
+    ]
+    all_logprior = [d.logprior for d in dead] + [live.logprior]
+
+    combined_loglikelihood = jnp.concatenate(all_loglikelihood, axis=0)
+    combined_loglikelihood_birth = jnp.concatenate(all_loglikelihood_birth, axis=0)
+    combined_logprior = jnp.concatenate(all_logprior, axis=0)
+
+    return NSInfo(
+        combined_particles,
+        combined_loglikelihood,
+        combined_loglikelihood_birth,
+        combined_logprior,
+        dead[-1].inner_kernel_info,
+    )
 
 
 def ess(rng_key: PRNGKey, dead_info_map: NSInfo) -> Array:
