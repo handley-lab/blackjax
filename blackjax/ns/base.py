@@ -150,37 +150,34 @@ def build_kernel(
     Parameters
     ----------
     delete_fn
-        this particle deletion function has the signature
-        `(rng_key, current_state) -> (dead_idx, target_update_idx, start_idx)`
-        and identifies particles to be deleted, particles to be updated, and
-        selects live particles to be starting points for the inner kernel
-        for new particle generation.
+        A deletion function, typically partially applied with ``num_delete``,
+        with effective signature ``(state) -> (dead_idx, target_update_idx)``.
+        Receives the full NS state (duck-typed) and identifies particles
+        to be deleted and the indices to update.
     inner_kernel
-        This kernel function has the signature
-        `(rng_keys, inner_state, loglikelihood_0) -> (new_inner_state, inner_info)`,
-        and is used to generate new particles.
+        A kernel function with the signature
+        ``(rng_key, state, dead_idx, loglikelihood_0) -> (new_particles, info)``
+        that generates replacement particles. Receives the full NS state
+        (duck-typed) and a single PRNG key; returns a
+        ``StateWithLogLikelihood`` with leading dimension ``num_delete``.
 
     Returns
     -------
     Callable
         A kernel function for Nested Sampling:
-        `(rng_key, state, inner_kernel_params) -> (new_state, ns_info)`.
+        ``(rng_key, state) -> (new_state, ns_info)``.
     """
 
     def kernel(rng_key: PRNGKey, state: NSState) -> tuple[NSState, NSInfo]:
         # Delete, and grab all the dead information
-        rng_key, delete_fn_key = jax.random.split(rng_key)
-        dead_idx, target_update_idx, start_idx = delete_fn(
-            delete_fn_key, state.particles
-        )
+        dead_idx, target_update_idx = delete_fn(state)
         dead_particles = jax.tree.map(lambda x: x[dead_idx], state.particles)
 
-        # Resample the live particles
-        sample_keys = jax.random.split(rng_key, len(start_idx))
-        inner_state = jax.tree.map(lambda x: x[start_idx], state.particles)
+        # Generate replacement particles
+        rng_key, inner_key = jax.random.split(rng_key)
         loglikelihood_0 = dead_particles.loglikelihood.max()
-        new_inner_state, inner_update_info = inner_kernel(
-            sample_keys, inner_state, loglikelihood_0
+        new_particles, inner_update_info = inner_kernel(
+            inner_key, state, dead_idx, loglikelihood_0
         )
 
         # Update the particles
@@ -188,7 +185,7 @@ def build_kernel(
             particles=jax.tree_util.tree_map(
                 lambda p, n: p.at[target_update_idx].set(n),
                 state.particles,
-                new_inner_state,
+                new_particles,
             )
         )
 
@@ -203,49 +200,29 @@ def build_kernel(
 
 
 def delete_fn(
-    rng_key: PRNGKey, state: StateWithLogLikelihood, num_delete: int
-) -> tuple[Array, Array, Array]:
-    """Identifies particles to be deleted and selects live particles for resampling.
+    state: NSState, num_delete: int
+) -> tuple[Array, Array]:
+    """Identifies particles to be deleted.
 
-    This function implements a common strategy in Nested Sampling:
-    1. Identify the `num_delete` particles with the lowest log-likelihoods. These
-       are marked as "dead".
-    2. From the remaining live particles (those not marked as dead), `num_delete`
-       particles are chosen (typically with replacement, weighted by their
-       current importance weights, here it is uniform from survivors)
-       to serve as starting points for generating new particles.
+    Selects the ``num_delete`` particles with the lowest log-likelihoods
+    and marks them as "dead".
 
     Parameters
     ----------
-    rng_key
-        A JAX PRNG key, used here for choosing live particles.
     state
-        The current state of the Nested Sampler.
+        The current NS state (duck-typed; must have ``.particles.loglikelihood``).
     num_delete
         The number of particles to delete and subsequently replace.
 
     Returns
     -------
-    tuple[Array, Array, Array]
+    tuple[Array, Array]
         A tuple containing:
-        - `dead_idx`: An array of indices corresponding to the particles
-          marked for deletion.
-        - `target_update_idx`: An array of indices corresponding to the
-          particles to be updated (same as dead_idx in this implementation).
-        - `start_idx`: An array of indices corresponding to the particles
-            selected for initialization.
+        - ``dead_idx``: Indices of particles marked for deletion.
+        - ``target_update_idx``: Indices of particles to be overwritten
+          (same as ``dead_idx`` in this implementation).
     """
-    loglikelihood = state.loglikelihood
-    neg_dead_loglikelihood, dead_idx = jax.lax.top_k(-loglikelihood, num_delete)
-    constraint_loglikelihood = loglikelihood > -neg_dead_loglikelihood.min()
-    weights = jnp.array(constraint_loglikelihood)
-    weights = jnp.where(weights.sum() > 0.0, weights, jnp.ones_like(weights))
-    start_idx = jax.random.choice(
-        rng_key,
-        len(weights),
-        shape=(num_delete,),
-        p=weights / weights.sum(),
-        replace=True,
-    )
+    loglikelihood = state.particles.loglikelihood
+    _, dead_idx = jax.lax.top_k(-loglikelihood, num_delete)
     target_update_idx = dead_idx
-    return dead_idx, target_update_idx, start_idx
+    return dead_idx, target_update_idx

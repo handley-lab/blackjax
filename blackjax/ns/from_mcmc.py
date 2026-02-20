@@ -39,7 +39,23 @@ def update_with_mcmc_take_last(
         Number of MCMC proposals per particle.
     """
 
-    def update_function(rng_key, state, loglikelihood_0, **step_parameters):
+    def update_function(rng_key, state, dead_idx, loglikelihood_0, **step_parameters):
+        choice_key, sample_key = jax.random.split(rng_key)
+        particles = state.particles
+        num_delete = dead_idx.shape[0]
+
+        # Select start particles from survivors
+        weights = (particles.loglikelihood > loglikelihood_0).astype(jnp.float32)
+        weights = jnp.where(weights.sum() > 0.0, weights, jnp.ones_like(weights))
+        start_idx = jax.random.choice(
+            choice_key,
+            len(weights),
+            shape=(num_delete,),
+            p=weights / weights.sum(),
+            replace=True,
+        )
+        start_state = jax.tree.map(lambda x: x[start_idx], particles)
+
         shared_mcmc_step_fn = partial(
             constrained_mcmc_step_fn,
             loglikelihood_0=loglikelihood_0,
@@ -54,9 +70,10 @@ def update_with_mcmc_take_last(
                 return new_state, info
 
             final_state, infos = jax.lax.scan(body_fn, state, keys)
-            return final_state, infos  # MCMCUpdateInfo(final_state, infos)
+            return final_state, infos
 
-        return jax.vmap(mcmc_kernel)(rng_key, state)
+        sample_keys = jax.random.split(sample_key, num_delete)
+        return jax.vmap(mcmc_kernel)(sample_keys, start_state)
 
     return update_function
 

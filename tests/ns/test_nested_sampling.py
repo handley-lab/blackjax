@@ -96,14 +96,11 @@ class NestedSamplingTest(chex.TestCase):
         )
         state = base.init(positions, init_state_fn)
 
-        dead_idx, target_idx, start_idx = base.delete_fn(
-            key, state.particles, num_delete
-        )
+        dead_idx, target_idx = base.delete_fn(state, num_delete)
 
         # Check correct number of deletions
         chex.assert_shape(dead_idx, (num_delete,))
         chex.assert_shape(target_idx, (num_delete,))
-        chex.assert_shape(start_idx, (num_delete,))
 
         # Check that worst particles are selected
         worst_loglik = jnp.sort(state.particles.loglikelihood)[:num_delete]
@@ -122,9 +119,24 @@ class NestedSamplingTest(chex.TestCase):
         )
         state = base.init(positions, init_state_fn)
 
-        # Mock inner kernel for testing - matches new API signature
-        def mock_inner_kernel(rng_keys, inner_state, loglikelihood_0):
-            # inner_state is StateWithLogLikelihood
+        # Mock inner kernel for testing
+        def mock_inner_kernel(rng_key, state, dead_idx, loglikelihood_0):
+            particles = state.particles
+            num_replace = dead_idx.shape[0]
+
+            # Select start particles from survivors
+            choice_key, sample_key = jax.random.split(rng_key)
+            weights = (particles.loglikelihood > loglikelihood_0).astype(jnp.float32)
+            weights = jnp.where(weights.sum() > 0.0, weights, jnp.ones_like(weights))
+            start_idx = jax.random.choice(
+                choice_key,
+                len(weights),
+                shape=(num_replace,),
+                p=weights / weights.sum(),
+                replace=True,
+            )
+            start_state = jax.tree.map(lambda x: x[start_idx], particles)
+
             # Simple random walk for testing
             def single_step(rng_key, state):
                 new_pos = (
@@ -139,23 +151,36 @@ class NestedSamplingTest(chex.TestCase):
                 )
                 return new_state
 
-            new_inner_state = jax.vmap(single_step)(rng_keys, inner_state)
-            return new_inner_state, {}
+            sample_keys = jax.random.split(sample_key, num_replace)
+            new_particles = jax.vmap(single_step)(sample_keys, start_state)
+            return new_particles, {}
 
         delete_fn = functools.partial(base.delete_fn, num_delete=num_delete)
         kernel = base.build_kernel(delete_fn, mock_inner_kernel)
 
         # Test that the kernel can be constructed with mock components
-        # Full execution would require more complex mocking of inner kernel behavior
         self.assertTrue(callable(kernel))
 
         # Test delete function works
-        dead_idx, target_idx, start_idx = base.delete_fn(
-            key, state.particles, num_delete
-        )
+        dead_idx, target_idx = base.delete_fn(state, num_delete)
         chex.assert_shape(dead_idx, (num_delete,))
         chex.assert_shape(target_idx, (num_delete,))
-        chex.assert_shape(start_idx, (num_delete,))
+
+        # Actually run the kernel and check post-conditions
+        new_state, info = kernel(key, state)
+
+        # Particle count preserved
+        chex.assert_shape(
+            new_state.particles.position,
+            state.particles.position.shape,
+        )
+        # Dead particles returned in info
+        chex.assert_shape(info.particles.loglikelihood, (num_delete,))
+        # Dead particles are the worst from original state
+        worst_loglik = jnp.sort(state.particles.loglikelihood)[:num_delete]
+        chex.assert_trees_all_close(
+            jnp.sort(info.particles.loglikelihood), worst_loglik
+        )
 
     def test_utils_functions(self):
         """Test utility functions"""
