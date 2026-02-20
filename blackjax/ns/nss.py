@@ -130,7 +130,7 @@ def build_kernel(
         return new_slice_state, slice_info
 
     inner_kernel = update_with_mcmc_take_last(
-        constrained_mcmc_slice_fn, num_inner_steps
+        constrained_mcmc_slice_fn, num_inner_steps, num_delete
     )
 
     delete_fn = partial(delete_fn, num_delete=num_delete)

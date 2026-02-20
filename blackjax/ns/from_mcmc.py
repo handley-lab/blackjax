@@ -26,6 +26,7 @@ class ConstrainedMCMCInfo(NamedTuple):
 def update_with_mcmc_take_last(
     constrained_mcmc_step_fn,
     num_mcmc_steps,
+    num_delete,
 ):
     """An update strategy for NS that uses MCMC to update the particles.
     For now we will not keep the states as they will be too large to store.
@@ -37,12 +38,13 @@ def update_with_mcmc_take_last(
         Wrapped MCMC step function that enforces the NS likelihood constraint.
     num_mcmc_steps
         Number of MCMC proposals per particle.
+    num_delete
+        Number of particles to replace per step.
     """
 
-    def update_function(rng_key, state, dead_idx, loglikelihood_0, **step_parameters):
+    def update_function(rng_key, state, loglikelihood_0, **step_parameters):
         choice_key, sample_key = jax.random.split(rng_key)
         particles = state.particles
-        num_delete = dead_idx.shape[0]
 
         # Select start particles from survivors
         weights = (particles.loglikelihood > loglikelihood_0).astype(jnp.float32)
@@ -143,7 +145,7 @@ def build_kernel(
         mcmc_info = ConstrainedMCMCInfo(mcmc_info, is_accepted, trials)
         return state, mcmc_info, trials
 
-    inner_kernel = update_with_mcmc_take_last(constrained_mcmc_step_fn, num_inner_steps)
+    inner_kernel = update_with_mcmc_take_last(constrained_mcmc_step_fn, num_inner_steps, num_delete)
 
     delete_fn = partial(delete_fn, num_delete=num_delete)
 

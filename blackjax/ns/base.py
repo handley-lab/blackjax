@@ -156,10 +156,11 @@ def build_kernel(
         to be deleted and the indices to update.
     inner_kernel
         A kernel function with the signature
-        ``(rng_key, state, dead_idx, loglikelihood_0) -> (new_particles, info)``
+        ``(rng_key, state, loglikelihood_0) -> (new_particles, info)``
         that generates replacement particles. Receives the full NS state
         (duck-typed) and a single PRNG key; returns a
         ``StateWithLogLikelihood`` with leading dimension ``num_delete``.
+        The number of particles to produce is known at construction time.
 
     Returns
     -------
@@ -177,7 +178,7 @@ def build_kernel(
         rng_key, inner_key = jax.random.split(rng_key)
         loglikelihood_0 = dead_particles.loglikelihood.max()
         new_particles, inner_update_info = inner_kernel(
-            inner_key, state, dead_idx, loglikelihood_0
+            inner_key, state, loglikelihood_0
         )
 
         # Update the particles

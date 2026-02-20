@@ -119,10 +119,9 @@ class NestedSamplingTest(chex.TestCase):
         )
         state = base.init(positions, init_state_fn)
 
-        # Mock inner kernel for testing
-        def mock_inner_kernel(rng_key, state, dead_idx, loglikelihood_0):
+        # Mock inner kernel for testing — num_delete closed over from outer scope
+        def mock_inner_kernel(rng_key, state, loglikelihood_0):
             particles = state.particles
-            num_replace = dead_idx.shape[0]
 
             # Select start particles from survivors
             choice_key, sample_key = jax.random.split(rng_key)
@@ -131,7 +130,7 @@ class NestedSamplingTest(chex.TestCase):
             start_idx = jax.random.choice(
                 choice_key,
                 len(weights),
-                shape=(num_replace,),
+                shape=(num_delete,),
                 p=weights / weights.sum(),
                 replace=True,
             )
@@ -151,7 +150,7 @@ class NestedSamplingTest(chex.TestCase):
                 )
                 return new_state
 
-            sample_keys = jax.random.split(sample_key, num_replace)
+            sample_keys = jax.random.split(sample_key, num_delete)
             new_particles = jax.vmap(single_step)(sample_keys, start_state)
             return new_particles, {}
 
