@@ -43,7 +43,6 @@ __all__ = [
     "GaussianProposalInfo",
     "as_top_level_api",
     "build_kernel",
-    "count_survivors",
     "init",
     "update_inner_kernel_params",
 ]
@@ -75,33 +74,6 @@ class GaussianProposalInfo(NamedTuple):
     log_w_max: Array
     success: Array
 
-
-def count_survivors(log_weights, log_uniforms, log_w_max):
-    """Compute survival mask for importance-weighted rejection.
-
-    A proposal survives iff it has a finite weight and its stored log-uniform
-    satisfies ``log_u < log_w - log_w_max``.
-
-    Parameters
-    ----------
-    log_weights
-        Log-importance-weights for each proposal.
-    log_uniforms
-        Stored log-uniforms for each proposal.
-    log_w_max
-        Current maximum log-weight.
-
-    Returns
-    -------
-    Array
-        Boolean mask of surviving proposals.
-    """
-    valid = jnp.isfinite(log_weights)
-    delta = jnp.where(
-        jnp.isfinite(log_w_max), log_weights - log_w_max, jnp.array(-jnp.inf)
-    )
-    surviving = valid & (log_uniforms < delta)
-    return surviving
 
 
 def _build_gaussian_inner_kernel(
@@ -145,16 +117,11 @@ def _build_gaussian_inner_kernel(
         NEG_INF = jnp.array(-jnp.inf)
 
         prototype = jax.tree.map(lambda x: x[0], state.particles)
-        buffer_states = jax.tree.map(
-            lambda x: jnp.zeros((buffer_size,) + x.shape), prototype
-        )
-        buffer_log_weights = jnp.full(buffer_size, NEG_INF)
-        buffer_log_uniforms = jnp.zeros(buffer_size)
 
         init_carry = (
-            buffer_states,
-            buffer_log_weights,
-            buffer_log_uniforms,
+            jax.tree.map(lambda x: jnp.zeros((buffer_size,) + x.shape), prototype),  # states
+            jnp.full(buffer_size, NEG_INF),  # log_w
+            jnp.zeros(buffer_size),  # log_u
             jnp.array(0),  # num_buffered
             NEG_INF,  # log_w_max
             jnp.array(0),  # num_accepted_total
@@ -164,8 +131,8 @@ def _build_gaussian_inner_kernel(
 
         def cond_fn(carry):
             _, log_w, log_u, _, log_w_max, _, _, round_count = carry
-            surviving = count_survivors(log_w, log_u, log_w_max)
-            return (surviving.sum() < num_delete) & (round_count < max_rounds)
+            num_survivors = (log_u < log_w - log_w_max).sum()
+            return (num_survivors < num_delete) & (round_count < max_rounds)
 
         def body_fn(carry):
             states, log_w, log_u, num_buf, log_w_max, n_acc, key, rnd = carry
@@ -214,7 +181,7 @@ def _build_gaussian_inner_kernel(
         final = jax.lax.while_loop(cond_fn, body_fn, init_carry)
         states, log_w, log_u, num_buf, log_w_max, n_acc, _, num_rounds = final
 
-        surviving = count_survivors(log_w, log_u, log_w_max)
+        surviving = log_u < log_w - log_w_max
         (survivor_idx,) = jnp.nonzero(surviving, size=num_delete, fill_value=0)
         new_particles = jax.tree.map(lambda x: x[survivor_idx], states)
 
@@ -268,7 +235,7 @@ def build_kernel(
     init_state_fn: Callable,
     unravel_fn: Callable,
     num_delete: int = 1,
-    num_proposals: int = 1000,
+    num_proposals: Optional[int] = None,
     max_rounds: int = 100,
     update_inner_kernel_params_fn: Callable = update_inner_kernel_params,
     delete_fn: Callable = default_delete_fn,
@@ -284,7 +251,7 @@ def build_kernel(
     num_delete
         Number of particles to replace per step.
     num_proposals
-        Batch size per round of proposal generation.
+        Batch size per round of proposal generation. Defaults to num_delete.
     max_rounds
         Maximum rounds before declaring failure.
     update_inner_kernel_params_fn
@@ -297,6 +264,9 @@ def build_kernel(
     Callable
         A kernel function for Nested Rejection Sampling.
     """
+    if num_proposals is None:
+        num_proposals = num_delete
+
     inner_kernel = _build_gaussian_inner_kernel(
         init_state_fn, unravel_fn, num_delete, num_proposals, max_rounds
     )
@@ -316,7 +286,7 @@ def as_top_level_api(
     loglikelihood_fn: Callable,
     prototype_position: ArrayTree,
     num_delete: int = 1,
-    num_proposals: int = 1000,
+    num_proposals: Optional[int] = None,
     max_rounds: int = 100,
     init_state_strategy_fn: Callable = init_state_strategy,
     update_inner_kernel_params_fn: Callable = update_inner_kernel_params,

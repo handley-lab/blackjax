@@ -12,7 +12,6 @@ from blackjax.ns import base, nrs
 from blackjax.ns.nrs import (
     GaussianProposalInfo,
     _build_gaussian_inner_kernel,
-    count_survivors,
 )
 from blackjax.smc.tuning.from_particles import (
     particles_covariance_matrix,
@@ -282,7 +281,7 @@ class GaussianProposalTest(chex.TestCase):
     def test_wmax_rescaling_deterministic(self):
         """Deterministic test of the stored-uniform rescaling logic.
 
-        Directly tests the _count_survivors function used inside the kernel
+        Directly tests the stored-uniform rescaling logic
         with known log-weights, log-uniforms, and log_w_max. Verifies:
         1. Increasing w_max causes previously surviving proposals to be discarded
         2. The result depends on the stored uniforms (reusing vs redrawing differs)
@@ -301,7 +300,7 @@ class GaussianProposalTest(chex.TestCase):
         # B: -1.0 < 3.0 - 3.0 = 0.0 → True
         # C: -0.1 < 5.0 - 3.0 = 2.0 → True
         # D: invalid → False
-        surviving_phase1 = count_survivors(log_weights, log_uniforms, jnp.array(3.0))
+        surviving_phase1 = (log_uniforms < log_weights - jnp.array(3.0))
         self.assertEqual(
             int(surviving_phase1.sum()), 2, "Phase 1: B and C should survive"
         )
@@ -316,7 +315,7 @@ class GaussianProposalTest(chex.TestCase):
         # B: -1.0 < 3.0 - 4.0 = -1.0? No (strict <) → False (B lost!)
         # C: -0.1 < 5.0 - 4.0 = 1.0? Yes → True
         # Increasing w_max from 3 to 4 causes B to be discarded (rescaling!)
-        surviving_phase2 = count_survivors(log_weights, log_uniforms, jnp.array(4.0))
+        surviving_phase2 = (log_uniforms < log_weights - jnp.array(4.0))
         self.assertEqual(
             int(surviving_phase2.sum()), 1, "Phase 2: only C survives"
         )
@@ -325,19 +324,19 @@ class GaussianProposalTest(chex.TestCase):
 
         # Phase 3: w_max = 5.0 → C is marginal
         # C: -0.1 < 5.0 - 5.0 = 0.0? Yes → True
-        surviving_phase3 = count_survivors(log_weights, log_uniforms, jnp.array(5.0))
+        surviving_phase3 = (log_uniforms < log_weights - jnp.array(5.0))
         self.assertEqual(int(surviving_phase3.sum()), 1, "C survives at w_max=5")
 
         # Phase 4: w_max = 5.2 → C's margin breaks
         # C: -0.1 < 5.0 - 5.2 = -0.2? No (-0.1 > -0.2) → False
-        surviving_phase4 = count_survivors(log_weights, log_uniforms, jnp.array(5.2))
+        surviving_phase4 = (log_uniforms < log_weights - jnp.array(5.2))
         self.assertEqual(int(surviving_phase4.sum()), 0, "No survivors at w_max=5.2")
 
         # KEY PROPERTY: outcome depends on the STORED uniform, not just weights.
         # If B had log_uniform = -2.0 instead of -1.0, B would survive w_max=4:
         # B: -2.0 < 3.0 - 4.0 = -1.0? Yes → True (would survive!)
         alt_log_uniforms = jnp.array([-0.5, -2.0, -0.1, -0.5])
-        surviving_alt = count_survivors(log_weights, alt_log_uniforms, jnp.array(4.0))
+        surviving_alt = (alt_log_uniforms < log_weights - jnp.array(4.0))
         self.assertTrue(
             bool(surviving_alt[1]),
             "B survives w_max=4 with more generous stored uniform",
