@@ -131,9 +131,11 @@ class GaussianProposalTest(chex.TestCase):
         prototype_pos = jax.tree.map(lambda x: x[0], state.particles.position)
         _, unravel_fn = ravel_pytree(prototype_pos)
 
-        # Use standard normal as proposal (matches prior)
+        # Proposal is N(mean, scale * cov) where scale starts at (d+2)/d.
+        # Set cov so that scale * cov = I, matching the N(0, I) prior.
         mean = jnp.zeros(ndim)
-        cov = jnp.eye(ndim)
+        scale_init = (ndim + 2.0) / ndim
+        cov = jnp.eye(ndim) / scale_init
 
         update_fn = _build_gaussian_inner_kernel(
             init_state_fn, unravel_fn, num_delete, num_proposals, max_rounds=10

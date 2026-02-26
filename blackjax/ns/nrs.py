@@ -63,6 +63,8 @@ class GaussianProposalInfo(NamedTuple):
         Number of batches processed.
     log_w_max
         Final maximum log-importance-weight observed across all batches.
+    scale
+        Final covariance scale factor (proposal was N(mean, scale * cov)).
     success
         Whether num_delete survivors were obtained.
     """
@@ -72,6 +74,7 @@ class GaussianProposalInfo(NamedTuple):
     num_survivors: Array
     num_rounds: Array
     log_w_max: Array
+    scale: Array
     success: Array
 
 
@@ -115,6 +118,8 @@ def _build_gaussian_inner_kernel(
 
     def update_function(rng_key, state, loglikelihood_0, *, mean, cov):
         NEG_INF = jnp.array(-jnp.inf)
+        d = mean.shape[0]
+        logpdf_at_mean = jax.scipy.stats.multivariate_normal.logpdf(mean, mean, cov)
 
         prototype = jax.tree.map(lambda x: x[0], state.particles)
 
@@ -127,19 +132,21 @@ def _build_gaussian_inner_kernel(
             jnp.array(0),  # num_accepted_total
             rng_key,
             jnp.array(0),  # round_count
+            jnp.array((d + 2.0) / d),  # scale
         )
 
         def cond_fn(carry):
-            _, log_w, log_u, _, log_w_max, _, _, round_count = carry
+            _, log_w, log_u, _, log_w_max, _, _, round_count, _ = carry
             num_survivors = (log_u < log_w - log_w_max).sum()
             return (num_survivors < num_delete) & (round_count < max_rounds)
 
         def body_fn(carry):
-            states, log_w, log_u, num_buf, log_w_max, n_acc, key, rnd = carry
+            states, log_w, log_u, num_buf, log_w_max, n_acc, key, rnd, scale = carry
             key, batch_key, u_key = jax.random.split(key, 3)
 
+            scaled_cov = scale * cov
             flat_proposals = jax.random.multivariate_normal(
-                batch_key, mean, cov, shape=(num_proposals,)
+                batch_key, mean, scaled_cov, shape=(num_proposals,)
             )
             positions = jax.vmap(unravel_fn)(flat_proposals)
             batch_states = jax.vmap(
@@ -148,7 +155,7 @@ def _build_gaussian_inner_kernel(
 
             accepted = batch_states.loglikelihood > loglikelihood_0
             log_proposal = jax.scipy.stats.multivariate_normal.logpdf(
-                flat_proposals, mean, cov
+                flat_proposals, mean, scaled_cov
             )
             log_weights = batch_states.logdensity - log_proposal
             valid = accepted & jnp.isfinite(log_weights)
@@ -167,6 +174,16 @@ def _build_gaussian_inner_kernel(
             new_log_w_max = jnp.maximum(log_w_max, batch_log_w_max)
             new_n_acc = n_acc + valid.sum()
 
+            # Adaptive scale: SNIS estimate of E_π̃[δ²] / d
+            logpdf_base = jax.scipy.stats.multivariate_normal.logpdf(
+                flat_proposals, mean, cov
+            )
+            delta_sq = 2 * (logpdf_at_mean - logpdf_base)
+            log_sum_w = jax.scipy.special.logsumexp(log_weights)
+            log_sum_w_delta = jax.scipy.special.logsumexp(log_weights, b=delta_sq)
+            E_hat = jnp.exp(log_sum_w_delta - log_sum_w)
+            new_scale = jnp.where(jnp.isfinite(log_sum_w), E_hat / d, scale)
+
             return (
                 states,
                 log_w,
@@ -176,10 +193,11 @@ def _build_gaussian_inner_kernel(
                 new_n_acc,
                 key,
                 rnd + 1,
+                new_scale,
             )
 
         final = jax.lax.while_loop(cond_fn, body_fn, init_carry)
-        states, log_w, log_u, num_buf, log_w_max, n_acc, _, num_rounds = final
+        states, log_w, log_u, num_buf, log_w_max, n_acc, _, num_rounds, scale = final
 
         surviving = log_u < log_w - log_w_max
         (survivor_idx,) = jnp.nonzero(surviving, size=num_delete, fill_value=0)
@@ -191,6 +209,7 @@ def _build_gaussian_inner_kernel(
             num_survivors=surviving.sum(),
             num_rounds=num_rounds,
             log_w_max=log_w_max,
+            scale=scale,
             success=surviving.sum() >= num_delete,
         )
         return new_particles, info
