@@ -102,6 +102,7 @@ def build_kernel(
     generate_slice_direction_fn: Callable = sample_direction_from_covariance,
     update_inner_kernel_params_fn: Callable = update_inner_kernel_params,
     delete_fn: Callable = default_delete_fn,
+    update_strategy: Callable = update_with_mcmc_take_last,
     max_steps: int = 10,
     max_shrinkage: int = 100,
 ) -> Callable:
@@ -129,7 +130,7 @@ def build_kernel(
         new_slice_state, slice_info = slice_kernel(rng_key, state)
         return new_slice_state, slice_info
 
-    inner_kernel = update_with_mcmc_take_last(
+    inner_kernel = update_strategy(
         constrained_mcmc_slice_fn, num_inner_steps, num_delete
     )
 
@@ -153,6 +154,7 @@ def as_top_level_api(
     init_state_strategy_fn: Callable = init_state_strategy,
     update_inner_kernel_params_fn: Callable = update_inner_kernel_params,
     delete_fn: Callable = default_delete_fn,
+    update_strategy: Callable = update_with_mcmc_take_last,
     max_steps: int = 10,
     max_shrinkage: int = 100,
 ) -> SamplingAlgorithm:
@@ -213,6 +215,7 @@ def as_top_level_api(
         generate_slice_direction_fn=generate_slice_direction_fn,
         update_inner_kernel_params_fn=update_inner_kernel_params_fn,
         delete_fn=delete_fn,
+        update_strategy=update_strategy,
         max_steps=max_steps,
         max_shrinkage=max_shrinkage,
     )
