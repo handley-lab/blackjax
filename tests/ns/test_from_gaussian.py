@@ -9,10 +9,10 @@ import jax.scipy.stats as stats
 from absl.testing import absltest
 
 from blackjax.ns import base, nrs
-from blackjax.ns.from_gaussian import (
+from blackjax.ns.nrs import (
     GaussianProposalInfo,
+    _build_gaussian_inner_kernel,
     count_survivors,
-    update_with_gaussian_proposal,
 )
 from blackjax.smc.tuning.from_particles import (
     particles_covariance_matrix,
@@ -62,10 +62,9 @@ class GaussianProposalTest(chex.TestCase):
         # Compute mean and cov
         mean = particles_means(state.particles.position)
         cov = jnp.atleast_2d(particles_covariance_matrix(state.particles.position))
-        cov = cov + 1e-6 * jnp.eye(cov.shape[0])
 
         # Build and run inner kernel
-        update_fn = update_with_gaussian_proposal(
+        update_fn = _build_gaussian_inner_kernel(
             init_state_fn, unravel_fn, num_delete, num_proposals, max_rounds=50
         )
 
@@ -137,7 +136,7 @@ class GaussianProposalTest(chex.TestCase):
         mean = jnp.zeros(ndim)
         cov = jnp.eye(ndim)
 
-        update_fn = update_with_gaussian_proposal(
+        update_fn = _build_gaussian_inner_kernel(
             init_state_fn, unravel_fn, num_delete, num_proposals, max_rounds=10
         )
 
@@ -205,10 +204,9 @@ class GaussianProposalTest(chex.TestCase):
 
         mean = particles_means(state.particles.position)
         cov = jnp.atleast_2d(particles_covariance_matrix(state.particles.position))
-        cov = cov + 1e-6 * jnp.eye(cov.shape[0])
 
         # 2 proposals, 1 round, need 10 survivors — guaranteed failure
-        update_fn = update_with_gaussian_proposal(
+        update_fn = _build_gaussian_inner_kernel(
             init_state_fn, unravel_fn, num_delete, num_proposals=2, max_rounds=1
         )
 
@@ -258,10 +256,9 @@ class GaussianProposalTest(chex.TestCase):
 
         mean = particles_means(state.particles.position)
         cov = jnp.atleast_2d(particles_covariance_matrix(state.particles.position))
-        cov = cov + 1e-6 * jnp.eye(cov.shape[0])
 
         # Very few proposals, only 1 round — likely to fail
-        update_fn = update_with_gaussian_proposal(
+        update_fn = _build_gaussian_inner_kernel(
             init_state_fn, unravel_fn, num_delete, num_proposals=2, max_rounds=1
         )
 
@@ -392,7 +389,7 @@ class GaussianProposalTest(chex.TestCase):
         mean = jnp.zeros(ndim)
         cov = 0.5 * jnp.eye(ndim)
 
-        update_fn = update_with_gaussian_proposal(
+        update_fn = _build_gaussian_inner_kernel(
             init_state_fn, unravel_fn, num_delete, num_proposals, max_rounds=100
         )
 

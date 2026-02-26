@@ -13,13 +13,15 @@
 # limitations under the License.
 """Nested Rejection Sampling (NRS) algorithm.
 
-A specific implementation of Nested Sampling that uses importance-weighted
-rejection sampling from a Gaussian proposal as the inner kernel. The Gaussian
-is fitted to the live points' empirical mean and covariance.
+Importance-weighted rejection sampling from a Gaussian proposal fitted to
+live points. Proposals passing the likelihood constraint are accepted into
+a buffer with stored log-uniforms. When a heavier weight is observed, all
+stored proposals are re-tested against the new maximum, preserving
+independence of survivors.
 """
 
 from functools import partial
-from typing import Callable, Dict, Optional
+from typing import Callable, Dict, NamedTuple, Optional
 
 import jax
 import jax.numpy as jnp
@@ -31,19 +33,202 @@ from blackjax.ns.adaptive import init
 from blackjax.ns.base import NSInfo, NSState
 from blackjax.ns.base import delete_fn as default_delete_fn
 from blackjax.ns.base import init_state_strategy
-from blackjax.ns.from_gaussian import update_with_gaussian_proposal
 from blackjax.smc.tuning.from_particles import (
     particles_covariance_matrix,
     particles_means,
 )
-from blackjax.types import ArrayTree
+from blackjax.types import Array, ArrayTree
 
 __all__ = [
+    "GaussianProposalInfo",
     "as_top_level_api",
     "build_kernel",
+    "count_survivors",
     "init",
     "update_inner_kernel_params",
 ]
+
+
+class GaussianProposalInfo(NamedTuple):
+    """Information returned by the Gaussian proposal inner kernel.
+
+    Attributes
+    ----------
+    num_proposals_total
+        Total proposals drawn across all batches.
+    num_accepted_total
+        Proposals passing the likelihood constraint (before rejection test).
+    num_survivors
+        Proposals surviving the final rejection test (after w_max rescaling).
+    num_rounds
+        Number of batches processed.
+    log_w_max
+        Final maximum log-importance-weight observed across all batches.
+    success
+        Whether num_delete survivors were obtained.
+    """
+
+    num_proposals_total: Array
+    num_accepted_total: Array
+    num_survivors: Array
+    num_rounds: Array
+    log_w_max: Array
+    success: Array
+
+
+def count_survivors(log_weights, log_uniforms, log_w_max):
+    """Compute survival mask for importance-weighted rejection.
+
+    A proposal survives iff it has a finite weight and its stored log-uniform
+    satisfies ``log_u < log_w - log_w_max``.
+
+    Parameters
+    ----------
+    log_weights
+        Log-importance-weights for each proposal.
+    log_uniforms
+        Stored log-uniforms for each proposal.
+    log_w_max
+        Current maximum log-weight.
+
+    Returns
+    -------
+    Array
+        Boolean mask of surviving proposals.
+    """
+    valid = jnp.isfinite(log_weights)
+    delta = jnp.where(
+        jnp.isfinite(log_w_max), log_weights - log_w_max, jnp.array(-jnp.inf)
+    )
+    surviving = valid & (log_uniforms < delta)
+    return surviving
+
+
+def _build_gaussian_inner_kernel(
+    init_state_fn: Callable,
+    unravel_fn: Callable,
+    num_delete: int,
+    num_proposals: int,
+    max_rounds: int = 100,
+):
+    """Factory for a Gaussian proposal update strategy.
+
+    Parameters
+    ----------
+    init_state_fn
+        Scalar function: position -> StateWithLogLikelihood. Must accept
+        ``loglikelihood_birth`` keyword argument.
+    unravel_fn
+        Function mapping a flat array to a PyTree position, obtained from
+        ``jax.flatten_util.ravel_pytree``.
+    num_delete
+        Number of replacement particles to produce.
+    num_proposals
+        Batch size: number of proposals drawn per round.
+    max_rounds
+        Maximum number of batches before declaring failure.
+
+    Returns
+    -------
+    Callable
+        Update function with signature
+        ``(rng_key, state, loglikelihood_0, *, mean, cov) -> (new_particles, info)``.
+        When ``info.success`` is False, the algorithm failed to find enough
+        survivors. The returned ``new_particles`` may contain duplicates
+        (from ``jnp.nonzero`` fill_value=0) and should not be used without
+        checking ``info.success``.
+    """
+
+    buffer_size = num_proposals * max_rounds
+
+    def update_function(rng_key, state, loglikelihood_0, *, mean, cov):
+        NEG_INF = jnp.array(-jnp.inf)
+
+        prototype = jax.tree.map(lambda x: x[0], state.particles)
+        buffer_states = jax.tree.map(
+            lambda x: jnp.zeros((buffer_size,) + x.shape), prototype
+        )
+        buffer_log_weights = jnp.full(buffer_size, NEG_INF)
+        buffer_log_uniforms = jnp.zeros(buffer_size)
+
+        init_carry = (
+            buffer_states,
+            buffer_log_weights,
+            buffer_log_uniforms,
+            jnp.array(0),  # num_buffered
+            NEG_INF,  # log_w_max
+            jnp.array(0),  # num_accepted_total
+            rng_key,
+            jnp.array(0),  # round_count
+        )
+
+        def cond_fn(carry):
+            _, log_w, log_u, _, log_w_max, _, _, round_count = carry
+            surviving = count_survivors(log_w, log_u, log_w_max)
+            return (surviving.sum() < num_delete) & (round_count < max_rounds)
+
+        def body_fn(carry):
+            states, log_w, log_u, num_buf, log_w_max, n_acc, key, rnd = carry
+            key, batch_key, u_key = jax.random.split(key, 3)
+
+            flat_proposals = jax.random.multivariate_normal(
+                batch_key, mean, cov, shape=(num_proposals,)
+            )
+            positions = jax.vmap(unravel_fn)(flat_proposals)
+            batch_states = jax.vmap(
+                lambda x: init_state_fn(x, loglikelihood_birth=loglikelihood_0)
+            )(positions)
+
+            accepted = batch_states.loglikelihood > loglikelihood_0
+            log_proposal = jax.scipy.stats.multivariate_normal.logpdf(
+                flat_proposals, mean, cov
+            )
+            log_weights = batch_states.logdensity - log_proposal
+            valid = accepted & jnp.isfinite(log_weights)
+            log_weights = jnp.where(valid, log_weights, NEG_INF)
+
+            log_uniforms = jnp.log(jax.random.uniform(u_key, shape=(num_proposals,)))
+
+            idx = jnp.arange(num_proposals) + num_buf
+            states = jax.tree.map(
+                lambda s, b: s.at[idx].set(b), states, batch_states
+            )
+            log_w = log_w.at[idx].set(log_weights)
+            log_u = log_u.at[idx].set(log_uniforms)
+
+            batch_log_w_max = jnp.where(valid, log_weights, NEG_INF).max()
+            new_log_w_max = jnp.maximum(log_w_max, batch_log_w_max)
+            new_n_acc = n_acc + valid.sum()
+
+            return (
+                states,
+                log_w,
+                log_u,
+                num_buf + num_proposals,
+                new_log_w_max,
+                new_n_acc,
+                key,
+                rnd + 1,
+            )
+
+        final = jax.lax.while_loop(cond_fn, body_fn, init_carry)
+        states, log_w, log_u, num_buf, log_w_max, n_acc, _, num_rounds = final
+
+        surviving = count_survivors(log_w, log_u, log_w_max)
+        (survivor_idx,) = jnp.nonzero(surviving, size=num_delete, fill_value=0)
+        new_particles = jax.tree.map(lambda x: x[survivor_idx], states)
+
+        info = GaussianProposalInfo(
+            num_proposals_total=num_buf,
+            num_accepted_total=n_acc,
+            num_survivors=surviving.sum(),
+            num_rounds=num_rounds,
+            log_w_max=log_w_max,
+            success=surviving.sum() >= num_delete,
+        )
+        return new_particles, info
+
+    return update_function
 
 
 def update_inner_kernel_params(
@@ -76,7 +261,6 @@ def update_inner_kernel_params(
     positions = state.particles.position
     mean = particles_means(positions)
     cov = jnp.atleast_2d(particles_covariance_matrix(positions))
-    cov = cov + 1e-6 * jnp.eye(cov.shape[0])
     return {"mean": mean, "cov": cov}
 
 
@@ -113,7 +297,7 @@ def build_kernel(
     Callable
         A kernel function for Nested Rejection Sampling.
     """
-    inner_kernel = update_with_gaussian_proposal(
+    inner_kernel = _build_gaussian_inner_kernel(
         init_state_fn, unravel_fn, num_delete, num_proposals, max_rounds
     )
 
