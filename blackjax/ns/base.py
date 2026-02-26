@@ -200,9 +200,7 @@ def build_kernel(
     return kernel
 
 
-def delete_fn(
-    state: NSState, num_delete: int
-) -> tuple[Array, Array]:
+def delete_fn(state: NSState, num_delete: int) -> tuple[Array, Array]:
     """Identifies particles to be deleted.
 
     Selects the ``num_delete`` particles with the lowest log-likelihoods

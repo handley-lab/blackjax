@@ -1,4 +1,5 @@
 """Test the Nested Sampling algorithms"""
+
 import functools
 
 import chex
