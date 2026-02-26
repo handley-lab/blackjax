@@ -10,8 +10,9 @@ from absl.testing import absltest
 
 from blackjax.ns import base, nrs
 from blackjax.ns.nrs import (
-    GaussianProposalInfo,
-    _build_gaussian_inner_kernel,
+    RejectionInfo,
+    _build_proposal_inner_kernel,
+    gaussian_proposal,
 )
 from blackjax.smc.tuning.from_particles import (
     particles_covariance_matrix,
@@ -63,8 +64,13 @@ class GaussianProposalTest(chex.TestCase):
         cov = jnp.atleast_2d(particles_covariance_matrix(state.particles.position))
 
         # Build and run inner kernel
-        update_fn = _build_gaussian_inner_kernel(
-            init_state_fn, unravel_fn, num_delete, num_proposals, max_rounds=50
+        update_fn = _build_proposal_inner_kernel(
+            init_state_fn,
+            unravel_fn,
+            gaussian_proposal,
+            num_delete,
+            num_proposals,
+            max_rounds=50,
         )
 
         loglikelihood_0 = jnp.sort(state.particles.loglikelihood)[num_delete - 1]
@@ -90,7 +96,7 @@ class GaussianProposalTest(chex.TestCase):
         )
 
         # Check info types and invariants
-        self.assertIsInstance(info, GaussianProposalInfo)
+        self.assertIsInstance(info, RejectionInfo)
         self.assertGreaterEqual(int(info.num_rounds), 1)
         self.assertEqual(
             int(info.num_proposals_total),
@@ -135,8 +141,13 @@ class GaussianProposalTest(chex.TestCase):
         mean = jnp.zeros(ndim)
         cov = jnp.eye(ndim)
 
-        update_fn = _build_gaussian_inner_kernel(
-            init_state_fn, unravel_fn, num_delete, num_proposals, max_rounds=10
+        update_fn = _build_proposal_inner_kernel(
+            init_state_fn,
+            unravel_fn,
+            gaussian_proposal,
+            num_delete,
+            num_proposals,
+            max_rounds=10,
         )
 
         # Use -inf threshold so ALL proposals pass the likelihood constraint.
@@ -205,8 +216,13 @@ class GaussianProposalTest(chex.TestCase):
         cov = jnp.atleast_2d(particles_covariance_matrix(state.particles.position))
 
         # 2 proposals, 1 round, need 10 survivors — guaranteed failure
-        update_fn = _build_gaussian_inner_kernel(
-            init_state_fn, unravel_fn, num_delete, num_proposals=2, max_rounds=1
+        update_fn = _build_proposal_inner_kernel(
+            init_state_fn,
+            unravel_fn,
+            gaussian_proposal,
+            num_delete,
+            num_proposals=2,
+            max_rounds=1,
         )
 
         loglikelihood_0 = state.particles.loglikelihood.max()
@@ -257,8 +273,13 @@ class GaussianProposalTest(chex.TestCase):
         cov = jnp.atleast_2d(particles_covariance_matrix(state.particles.position))
 
         # Very few proposals, only 1 round — likely to fail
-        update_fn = _build_gaussian_inner_kernel(
-            init_state_fn, unravel_fn, num_delete, num_proposals=2, max_rounds=1
+        update_fn = _build_proposal_inner_kernel(
+            init_state_fn,
+            unravel_fn,
+            gaussian_proposal,
+            num_delete,
+            num_proposals=2,
+            max_rounds=1,
         )
 
         # Use a very high threshold
@@ -270,9 +291,11 @@ class GaussianProposalTest(chex.TestCase):
         )
 
         # Should report failure (very unlikely to get 5 survivors from 2 proposals)
-        self.assertIsInstance(info, GaussianProposalInfo)
+        self.assertIsInstance(info, RejectionInfo)
         chex.assert_shape(new_particles.position, (num_delete, ndim))
-        self.assertFalse(bool(info.success), "Should fail with only 2 proposals and 1 round")
+        self.assertFalse(
+            bool(info.success), "Should fail with only 2 proposals and 1 round"
+        )
         self.assertEqual(int(info.num_rounds), 1, "Should exhaust max_rounds=1")
         self.assertEqual(
             int(info.num_proposals_total), 2, "Should have drawn exactly 2 proposals"
@@ -300,7 +323,7 @@ class GaussianProposalTest(chex.TestCase):
         # B: -1.0 < 3.0 - 3.0 = 0.0 → True
         # C: -0.1 < 5.0 - 3.0 = 2.0 → True
         # D: invalid → False
-        surviving_phase1 = (log_uniforms < log_weights - jnp.array(3.0))
+        surviving_phase1 = log_uniforms < log_weights - jnp.array(3.0)
         self.assertEqual(
             int(surviving_phase1.sum()), 2, "Phase 1: B and C should survive"
         )
@@ -315,28 +338,26 @@ class GaussianProposalTest(chex.TestCase):
         # B: -1.0 < 3.0 - 4.0 = -1.0? No (strict <) → False (B lost!)
         # C: -0.1 < 5.0 - 4.0 = 1.0? Yes → True
         # Increasing w_max from 3 to 4 causes B to be discarded (rescaling!)
-        surviving_phase2 = (log_uniforms < log_weights - jnp.array(4.0))
-        self.assertEqual(
-            int(surviving_phase2.sum()), 1, "Phase 2: only C survives"
-        )
+        surviving_phase2 = log_uniforms < log_weights - jnp.array(4.0)
+        self.assertEqual(int(surviving_phase2.sum()), 1, "Phase 2: only C survives")
         self.assertFalse(bool(surviving_phase2[1]), "B discarded after w_max increase")
         self.assertTrue(bool(surviving_phase2[2]), "C survives at w_max=4")
 
         # Phase 3: w_max = 5.0 → C is marginal
         # C: -0.1 < 5.0 - 5.0 = 0.0? Yes → True
-        surviving_phase3 = (log_uniforms < log_weights - jnp.array(5.0))
+        surviving_phase3 = log_uniforms < log_weights - jnp.array(5.0)
         self.assertEqual(int(surviving_phase3.sum()), 1, "C survives at w_max=5")
 
         # Phase 4: w_max = 5.2 → C's margin breaks
         # C: -0.1 < 5.0 - 5.2 = -0.2? No (-0.1 > -0.2) → False
-        surviving_phase4 = (log_uniforms < log_weights - jnp.array(5.2))
+        surviving_phase4 = log_uniforms < log_weights - jnp.array(5.2)
         self.assertEqual(int(surviving_phase4.sum()), 0, "No survivors at w_max=5.2")
 
         # KEY PROPERTY: outcome depends on the STORED uniform, not just weights.
         # If B had log_uniform = -2.0 instead of -1.0, B would survive w_max=4:
         # B: -2.0 < 3.0 - 4.0 = -1.0? Yes → True (would survive!)
         alt_log_uniforms = jnp.array([-0.5, -2.0, -0.1, -0.5])
-        surviving_alt = (alt_log_uniforms < log_weights - jnp.array(4.0))
+        surviving_alt = alt_log_uniforms < log_weights - jnp.array(4.0)
         self.assertTrue(
             bool(surviving_alt[1]),
             "B survives w_max=4 with more generous stored uniform",
@@ -388,8 +409,13 @@ class GaussianProposalTest(chex.TestCase):
         mean = jnp.zeros(ndim)
         cov = 0.5 * jnp.eye(ndim)
 
-        update_fn = _build_gaussian_inner_kernel(
-            init_state_fn, unravel_fn, num_delete, num_proposals, max_rounds=100
+        update_fn = _build_proposal_inner_kernel(
+            init_state_fn,
+            unravel_fn,
+            gaussian_proposal,
+            num_delete,
+            num_proposals,
+            max_rounds=100,
         )
 
         loglikelihood_0 = jnp.array(-jnp.inf)
@@ -437,7 +463,9 @@ class NRSIntegrationTest(chex.TestCase):
             return -0.5 * jnp.sum(x**2)
 
         key, init_key = jax.random.split(self.key)
-        positions = jax.random.uniform(init_key, (num_live, ndim), minval=-5.0, maxval=5.0)
+        positions = jax.random.uniform(
+            init_key, (num_live, ndim), minval=-5.0, maxval=5.0
+        )
 
         algorithm = nrs.as_top_level_api(
             logprior_fn,
@@ -517,7 +545,6 @@ class NRSIntegrationTest(chex.TestCase):
             dead_thresholds[0],
             "Minimum live loglikelihood should exceed initial dead threshold",
         )
-
 
     def test_nrs_multi_step_consistency(self):
         """Verify that consecutive steps produce valid, finite results."""
