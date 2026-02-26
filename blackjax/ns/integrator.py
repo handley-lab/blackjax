@@ -102,7 +102,7 @@ def update_integrator(
     num_live = jnp.arange(num_particles, num_particles - num_deleted, -1)
     delta_logX = -1 / num_live
     logX = integrator.logX + jnp.cumsum(delta_logX)
-    log_delta_X = logX + jnp.log(1 - jnp.exp(delta_logX))
+    log_delta_X = logX + jnp.log1p(-jnp.exp(delta_logX))
     log_delta_Z = dead_loglikelihood + log_delta_X
 
     delta_logZ = logsumexp(log_delta_Z)
