@@ -440,16 +440,17 @@ class NRSIntegrationTest(chex.TestCase):
         def loglikelihood_fn(x):
             return -0.5 * jnp.sum(x**2)
 
+        key, init_key = jax.random.split(self.key)
+        positions = jax.random.uniform(init_key, (num_live, ndim), minval=-5.0, maxval=5.0)
+
         algorithm = nrs.as_top_level_api(
             logprior_fn,
             loglikelihood_fn,
+            prototype_position=positions[0],
             num_delete=num_delete,
             num_proposals=500,
             max_rounds=20,
         )
-
-        key, init_key = jax.random.split(self.key)
-        positions = jax.random.uniform(init_key, (num_live, ndim), minval=-5.0, maxval=5.0)
 
         state = algorithm.init(positions)
 
@@ -481,17 +482,18 @@ class NRSIntegrationTest(chex.TestCase):
         def loglikelihood_fn(x):
             return -0.5 * jnp.sum(x**2)
 
-        algorithm = nrs.as_top_level_api(
-            logprior_fn,
-            loglikelihood_fn,
-            num_delete=num_delete,
-            num_proposals=500,
-            max_rounds=20,
-        )
-
         key, init_key = jax.random.split(self.key)
         positions = jax.random.uniform(
             init_key, (num_live, ndim), minval=-5.0, maxval=5.0
+        )
+
+        algorithm = nrs.as_top_level_api(
+            logprior_fn,
+            loglikelihood_fn,
+            prototype_position=positions[0],
+            num_delete=num_delete,
+            num_proposals=500,
+            max_rounds=20,
         )
 
         state = algorithm.init(positions)
@@ -521,13 +523,8 @@ class NRSIntegrationTest(chex.TestCase):
         )
 
 
-    def test_nrs_kernel_caching(self):
-        """Verify the deferred kernel cache works: second step reuses cached kernel.
-
-        The NRS step_fn builds the kernel on first call and caches it.
-        This test verifies that the second step produces valid results
-        from the cached kernel (same shapes, finite values, updated params).
-        """
+    def test_nrs_multi_step_consistency(self):
+        """Verify that consecutive steps produce valid, finite results."""
         ndim = 2
         num_live = 30
         num_delete = 1
@@ -540,26 +537,27 @@ class NRSIntegrationTest(chex.TestCase):
         def loglikelihood_fn(x):
             return -0.5 * jnp.sum(x**2)
 
-        algorithm = nrs.as_top_level_api(
-            logprior_fn,
-            loglikelihood_fn,
-            num_delete=num_delete,
-            num_proposals=200,
-            max_rounds=10,
-        )
-
         key, init_key = jax.random.split(self.key)
         positions = jax.random.uniform(
             init_key, (num_live, ndim), minval=-5.0, maxval=5.0
         )
+
+        algorithm = nrs.as_top_level_api(
+            logprior_fn,
+            loglikelihood_fn,
+            prototype_position=positions[0],
+            num_delete=num_delete,
+            num_proposals=200,
+            max_rounds=10,
+        )
         state = algorithm.init(positions)
 
-        # First step builds and caches the kernel
+        # First step
         key, step_key = jax.random.split(key)
         state1, info1 = algorithm.step(step_key, state)
         chex.assert_shape(state1.particles.position, (num_live, ndim))
 
-        # Second step reuses cached kernel — should produce valid output
+        # Second step — should produce valid output
         key, step_key = jax.random.split(key)
         state2, info2 = algorithm.step(step_key, state1)
         chex.assert_shape(state2.particles.position, (num_live, ndim))
@@ -571,7 +569,7 @@ class NRSIntegrationTest(chex.TestCase):
         )
         self.assertTrue(
             jnp.all(jnp.isfinite(state2.particles.position)),
-            "Second step (cached kernel) should produce finite positions",
+            "Second step should produce finite positions",
         )
 
         # inner_kernel_params should be finite and correctly shaped

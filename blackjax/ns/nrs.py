@@ -32,7 +32,6 @@ from blackjax.ns.base import NSInfo, NSState
 from blackjax.ns.base import delete_fn as default_delete_fn
 from blackjax.ns.base import init_state_strategy
 from blackjax.ns.from_gaussian import update_with_gaussian_proposal
-from blackjax.ns.utils import get_first_row
 from blackjax.smc.tuning.from_particles import (
     particles_covariance_matrix,
     particles_means,
@@ -131,6 +130,7 @@ def build_kernel(
 def as_top_level_api(
     logprior_fn: Callable,
     loglikelihood_fn: Callable,
+    prototype_position: ArrayTree,
     num_delete: int = 1,
     num_proposals: int = 1000,
     max_rounds: int = 100,
@@ -150,6 +150,9 @@ def as_top_level_api(
         A function that computes the log-prior probability of a single particle.
     loglikelihood_fn
         A function that computes the log-likelihood of a single particle.
+    prototype_position
+        A single example position (PyTree) used to determine the flattening
+        structure for proposals. Typically ``positions[0]``.
     num_delete
         The number of particles to delete and replace at each NS step.
     num_proposals
@@ -175,6 +178,18 @@ def as_top_level_api(
         loglikelihood_fn=loglikelihood_fn,
     )
 
+    _, unravel_fn = ravel_pytree(prototype_position)
+
+    kernel = build_kernel(
+        init_state_fn,
+        unravel_fn,
+        num_delete,
+        num_proposals,
+        max_rounds,
+        update_inner_kernel_params_fn=update_inner_kernel_params_fn,
+        delete_fn=delete_fn,
+    )
+
     def init_fn(position, rng_key=None):
         return init(
             position,
@@ -182,23 +197,7 @@ def as_top_level_api(
             update_inner_kernel_params_fn=update_inner_kernel_params_fn,
         )
 
-    # Deferred kernel construction: unravel_fn depends on position structure.
-    # Built once on first step call, cached for subsequent calls.
-    _kernel_cache = {}
-
     def step_fn(rng_key, state):
-        if "kernel" not in _kernel_cache:
-            prototype_pos = get_first_row(state.particles.position)
-            _, unravel_fn = ravel_pytree(prototype_pos)
-            _kernel_cache["kernel"] = build_kernel(
-                init_state_fn,
-                unravel_fn,
-                num_delete,
-                num_proposals,
-                max_rounds,
-                update_inner_kernel_params_fn=update_inner_kernel_params_fn,
-                delete_fn=delete_fn,
-            )
-        return _kernel_cache["kernel"](rng_key, state)
+        return kernel(rng_key, state)
 
     return SamplingAlgorithm(init_fn, step_fn)
