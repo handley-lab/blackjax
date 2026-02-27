@@ -24,9 +24,20 @@ from blackjax.types import Array, ArrayTree, PRNGKey
 
 
 def log1mexp(x: Array) -> Array:
-    """Computes log(1 - exp(x)) in a numerically stable way."""
+    """Compute log(1 - exp(x)) in a numerically stable way.
+
+    Uses a two-branch approach that switches at x = -log(2), following
+    Mächler (2012) [1]_. See also the TensorFlow Probability implementation [2]_.
+
+    References
+    ----------
+    .. [1] Mächler, M. (2012). "Accurately Computing log(1 - exp(-|a|))."
+       https://cran.r-project.org/web/packages/Rmpfr/vignettes/log1mexp-note.pdf
+    .. [2] TensorFlow Probability, ``log1mexp`` in ``math/generic.py``.
+       https://github.com/tensorflow/probability/blob/main/tensorflow_probability/python/math/generic.py#L685-L709
+    """
     return jnp.where(
-        x > -0.6931472,  # approx log(2)
+        x > -jnp.log(2),
         jnp.log(-jnp.expm1(x)),
         jnp.log1p(-jnp.exp(x)),
     )
@@ -100,7 +111,7 @@ def logX(rng_key: PRNGKey, dead_info: NSInfo, shape: int = 100) -> tuple[Array, 
         subkey,
         shape=(dead_info.particles.loglikelihood.shape[0], shape),
     )
-    r = jax.lax.log1p(jax.lax.neg(u))
+    r = jnp.log(u)
     num_live = compute_num_live(dead_info)
     t = r / num_live[:, jnp.newaxis]
     logX = jnp.cumsum(t, axis=0)

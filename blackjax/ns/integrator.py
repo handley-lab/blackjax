@@ -25,6 +25,7 @@ import jax.numpy as jnp
 from jax.scipy.special import logsumexp
 
 from blackjax.ns.base import StateWithLogLikelihood
+from blackjax.ns.utils import log1mexp
 from blackjax.types import Array
 
 __all__ = ["NSIntegrator", "init_integrator", "update_integrator"]
@@ -102,7 +103,7 @@ def update_integrator(
     num_live = jnp.arange(num_particles, num_particles - num_deleted, -1)
     delta_logX = -1 / num_live
     logX = integrator.logX + jnp.cumsum(delta_logX)
-    log_delta_X = logX + jnp.log1p(-jnp.exp(delta_logX))
+    log_delta_X = logX + log1mexp(delta_logX)
     log_delta_Z = dead_loglikelihood + log_delta_X
 
     delta_logZ = logsumexp(log_delta_Z)
