@@ -14,11 +14,10 @@
 """Nested Rejection Sampling (NRS) algorithm.
 
 Importance-weighted rejection sampling from a proposal distribution fitted to
-live points. By default uses a Gaussian proposal. Proposals passing the
-likelihood constraint are accepted into
-a buffer with stored log-uniforms. When a heavier weight is observed, all
-stored proposals are re-tested against the new maximum, preserving
-independence of survivors.
+live points. By default uses a Gaussian proposal. A fixed-size buffer of
+proposals is maintained; non-surviving slots are overwritten each round.
+When a heavier weight is observed, all stored proposals are re-tested against
+the new maximum, preserving independence of survivors.
 """
 
 from functools import partial
@@ -174,8 +173,6 @@ def _build_proposal_inner_kernel(
         checking ``info.success``.
     """
 
-    buffer_size = num_proposals * max_rounds
-
     def update_function(rng_key, state, loglikelihood_0, **params):
         NEG_INF = jnp.array(-jnp.inf)
 
@@ -185,26 +182,12 @@ def _build_proposal_inner_kernel(
 
         prototype = jax.tree.map(lambda x: x[0], state.particles)
 
-        init_carry = (
-            jax.tree.map(
-                lambda x: jnp.zeros((buffer_size,) + x.shape), prototype
-            ),  # states
-            jnp.full(buffer_size, NEG_INF),  # log_w
-            jnp.zeros(buffer_size),  # log_u
-            jnp.array(0),  # num_buffered
-            NEG_INF,  # log_w_max
-            jnp.array(0),  # num_accepted_total
-            rng_key,
-            jnp.array(0),  # round_count
-        )
-
         def cond_fn(carry):
-            _, log_w, log_u, _, log_w_max, _, _, round_count = carry
-            num_survivors = (log_u < log_w - log_w_max).sum()
-            return (num_survivors < num_delete) & (round_count < max_rounds)
+            _, _, _, _, surviving, _, _, round_count = carry
+            return (surviving.sum() < num_delete) & (round_count < max_rounds)
 
         def body_fn(carry):
-            states, log_w, log_u, num_buf, log_w_max, n_acc, key, rnd = carry
+            states, log_w, log_u, log_w_max, surviving, n_acc, key, rnd = carry
             key, batch_key, u_key = jax.random.split(key, 3)
 
             samples, log_proposal = proposal_fn(batch_key, num_proposals, **params)
@@ -214,27 +197,40 @@ def _build_proposal_inner_kernel(
             log_weights = jnp.where(valid, log_weights, NEG_INF)
             log_uniforms = jnp.log(jax.random.uniform(u_key, shape=(num_proposals,)))
 
-            idx = jnp.arange(num_proposals) + num_buf
-            states = jax.tree.map(lambda s, b: s.at[idx].set(b), states, batch_states)
-            log_w = log_w.at[idx].set(log_weights)
-            log_u = log_u.at[idx].set(log_uniforms)
-            log_w_max = jnp.maximum(log_w_max, log_weights.max())
+            states = jax.tree.map(
+                lambda old, new: jax.vmap(jnp.where)(surviving, old, new),
+                states, batch_states,
+            )
+            log_w = jnp.where(surviving, log_w, log_weights)
+            log_u = jnp.where(surviving, log_u, log_uniforms)
+            log_w_max = jnp.maximum(log_w_max, log_w.max())
+            surviving = log_u < log_w - log_w_max
             n_acc = n_acc + valid.sum()
-            num_buf = num_buf + num_proposals
             rnd = rnd + 1
 
-            return states, log_w, log_u, num_buf, log_w_max, n_acc, key, rnd
+            return states, log_w, log_u, log_w_max, surviving, n_acc, key, rnd
 
-        final = jax.lax.while_loop(cond_fn, body_fn, init_carry)
-        states, log_w, log_u, num_buf, log_w_max, n_acc, _, num_rounds = final
+        states = jax.tree.map(
+            lambda x: jnp.zeros((num_proposals,) + x.shape), prototype
+        )
+        log_w = jnp.full(num_proposals, NEG_INF)
+        log_u = jnp.zeros(num_proposals)
+        log_w_max = NEG_INF
+        surviving = jnp.zeros(num_proposals, dtype=bool)
+        n_acc = jnp.array(0)
+        key = rng_key
+        rnd = jnp.array(0)
 
-        surviving = log_u < log_w - log_w_max
+        carry = states, log_w, log_u, log_w_max, surviving, n_acc, key, rnd
+        final = jax.lax.while_loop(cond_fn, body_fn, carry)
+        states, _, _, log_w_max, surviving, n_acc, _, num_rounds = final
+
         num_survivors = surviving.sum()
         (survivor_idx,) = jnp.nonzero(surviving, size=num_delete, fill_value=0)
         new_particles = jax.tree.map(lambda x: x[survivor_idx], states)
 
         info = RejectionInfo(
-            num_proposals_total=num_buf,
+            num_proposals_total=num_rounds * num_proposals,
             num_accepted_total=n_acc,
             num_survivors=num_survivors,
             num_rounds=num_rounds,

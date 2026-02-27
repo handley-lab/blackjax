@@ -135,6 +135,7 @@ nrs_algo = blackjax.nrs(
     logprior_fn=logprior_fn,
     loglikelihood_fn=loglikelihood_fn,
     prototype_position=positions[0],
+    num_proposals=num_proposals_nrs,
     num_delete=num_delete,
 )
 nrs_run, nrs_infos, nrs_time = run_sampler("NRS", nrs_algo, positions, nrs_key, update_info=False)

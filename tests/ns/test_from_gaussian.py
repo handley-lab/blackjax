@@ -382,7 +382,7 @@ class GaussianProposalTest(chex.TestCase):
         ndim = 4
         num_live = 50
         num_delete = 5
-        num_proposals = 3
+        num_proposals = 10
 
         half_width = 5.0
 
