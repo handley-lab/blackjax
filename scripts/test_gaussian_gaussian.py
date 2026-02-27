@@ -129,7 +129,7 @@ print("=" * 60)
 print("NRS (Nested Rejection Sampling)")
 print("=" * 60)
 
-num_proposals_nrs = 1000
+num_proposals_nrs = num_delete
 rng_key, nrs_key = jax.random.split(rng_key)
 nrs_algo = blackjax.nrs(
     logprior_fn=logprior_fn,
