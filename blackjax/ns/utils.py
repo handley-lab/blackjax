@@ -111,7 +111,7 @@ def logX(rng_key: PRNGKey, dead_info: NSInfo, shape: int = 100) -> tuple[Array, 
         subkey,
         shape=(dead_info.particles.loglikelihood.shape[0], shape),
     )
-    r = jnp.log(u)
+    r = jnp.log1p(-u)
     num_live = compute_num_live(dead_info)
     t = r / num_live[:, jnp.newaxis]
     logX = jnp.cumsum(t, axis=0)
