@@ -192,19 +192,25 @@ def _build_proposal_inner_kernel(
 
             samples, log_proposal = proposal_fn(batch_key, num_proposals, **params)
             batch_states = eval_states(samples)
-            log_weights = batch_states.logdensity - log_proposal
+            batch_log_w = batch_states.logdensity - log_proposal
             valid = batch_states.loglikelihood > loglikelihood_0
-            log_weights = jnp.where(valid, log_weights, NEG_INF)
-            log_uniforms = jnp.log(jax.random.uniform(u_key, shape=(num_proposals,)))
+            batch_log_w = jnp.where(valid, batch_log_w, NEG_INF)
+            batch_log_u = jnp.log(jax.random.uniform(u_key, shape=(num_proposals,)))
 
-            states = jax.tree.map(
-                lambda old, new: jax.vmap(jnp.where)(surviving, old, new),
-                states, batch_states,
+            all_states = jax.tree.map(
+                lambda a, b: jnp.concatenate([a, b]), states, batch_states
             )
-            log_w = jnp.where(surviving, log_w, log_weights)
-            log_u = jnp.where(surviving, log_u, log_uniforms)
-            log_w_max = jnp.maximum(log_w_max, log_w.max())
-            surviving = log_u < log_w - log_w_max
+            all_log_w = jnp.concatenate([log_w, batch_log_w])
+            all_log_u = jnp.concatenate([log_u, batch_log_u])
+            log_w_max = jnp.maximum(log_w_max, all_log_w.max())
+            all_surviving = all_log_u < all_log_w - log_w_max
+
+            num_surv = all_surviving.sum()
+            (surv_idx,) = jnp.nonzero(all_surviving, size=num_proposals, fill_value=0)
+            surviving = jnp.arange(num_proposals) < num_surv
+            states = jax.tree.map(lambda a: a[surv_idx], all_states)
+            log_w = jnp.where(surviving, all_log_w[surv_idx], NEG_INF)
+            log_u = all_log_u[surv_idx]
             n_acc = n_acc + valid.sum()
             rnd = rnd + 1
 
