@@ -34,7 +34,7 @@ Available modules:
          to live points with importance-weighted rejection.
 
 """
-from . import adaptive, base, from_mcmc, integrator, nrs, nss, utils
+from . import adaptive, base, from_mcmc, integrator, irmh, nrs, nss, utils
 
 __all__ = [
     "base",
@@ -42,6 +42,7 @@ __all__ = [
     "integrator",
     "nss",
     "nrs",
+    "irmh",
     "utils",
     "from_mcmc",
 ]

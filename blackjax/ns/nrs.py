@@ -41,10 +41,13 @@ from blackjax.types import Array, ArrayTree
 
 __all__ = [
     "RejectionInfo",
+    "_build_rejection_inner_kernel",
     "as_top_level_api",
     "build_kernel",
+    "ellipsoid_proposal",
     "gaussian_proposal",
     "init",
+    "update_ellipsoid_params",
     "update_gaussian_params",
 ]
 
@@ -134,6 +137,241 @@ def update_gaussian_params(
     return {"mean": mean, "cov": cov}
 
 
+def ellipsoid_proposal(key, n, *, mean, L, log_volume):
+    """Draw samples uniformly from an ellipsoid and evaluate their log-densities.
+
+    The ellipsoid is defined by ``{x : (x - mean)^T Σ^{-1} (x - mean) <= 1}``
+    where ``Σ = L L^T`` (L is lower-triangular Cholesky factor, already scaled
+    to enclose all live points).
+
+    Parameters
+    ----------
+    key
+        PRNG key.
+    n
+        Number of samples to draw.
+    mean
+        Centre of the ellipsoid.
+    L
+        Cholesky factor of the (scaled) covariance matrix defining the ellipsoid.
+    log_volume
+        Log-volume of the ellipsoid (precomputed for efficiency).
+
+    Returns
+    -------
+    tuple
+        (samples, log_proposal) where samples has shape (n, d) and
+        log_proposal has shape (n,).
+    """
+    d = mean.shape[0]
+    key1, key2 = jax.random.split(key)
+    # Sample uniformly from the unit ball: direction * radius^(1/d)
+    directions = jax.random.normal(key1, (n, d))
+    directions = directions / jnp.linalg.norm(directions, axis=-1, keepdims=True)
+    radii = jax.random.uniform(key2, (n, 1)) ** (1.0 / d)
+    unit_ball = directions * radii
+    # Transform to ellipsoid
+    samples = mean[None, :] + unit_ball @ L.T
+    log_proposal = jnp.full(n, -log_volume)
+    return samples, log_proposal
+
+
+def _log_unit_ball_volume(d):
+    """Log-volume of the d-dimensional unit ball."""
+    return (d / 2.0) * jnp.log(jnp.pi) - jax.lax.lgamma(d / 2.0 + 1.0)
+
+
+def update_ellipsoid_params(
+    rng_key,
+    state: NSState,
+    info: NSInfo,
+    inner_kernel_params: Optional[Dict[str, ArrayTree]] = None,
+) -> Dict[str, ArrayTree]:
+    """Update ellipsoid parameters from current live points.
+
+    Fits a bounding ellipsoid to the live points following the MultiNest
+    strategy (Feroz et al. 2009):
+    1. Compute the empirical mean and covariance.
+    2. Find the minimum enlargement factor so the ellipsoid contains all
+       live points (maximum Mahalanobis distance).
+    3. Further enlarge if necessary so the ellipsoid volume is at least
+       the estimated remaining prior volume ``exp(-i/N)`` where ``i`` is
+       the iteration count and ``N`` the number of live points.
+
+    Parameters
+    ----------
+    rng_key
+        PRNG key (unused but required by interface).
+    state
+        The current NSState containing live particles.
+    info
+        Information from the last NS step (unused but kept for interface).
+    inner_kernel_params
+        Previous inner kernel parameters. Used to retrieve and increment
+        the iteration counter ``i``.
+
+    Returns
+    -------
+    Dict[str, ArrayTree]
+        Dictionary containing 'mean', 'L' (scaled Cholesky factor),
+        'log_volume' of the bounding ellipsoid, and 'i' iteration counter.
+    """
+    positions = state.particles.position
+    n_live = positions.shape[0]
+    mean = particles_means(positions)
+    cov = jnp.atleast_2d(particles_covariance_matrix(positions))
+    L_cov = jnp.linalg.cholesky(cov)
+
+    # Mahalanobis distances: solve L_cov @ z = (x - mean) for z, then ||z||
+    centered = positions - mean[None, :]
+    z = jax.scipy.linalg.solve_triangular(L_cov, centered.T, lower=True).T
+    mahal_sq = jnp.sum(z**2, axis=-1)
+    max_mahal = jnp.sqrt(mahal_sq.max())
+
+    # Minimum bounding ellipsoid
+    d = jnp.array(mean.shape[0], dtype=float)
+    log_ball = _log_unit_ball_volume(d)
+    log_vol_bounding = (
+        log_ball + jnp.sum(jnp.log(jnp.diag(L_cov))) + d * jnp.log(max_mahal)
+    )
+
+    # Estimated remaining prior volume: exp(-i/N)
+    i = inner_kernel_params.get("i", jnp.array(0.0)) + 1.0
+    log_vol_prior = -i / n_live
+
+    # Enlarge to whichever is larger
+    log_vol_target = jnp.maximum(log_vol_bounding, log_vol_prior)
+
+    # Scale factor: V_target = V_ball * det(L_cov) * scale^d
+    # => log(scale) = (log_vol_target - log_ball - log|det(L_cov)|) / d
+    log_det_L = jnp.sum(jnp.log(jnp.diag(L_cov)))
+    log_scale = (log_vol_target - log_ball - log_det_L) / d
+    scale = jnp.exp(log_scale)
+
+    L_scaled = L_cov * scale
+    log_volume = log_vol_target
+
+    return {"mean": mean, "L": L_scaled, "log_volume": log_volume, "i": i}
+
+
+def _build_rejection_inner_kernel(
+    init_state_fn: Callable,
+    unravel_fn: Callable,
+    proposal_fn: Callable,
+    num_delete: int,
+    num_proposals: int,
+    max_rounds: int = 100,
+):
+    """Factory for a simple rejection-based update strategy.
+
+    Draws samples from the proposal, accepts those with likelihood above the
+    threshold, and collects until ``num_delete`` are found. No importance
+    weighting — every accepted sample is kept with equal probability.
+
+    Parameters
+    ----------
+    init_state_fn
+        Scalar function: position -> StateWithLogLikelihood.
+    unravel_fn
+        Function mapping a flat array to a PyTree position.
+    proposal_fn
+        Proposal function with signature ``(key, n, **params) -> (samples, log_proposal)``.
+        The ``log_proposal`` return value is ignored.
+    num_delete
+        Number of replacement particles to produce.
+    num_proposals
+        Batch size: number of proposals drawn per round.
+    max_rounds
+        Maximum number of batches before declaring failure.
+
+    Returns
+    -------
+    Callable
+        Update function with signature
+        ``(rng_key, state, loglikelihood_0, **params) -> (new_particles, info)``.
+    """
+
+    def update_function(rng_key, state, loglikelihood_0, **params):
+        NEG_INF = jnp.array(-jnp.inf)
+        proposal_params = {k: v for k, v in params.items() if k != "i"}
+
+        @jax.vmap
+        def eval_states(x):
+            return init_state_fn(unravel_fn(x), loglikelihood_birth=loglikelihood_0)
+
+        prototype = jax.tree.map(lambda x: x[0], state.particles)
+
+        def cond_fn(carry):
+            _, _, _, _, surviving, _, _, round_count = carry
+            return (surviving.sum() < num_delete) & (round_count < max_rounds)
+
+        def body_fn(carry):
+            states, log_w, log_u, log_w_max, surviving, n_acc, key, rnd = carry
+            key, batch_key, u_key = jax.random.split(key, 3)
+
+            samples, log_proposal = proposal_fn(
+                batch_key, num_proposals, **proposal_params
+            )
+            batch_states = eval_states(samples)
+
+            # Prior weight: π(x)/q(x); set to -inf if likelihood too low
+            batch_log_w = batch_states.logdensity - log_proposal
+            in_contour = batch_states.loglikelihood > loglikelihood_0
+            batch_log_w = jnp.where(in_contour, batch_log_w, NEG_INF)
+            batch_log_u = jnp.log(jax.random.uniform(u_key, shape=(num_proposals,)))
+
+            # Pool with existing survivors and re-test all against new log_w_max
+            all_states = jax.tree.map(
+                lambda a, b: jnp.concatenate([a, b]), states, batch_states
+            )
+            all_log_w = jnp.concatenate([log_w, batch_log_w])
+            all_log_u = jnp.concatenate([log_u, batch_log_u])
+            log_w_max = jnp.maximum(log_w_max, all_log_w.max())
+            all_surviving = all_log_u < all_log_w - log_w_max
+
+            num_surv = all_surviving.sum()
+            (surv_idx,) = jnp.nonzero(all_surviving, size=num_proposals, fill_value=0)
+            surviving = jnp.arange(num_proposals) < num_surv
+            states = jax.tree.map(lambda a: a[surv_idx], all_states)
+            log_w = jnp.where(surviving, all_log_w[surv_idx], NEG_INF)
+            log_u = all_log_u[surv_idx]
+            n_acc = n_acc + in_contour.sum()
+            rnd = rnd + 1
+
+            return states, log_w, log_u, log_w_max, surviving, n_acc, key, rnd
+
+        states = jax.tree.map(
+            lambda x: jnp.zeros((num_proposals,) + x.shape), prototype
+        )
+        log_w = jnp.full(num_proposals, NEG_INF)
+        log_u = jnp.zeros(num_proposals)
+        log_w_max = NEG_INF
+        surviving = jnp.zeros(num_proposals, dtype=bool)
+        n_acc = jnp.array(0)
+        key = rng_key
+        rnd = jnp.array(0)
+
+        carry = states, log_w, log_u, log_w_max, surviving, n_acc, key, rnd
+        final = jax.lax.while_loop(cond_fn, body_fn, carry)
+        states, _, _, log_w_max, surviving, n_acc, _, num_rounds = final
+
+        num_survivors = surviving.sum()
+        (survivor_idx,) = jnp.nonzero(surviving, size=num_delete, fill_value=0)
+        new_particles = jax.tree.map(lambda x: x[survivor_idx], states)
+
+        info = RejectionInfo(
+            num_proposals_total=num_rounds * num_proposals,
+            num_accepted_total=n_acc,
+            num_survivors=num_survivors,
+            num_rounds=num_rounds,
+            log_w_max=log_w_max,
+            success=num_survivors >= num_delete,
+        )
+        return new_particles, info
+
+    return update_function
+
+
 def _build_proposal_inner_kernel(
     init_state_fn: Callable,
     unravel_fn: Callable,
@@ -175,6 +413,7 @@ def _build_proposal_inner_kernel(
 
     def update_function(rng_key, state, loglikelihood_0, **params):
         NEG_INF = jnp.array(-jnp.inf)
+        proposal_params = {k: v for k, v in params.items() if k != "i"}
 
         @jax.vmap
         def eval_states(x):
@@ -190,7 +429,9 @@ def _build_proposal_inner_kernel(
             states, log_w, log_u, log_w_max, surviving, n_acc, key, rnd = carry
             key, batch_key, u_key = jax.random.split(key, 3)
 
-            samples, log_proposal = proposal_fn(batch_key, num_proposals, **params)
+            samples, log_proposal = proposal_fn(
+                batch_key, num_proposals, **proposal_params
+            )
             batch_states = eval_states(samples)
             batch_log_w = batch_states.logdensity - log_proposal
             valid = batch_states.loglikelihood > loglikelihood_0
@@ -257,6 +498,7 @@ def build_kernel(
     proposal_fn: Callable = gaussian_proposal,
     update_inner_kernel_params_fn: Callable = update_gaussian_params,
     delete_fn: Callable = default_delete_fn,
+    inner_kernel_builder: Callable = _build_proposal_inner_kernel,
 ) -> Callable:
     """Builds the Nested Rejection Sampling kernel.
 
@@ -278,13 +520,17 @@ def build_kernel(
         Function to update inner kernel parameters.
     delete_fn
         Particle deletion function.
+    inner_kernel_builder
+        Factory function for the inner kernel. Defaults to
+        ``_build_proposal_inner_kernel`` (importance-weighted rejection).
+        Use ``_build_rejection_inner_kernel`` for simple rejection.
 
     Returns
     -------
     Callable
         A kernel function for Nested Rejection Sampling.
     """
-    inner_kernel = _build_proposal_inner_kernel(
+    inner_kernel = inner_kernel_builder(
         init_state_fn, unravel_fn, proposal_fn, num_delete, num_proposals, max_rounds
     )
 
@@ -309,6 +555,7 @@ def as_top_level_api(
     init_state_strategy_fn: Callable = init_state_strategy,
     update_inner_kernel_params_fn: Callable = update_gaussian_params,
     delete_fn: Callable = default_delete_fn,
+    inner_kernel_builder: Callable = _build_proposal_inner_kernel,
 ) -> SamplingAlgorithm:
     """Creates a Nested Rejection Sampling (NRS) algorithm.
 
@@ -339,6 +586,10 @@ def as_top_level_api(
         A function to update inner kernel parameters from particles.
     delete_fn
         Particle deletion function.
+    inner_kernel_builder
+        Factory function for the inner kernel. Defaults to
+        ``_build_proposal_inner_kernel`` (importance-weighted rejection).
+        Use ``_build_rejection_inner_kernel`` for simple rejection.
 
     Returns
     -------
@@ -362,6 +613,7 @@ def as_top_level_api(
         proposal_fn=proposal_fn,
         update_inner_kernel_params_fn=update_inner_kernel_params_fn,
         delete_fn=delete_fn,
+        inner_kernel_builder=inner_kernel_builder,
     )
 
     def init_fn(position, rng_key=None):

@@ -32,7 +32,9 @@ from .mcmc.random_walk import (
     normal_random_walk,
     rmh_as_top_level_api,
 )
-from .ns import nrs as _nrs, nss as _nss
+from .ns import irmh as _irmh
+from .ns import nrs as _nrs
+from .ns import nss as _nss
 from .optimizers import dual_averaging, lbfgs
 from .sgmcmc import csgld as _csgld
 from .sgmcmc import sghmc as _sghmc
@@ -147,10 +149,11 @@ smc_family = [
 "Step_fn returning state has a .particles attribute"
 
 # NS
+irmh_ns = generate_top_level_api_from(_irmh)
 nrs = generate_top_level_api_from(_nrs)
 nss = generate_top_level_api_from(_nss)
 
-ns_family = [nrs, nss]
+ns_family = [irmh_ns, nrs, nss]
 
 # stochastic gradient mcmc
 sgld = generate_top_level_api_from(_sgld)

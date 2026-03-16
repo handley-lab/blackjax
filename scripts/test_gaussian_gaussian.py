@@ -2,37 +2,34 @@ import time
 
 import jax
 import jax.numpy as jnp
+import tqdm
+
 import blackjax
 from blackjax.ns.integrator import init_integrator, update_integrator
 from blackjax.ns.utils import finalise
-import tqdm
 
 rng_key = jax.random.PRNGKey(0)
 
-ndim = 5
+ndim = 10
 
-# Prior: N(mu_prior, cov_prior) with non-trivial correlations
-mu_prior = jnp.array([0.0, 0.5, -0.3, 0.2, -0.1])
+# Generate random correlated prior and likelihood covariances
+key_setup, rng_key = jax.random.split(rng_key)
+k1, k2, k3, k4 = jax.random.split(key_setup, 4)
 
-L_prior = jnp.array([
-    [1.0, 0.0, 0.0, 0.0, 0.0],
-    [0.3, 0.9, 0.0, 0.0, 0.0],
-    [-0.2, 0.4, 0.8, 0.0, 0.0],
-    [0.1, -0.3, 0.2, 0.7, 0.0],
-    [0.5, 0.1, -0.1, 0.3, 0.6],
-])
+mu_prior = 0.5 * jax.random.normal(k1, (ndim,))
+
+# Random lower-triangular with positive diagonal for prior
+L_prior_raw = jnp.tril(jax.random.normal(k2, (ndim, ndim)))
+L_prior = L_prior_raw.at[jnp.diag_indices(ndim)].set(
+    jnp.abs(jnp.diag(L_prior_raw)) + 0.5
+)
 cov_prior = L_prior @ L_prior.T
 
-# Likelihood: N(mu_like, cov_like) with different non-trivial correlations
-mu_like = jnp.array([1.0, -0.5, 0.8, 0.0, 0.3])
+mu_like = 0.5 * jax.random.normal(k3, (ndim,))
 
-L_like = jnp.array([
-    [0.5, 0.0, 0.0, 0.0, 0.0],
-    [-0.2, 0.4, 0.0, 0.0, 0.0],
-    [0.1, -0.1, 0.3, 0.0, 0.0],
-    [0.3, 0.2, -0.1, 0.4, 0.0],
-    [-0.1, 0.1, 0.2, -0.2, 0.3],
-])
+# Likelihood: tighter covariance (scaled down by 0.01)
+L_like_raw = 0.01 * jnp.tril(jax.random.normal(k4, (ndim, ndim)))
+L_like = L_like_raw.at[jnp.diag_indices(ndim)].set(jnp.abs(jnp.diag(L_like_raw)) + 0.01)
 cov_like = L_like @ L_like.T
 
 # Analytic evidence: Z = N(mu_prior | mu_like, cov_prior + cov_like)
@@ -52,14 +49,20 @@ print(f"Analytic logZ = {logZ_analytic:.6f}")
 print(f"Analytic posterior mean: {mu_post}")
 print()
 
-logprior_fn = lambda x: jax.scipy.stats.multivariate_normal.logpdf(x, mu_prior, cov_prior)
-loglikelihood_fn = lambda x: jax.scipy.stats.multivariate_normal.logpdf(x, mu_like, cov_like)
+logprior_fn = lambda x: jax.scipy.stats.multivariate_normal.logpdf(
+    x, mu_prior, cov_prior
+)
+loglikelihood_fn = lambda x: jax.scipy.stats.multivariate_normal.logpdf(
+    x, mu_like, cov_like
+)
 
 # Draw initial positions from the prior
 rng_key, init_key = jax.random.split(rng_key)
 n_live = 1000
 num_delete = 50
-positions = jax.random.multivariate_normal(init_key, mu_prior, cov_prior, shape=(n_live,))
+positions = jax.random.multivariate_normal(
+    init_key, mu_prior, cov_prior, shape=(n_live,)
+)
 
 
 def run_sampler(name, algo, positions, rng_key, update_info=True):
@@ -108,6 +111,7 @@ nss_algo = blackjax.nss(
 nss_run, nss_infos, nss_time = run_sampler("NSS", nss_algo, positions, nss_key)
 
 import anesthetic
+
 nss_samples = anesthetic.NestedSamples(
     data=nss_run.particles.position,
     logL=nss_run.particles.loglikelihood,
@@ -138,7 +142,9 @@ nrs_algo = blackjax.nrs(
     num_proposals=num_proposals_nrs,
     num_delete=num_delete,
 )
-nrs_run, nrs_infos, nrs_time = run_sampler("NRS", nrs_algo, positions, nrs_key, update_info=False)
+nrs_run, nrs_infos, nrs_time = run_sampler(
+    "NRS", nrs_algo, positions, nrs_key, update_info=False
+)
 
 nrs_samples = anesthetic.NestedSamples(
     data=nrs_run.particles.position,
@@ -160,17 +166,59 @@ print(f"NRS accepted (L > L0) = {nrs_accepted}")
 print(f"NRS total rounds = {nrs_rounds}")
 print()
 
+# --- IRMH ---
+print("=" * 60)
+print("IRMH (Independent Random Metropolis-Hastings)")
+print("=" * 60)
+
+num_inner_steps_irmh = num_inner_steps_nss
+rng_key, irmh_key = jax.random.split(rng_key)
+irmh_algo = blackjax.irmh_ns(
+    logprior_fn=logprior_fn,
+    loglikelihood_fn=loglikelihood_fn,
+    num_delete=num_delete,
+    num_inner_steps=num_inner_steps_irmh,
+)
+irmh_run, irmh_infos, irmh_time = run_sampler("IRMH", irmh_algo, positions, irmh_key)
+
+irmh_samples = anesthetic.NestedSamples(
+    data=irmh_run.particles.position,
+    logL=irmh_run.particles.loglikelihood,
+    logL_birth=irmh_run.particles.loglikelihood_birth,
+)
+
+irmh_num_steps = len(irmh_infos)
+irmh_num_dead = len(irmh_run.particles.position)
+irmh_like_evals = irmh_num_steps * num_delete * num_inner_steps_irmh
+
+irmh_acceptance = jnp.mean(jnp.array([info.is_accepted.mean() for info in irmh_infos]))
+
+print(f"IRMH logZ = {irmh_samples.logZ():.4f} +/- {irmh_samples.logZ(12).std():.4f}")
+print(f"IRMH wall time = {irmh_time:.2f}s")
+print(f"IRMH steps = {irmh_num_steps}, dead points = {irmh_num_dead}")
+print(f"IRMH likelihood evaluations = {irmh_like_evals}")
+print(f"IRMH mean acceptance rate = {float(irmh_acceptance):.4f}")
+print()
+
 # --- Summary ---
 print("=" * 60)
 print("Comparison")
 print("=" * 60)
-print(f"{'':20s} {'NSS':>12s} {'NRS':>12s} {'Analytic':>12s}")
-print(f"{'logZ':20s} {nss_samples.logZ():12.4f} {nrs_samples.logZ():12.4f} {logZ_analytic:12.4f}")
-print(f"{'logZ error':20s} {nss_samples.logZ(12).std():12.4f} {nrs_samples.logZ(12).std():12.4f}")
-print(f"{'Wall time (s)':20s} {nss_time:12.2f} {nrs_time:12.2f}")
-print(f"{'Dead points':20s} {nss_num_dead:12d} {nrs_num_dead:12d}")
-print(f"{'Like evals':20s} {nss_like_evals:12d} {nrs_like_evals:12d}")
-print(f"{'Like evals/dead pt':20s} {nss_like_evals/nss_num_dead:12.1f} {nrs_like_evals/nrs_num_dead:12.1f}")
+print(f"{'':20s} {'NSS':>12s} {'NRS':>12s} {'IRMH':>12s} {'Analytic':>12s}")
+print(
+    f"{'logZ':20s} {nss_samples.logZ():12.4f} {nrs_samples.logZ():12.4f} {irmh_samples.logZ():12.4f} {logZ_analytic:12.4f}"
+)
+print(
+    f"{'logZ error':20s} {nss_samples.logZ(12).std():12.4f} {nrs_samples.logZ(12).std():12.4f} {irmh_samples.logZ(12).std():12.4f}"
+)
+print(f"{'Wall time (s)':20s} {nss_time:12.2f} {nrs_time:12.2f} {irmh_time:12.2f}")
+print(f"{'Dead points':20s} {nss_num_dead:12d} {nrs_num_dead:12d} {irmh_num_dead:12d}")
+print(
+    f"{'Like evals':20s} {nss_like_evals:12d} {nrs_like_evals:12d} {irmh_like_evals:12d}"
+)
+print(
+    f"{'Like evals/dead pt':20s} {nss_like_evals/nss_num_dead:12.1f} {nrs_like_evals/nrs_num_dead:12.1f} {irmh_like_evals/irmh_num_dead:12.1f}"
+)
 print()
 
 # --- Save samples ---
@@ -184,6 +232,7 @@ import matplotlib.pyplot as plt
 
 axes = nss_samples.plot_2d(range(ndim), label="NSS")
 nrs_samples.plot_2d(axes, label="NRS")
-axes.iloc[-1, 0].legend(bbox_to_anchor=(ndim, ndim), loc='lower right')
+irmh_samples.plot_2d(axes, label="IRMH")
+axes.iloc[-1, 0].legend(bbox_to_anchor=(ndim, ndim), loc="lower right")
 plt.savefig("test_gaussian_gaussian.png", dpi=150, bbox_inches="tight")
 print("Saved test_gaussian_gaussian.png")
