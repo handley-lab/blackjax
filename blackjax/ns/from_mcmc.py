@@ -83,7 +83,14 @@ def update_with_mcmc_take_last(
             return final_state, infos
 
         sample_keys = jax.random.split(sample_key, num_delete)
-        return jax.vmap(mcmc_kernel)(sample_keys, start_state)
+        final_states, infos = jax.vmap(mcmc_kernel)(sample_keys, start_state)
+        # All replacement particles are born at the current contour,
+        # regardless of whether the chain accepted any moves.
+        final_states = final_states._replace(
+            loglikelihood_birth=loglikelihood_0
+            * jnp.ones_like(final_states.loglikelihood_birth)
+        )
+        return final_states, infos
 
     return update_function
 
