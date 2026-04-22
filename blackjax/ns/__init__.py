@@ -11,30 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Nested Sampling Algorithms in BlackJAX.
+"""Nested Sampling Algorithms in BlackJAX."""
 
-This subpackage provides implementations of Nested Sampling algorithms.
-
-Nested Sampling is a Monte Carlo method for Bayesian computation, primarily
-used for evidence (marginal likelihood) calculation and posterior sampling.
-It is particularly well-suited for problems with multi-modal posteriors or
-complex likelihood landscapes.
-
-Available modules:
-------------------
-- `base`: Provides core components for Nested Sampling.
-- `adaptive`: Implements Adaptive Nested Sampling, combining SMC tempering
-- `nss`: Implements Nested Slice Sampling, using Hit-and-Run Slice Sampling as
-         the inner kernel with adaptive tuning of its proposal mechanism.
-- `dynamic_nss`: Thin wrapper around `nss` that makes dynamic NS
-                 (num_delete > 1) a first-class API entry point.
-- `hamiltonian`: Implements gradient-guided Hamiltonian Nested Sampling.
-- `integrator`: Provides NSIntegrator for tracking evidence integration.
-- `utils`: Contains utility functions for processing and analyzing Nested
-           Sampling results.
-- `from_mcmc`: Utilities to build Nested Sampling algorithms from MCMC kernels.
-
-"""
 from . import adaptive, base, dynamic_nss, from_mcmc, hamiltonian, integrator, nss, utils
 
 __all__ = [
