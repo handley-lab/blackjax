@@ -1,7 +1,7 @@
 # Copyright 2020- The Blackjax Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
+# you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
@@ -14,7 +14,7 @@ you may not use this file except in compliance with the License.
 """Dynamic Nested Slice Sampling (Dynamic NSS).
 
 A thin wrapper around :mod:`blackjax.ns.nss` that makes *dynamic* Nested
-Sampling — replacing ``num_delete > 1`` live points per step — a first-class
+Sampling -- replacing ``num_delete > 1`` live points per step -- a first-class
 API entry point.  The underlying machinery (Hit-and-Run Slice Sampling inner
 kernel, covariance-based direction proposals, adaptive parameter updates) is
 identical to :func:`blackjax.nss`; only the default regime and documentation
@@ -34,21 +34,11 @@ from blackjax.mcmc.ss import sample_direction_from_covariance
 from blackjax.ns.base import delete_fn as default_delete_fn
 from blackjax.ns.base import init_state_strategy
 from blackjax.ns.from_mcmc import update_with_mcmc_take_last
-from blackjax.ns.nss import (
-    as_top_level_api as _nss_as_top_level_api,
-)
-from blackjax.ns.nss import (
-    build_kernel,  # noqa: F401 — re-exported for generate_top_level_api_from
-)
-from blackjax.ns.nss import (
-    default_stepper_fn,
-)
-from blackjax.ns.nss import (
-    init,  # noqa: F401 — re-exported for generate_top_level_api_from
-)
-from blackjax.ns.nss import (
-    update_inner_kernel_params,  # noqa: F401 — re-exported
-)
+from blackjax.ns.nss import as_top_level_api as _nss_as_top_level_api
+from blackjax.ns.nss import build_kernel  # noqa: F401
+from blackjax.ns.nss import default_stepper_fn
+from blackjax.ns.nss import init  # noqa: F401
+from blackjax.ns.nss import update_inner_kernel_params  # noqa: F401
 
 __all__ = [
     "as_top_level_api",
@@ -74,14 +64,14 @@ def as_top_level_api(
     """Creates a Dynamic Nested Slice Sampling (Dynamic NSS) algorithm.
 
     This is a convenience wrapper around :func:`blackjax.nss` that highlights
-the *dynamic* regime where multiple live points (``num_delete > 1``) are
-removed and replaced at every step.  All inner-kernel logic (Hit-and-Run
-Slice Sampling with adaptive covariance directions) is identical to
-:func:`blackjax.nss`.
+    the *dynamic* regime where multiple live points (``num_delete > 1``) are
+    removed and replaced at every step.  All inner-kernel logic (Hit-and-Run
+    Slice Sampling with adaptive covariance directions) is identical to
+    :func:`blackjax.nss`.
 
     A typical choice is ``num_delete = num_live // 2``, which removes half of
-the live population per step and maximises GPU utilisation via the ``vmap``
-over the batch that is already built into the inner kernel.
+    the live population per step and maximises GPU utilisation via the ``vmap``
+    over the batch that is already built into the inner kernel.
 
     Parameters
     ----------
