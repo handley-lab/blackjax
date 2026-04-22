@@ -58,7 +58,6 @@ factory and the low level components, which may not be differentiable. Moreover,
 level to be mostly functional programming in nature and reducing boilerplate code.
 """
 
-
 @dataclasses.dataclass
 class GenerateSamplingAPI:
     differentiable: Callable
@@ -71,7 +70,6 @@ class GenerateSamplingAPI:
     def register_factory(self, name, callable):
         setattr(self, name, callable)
 
-
 @dataclasses.dataclass
 class GenerateVariationalAPI:
     differentiable: Callable
@@ -81,7 +79,6 @@ class GenerateVariationalAPI:
 
     def __call__(self, *args, **kwargs) -> VIAlgorithm:
         return self.differentiable(*args, **kwargs)
-
 
 @dataclasses.dataclass
 class GeneratePathfinderAPI:
@@ -150,7 +147,7 @@ smc_family = [
 # NS
 nss = generate_top_level_api_from(_nss)
 dynamic_nss = generate_top_level_api_from(_dynamic_nss)
-sn_hamiltonian = generate_top_level_api_from(_ns_hamiltonian)
+ns_hamiltonian = generate_top_level_api_from(_ns_hamiltonian)
 
 ns_family = [nss, dynamic_nss, ns_hamiltonian]
 
