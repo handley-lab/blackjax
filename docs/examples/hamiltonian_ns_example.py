@@ -16,7 +16,12 @@ Usage::
 Requirements: blackjax, jax, scipy (optional, for comparison).
 """
 
+import os
+import sys
 import time
+
+# Ensure the project root is on the path when running as a script
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 try:
     import numpy as np
@@ -43,13 +48,8 @@ UPPER = jnp.full(NDIM, 5.0)
 MU = jnp.zeros(NDIM)
 SIGMA = 1.0
 
-# Analytic log-evidence:
-#   Z = integral_{[-5,5]^2} (1/10)^2 * N(x; 0, I) dx
-#   ~ (1/10)^2 * (2*pi*sigma^2)^(d/2) * [erf(5/(sigma*sqrt(2)))]^d
-#   where (2*pi*sigma^2)^(d/2) is the Gaussian normalising constant
 if _SCIPY_AVAILABLE:
     prior_prob = (1.0 / 10.0) ** NDIM
-    # (2 * pi * sigma^2)^(d/2) is the Gaussian normalising constant
     factor = (2.0 * np.pi * SIGMA**2) ** (NDIM / 2.0)
     p_in = erf(5.0 / (SIGMA * np.sqrt(2))) ** NDIM
     ANALYTIC_LOG_Z: float = float(np.log(prior_prob * factor * p_in))
@@ -70,11 +70,13 @@ def loglikelihood_fn(x):
     """Unnormalised 2-D Gaussian log-likelihood."""
     return -0.5 * jnp.sum(((x - MU) / SIGMA) ** 2)
 
+
 # -----------------------------------------------------------------------
 # Shared helpers
 # -----------------------------------------------------------------------
 NUM_LIVE = 200
 NUM_INNER = 5
+
 
 def run_ns(sampler, label, max_steps=2000, tol=3.0):
     """Run a full NS loop and return (logZ_estimate, elapsed_seconds, dead)."""
@@ -86,7 +88,6 @@ def run_ns(sampler, label, max_steps=2000, tol=3.0):
     state = jax.jit(sampler.init)(positions)
     step_fn = jax.jit(sampler.step)
 
-    # Warm-up JIT
     rng_key, subkey = jax.random.split(rng_key)
     state, _ = step_fn(subkey, state)
 
@@ -98,7 +99,6 @@ def run_ns(sampler, label, max_steps=2000, tol=3.0):
         state, info = step_fn(subkey, state)
         dead_list.append(info)
 
-        # Stopping criterion: live evidence well below dead evidence
         if state.integrator.logZ_live - state.integrator.logZ < -tol:
             break
 
@@ -107,10 +107,11 @@ def run_ns(sampler, label, max_steps=2000, tol=3.0):
     dead = ns_utils.finalise(state, dead_list, update_info=False)
     logZ_est = float(state.integrator.logZ)
     print(
-        f"  {{label:<40s}}  logZ = {{logZ_est:+.3f}}  "
-        f"(steps={{i + 1}}, t={{elapsed:.1f}}s)"
+        f"  {label:<40s}  logZ = {logZ_est:+.3f}  "
+        f"(steps={i + 1}, t={elapsed:.1f}s)"
     )
     return logZ_est, elapsed, dead
+
 
 # -----------------------------------------------------------------------
 # Run all four variants
@@ -118,10 +119,10 @@ def run_ns(sampler, label, max_steps=2000, tol=3.0):
 print("=" * 72)
 print("BlackJAX Nested Sampling — 2-D Gaussian benchmark")
 if ANALYTIC_LOG_Z is not None:
-    print(f"  Analytic log Z = {{ANALYTIC_LOG_Z:+.4f}}")
+    print(f"  Analytic log Z = {ANALYTIC_LOG_Z:+.4f}")
 print("=" * 72)
 
-results = {}  
+results = {}
 
 # 1. Static NSS
 sampler_nss = blackjax.nss(
@@ -133,7 +134,7 @@ sampler_nss = blackjax.nss(
 results["nss (static)"] = run_ns(sampler_nss, "nss (static, num_delete=1)")
 
 # 2. Dynamic NSS
-NUM_DELETE_DYN = NUM_LIVE // 10  # 20 particles per step
+NUM_DELETE_DYN = NUM_LIVE // 10
 sampler_dnss = blackjax.dynamic_nss(
     logprior_fn=logprior_fn,
     loglikelihood_fn=loglikelihood_fn,
@@ -141,7 +142,7 @@ sampler_dnss = blackjax.dynamic_nss(
     num_inner_steps=NUM_INNER,
 )
 results["dynamic_nss"] = run_ns(
-    sampler_dnss, f"dynamic_nss (num_delete={{NUM_DELETE_DYN}})"
+    sampler_dnss, f"dynamic_nss (num_delete={NUM_DELETE_DYN})"
 )
 
 # 3. Hamiltonian NS — static
@@ -178,18 +179,18 @@ sampler_ham_dyn = blackjax.ns_hamiltonian(
     max_steps=150,
 )
 results["ns_hamiltonian (dynamic)"] = run_ns(
-    sampler_ham_dyn, f"ns_hamiltonian (dynamic, num_delete={{NUM_DELETE_HAM}})"
+    sampler_ham_dyn, f"ns_hamiltonian (dynamic, num_delete={NUM_DELETE_HAM})"
 )
 
 # -----------------------------------------------------------------------
 # Summary table
 # -----------------------------------------------------------------------
 print("\n" + "=" * 72)
-print(f"{{'Sampler':<40s}}  {{'logZ':>10s}}  {{'bias':>10s}}  {{'time':>8s}}")
+print(f"{'Sampler':<40s}  {'logZ':>10s}  {'bias':>10s}  {'time':>8s}")
 print("-" * 72)
 for name, (logZ, elapsed, _) in results.items():
-    bias = (f"{{logZ - ANALYTIC_LOG_Z:+.3f}}" if ANALYTIC_LOG_Z is not None else "N/A")
-    print(f"  {{name:<38s}}  {{logZ:+10.3f}}  {{bias:>10s}}  {{elapsed:>7.1f}}s")
+    bias = (f"{logZ - ANALYTIC_LOG_Z:+.3f}" if ANALYTIC_LOG_Z is not None else "N/A")
+    print(f"  {name:<38s}  {logZ:+10.3f}  {bias:>10s}  {elapsed:>7.1f}s")
 if ANALYTIC_LOG_Z is not None:
-    print(f"  {{'Analytic':<38s}}  {{ANALYTIC_LOG_Z:+10.4f}}")
+    print(f"  {'Analytic':<38s}  {ANALYTIC_LOG_Z:+10.4f}")
 print("=" * 72)
