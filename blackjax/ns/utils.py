@@ -102,7 +102,7 @@ def logX(rng_key: PRNGKey, dead_info: NSInfo, shape: int = 100) -> tuple[Array, 
     )
     r = jax.lax.log1p(jax.lax.neg(u))
     num_live = compute_num_live(dead_info)
-    t = r / num_live[:, jnp.newaxis]
+    t = r / num_live[:, None]
     logX = jnp.cumsum(t, axis=0)
 
     logXp = jnp.concatenate([jnp.zeros((1, logX.shape[1])), logX[:-1]], axis=0)
@@ -142,7 +142,7 @@ def log_weights(
     unsort_indices = unsort_indices.at[sort_indices].set(jnp.arange(len(sort_indices)))
     dead_info_sorted = jax.tree.map(lambda x: x[sort_indices], dead_info)
     _, log_dX = logX(rng_key, dead_info_sorted, shape)
-    log_w = log_dX + beta * dead_info_sorted.particles.loglikelihood[..., jnp.newaxis]
+    log_w = log_dX + beta * dead_info_sorted.particles.loglikelihood[..., None]
     return log_w[unsort_indices]
 
 
