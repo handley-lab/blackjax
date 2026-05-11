@@ -24,7 +24,15 @@ from blackjax.types import Array, ArrayTree, PRNGKey
 
 
 def log1mexp(x: Array) -> Array:
-    """Computes log(1 - exp(x)) in a numerically stable way."""
+    """Computes log(1 - exp(x)) in a numerically stable way.
+
+    Mathematically defined for x <= 0 only. Inputs at or slightly above 0
+    (typically a float32 cumsum-drift artifact in `logX`) would make the
+    stable branch evaluate log(-expm1(x)) = log(negative) = NaN; we clamp
+    such inputs to -eps so the result is log(eps) -- the smallest
+    representable shrinkage at the dtype's precision -- instead of NaN.
+    """
+    x = jnp.minimum(x, -jnp.finfo(x.dtype).eps)
     return jnp.where(
         x > -0.6931472,  # approx log(2)
         jnp.log(-jnp.expm1(x)),
