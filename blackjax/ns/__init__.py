@@ -30,15 +30,18 @@ Available modules:
 - `utils`: Contains utility functions for processing and analyzing Nested
            Sampling results.
 - `from_mcmc`: Utilities to build Nested Sampling algorithms from MCMC kernels.
+- `nrs`: Implements Nested Rejection Sampling, using a Gaussian proposal fitted
+         to live points with importance-weighted rejection.
 
 """
-from . import adaptive, base, from_mcmc, integrator, nss, utils
+from . import adaptive, base, from_mcmc, integrator, nrs, nss, utils
 
 __all__ = [
     "base",
     "adaptive",
     "integrator",
     "nss",
+    "nrs",
     "utils",
     "from_mcmc",
 ]
