@@ -15,40 +15,44 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=e37d73aa" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="../../../_static/documentation_options.js?v=9eb32ce0"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/blackjax/mcmc/trajectory';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.1.dev1+g351bb9a14" />
   </head>
   
   
@@ -64,19 +68,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../../../search.html"
       method="get">
@@ -84,7 +77,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search..."
          aria-label="Search..."
          autocomplete="off"
@@ -92,8 +84,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -111,7 +103,8 @@
       
         
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -141,30 +134,29 @@
     
     
     <img src="../../../_static/blackjax.png" class="logo__image only-light" alt=" - Home"/>
-    <script>document.write(`<img src="../../../_static/blackjax.png" class="logo__image only-dark" alt=" - Home"/>`);</script>
+    <img src="../../../_static/blackjax.png" class="logo__image only-dark pst-js-only" alt=" - Home"/>
   
   
 </a></div>
         <div class="sidebar-primary-item">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script></div>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/diagnostics.html">MCMC Diagnostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/speed_up_guide.html">Speed-up Guide</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">PPL INTEGRATION</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_aesara.html">Aesara</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_pytensor.html">PyTensor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_numpyro.html">Numpyro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_funsor.html">Funsor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_oryx.html">Oryx</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_pymc.html">PyMC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_tfp.html">Tensorflow-Probability</a></li>
@@ -172,9 +164,11 @@
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">HOW TO</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_sample_multiple_chains.html">Sample with multiple chains?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_progress_bar.html">Show progress during sampling?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_custom_gradients.html">Use custom gradients?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_other_frameworks.html">Use non-JAX log-prob functions?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_metropolis_within_gibbs.html">Build a Metropolis-Within-Gibbs sampler?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_laplace_hmc.html">Use Laplace-preconditioned HMC?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_reproduce_the_blackjax_image.html">Sample from the word BlackJAX using BlackJAX?</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">LEARN BY EXAMPLE</span></p>
@@ -188,25 +182,52 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/adjusted_mclmc_adaptation/index.html">blackjax.adaptation.adjusted_mclmc_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/base/index.html">blackjax.adaptation.base</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/chees_adaptation/index.html">blackjax.adaptation.chees_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/laps/index.html">blackjax.adaptation.laps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/laps_burn_in/index.html">blackjax.adaptation.laps_burn_in</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/low_rank_adaptation/index.html">blackjax.adaptation.low_rank_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/mass_matrix/index.html">blackjax.adaptation.mass_matrix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/mclmc_adaptation/index.html">blackjax.adaptation.mclmc_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/mclmc_lrd_adaptation/index.html">blackjax.adaptation.mclmc_lrd_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/meads_adaptation/index.html">blackjax.adaptation.meads_adaptation</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/meta/index.html">blackjax.adaptation.meta</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/meta/builders/index.html">blackjax.adaptation.meta.builders</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/meta/verdict/index.html">blackjax.adaptation.meta.verdict</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/meta_adaptation/index.html">blackjax.adaptation.meta_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/metric_buffers/index.html">blackjax.adaptation.metric_buffers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/metric_estimators/index.html">blackjax.adaptation.metric_estimators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/metric_recipes/index.html">blackjax.adaptation.metric_recipes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/pathfinder_adaptation/index.html">blackjax.adaptation.pathfinder_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/staged_adaptation/index.html">blackjax.adaptation.staged_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/step_size/index.html">blackjax.adaptation.step_size</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/window_adaptation/index.html">blackjax.adaptation.window_adaptation</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../autoapi/blackjax/diagnostics/index.html">blackjax.diagnostics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../autoapi/blackjax/eca/index.html">blackjax.eca</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/index.html">blackjax.mcmc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/adjusted_mclmc/index.html">blackjax.mcmc.adjusted_mclmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/adjusted_mclmc_dynamic/index.html">blackjax.mcmc.adjusted_mclmc_dynamic</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/barker/index.html">blackjax.mcmc.barker</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/composed/index.html">blackjax.mcmc.composed</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/composed/step_size/index.html">blackjax.mcmc.composed.step_size</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/composed/trajectory_length/index.html">blackjax.mcmc.composed.trajectory_length</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/coupled_hmc/index.html">blackjax.mcmc.coupled_hmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/diffusions/index.html">blackjax.mcmc.diffusions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/dynamic_hmc/index.html">blackjax.mcmc.dynamic_hmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/elliptical_slice/index.html">blackjax.mcmc.elliptical_slice</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/ghmc/index.html">blackjax.mcmc.ghmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/gist/index.html">blackjax.mcmc.gist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/gist_step_size/index.html">blackjax.mcmc.gist_step_size</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/gist_trajectory_length/index.html">blackjax.mcmc.gist_trajectory_length</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/hmc/index.html">blackjax.mcmc.hmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/integrators/index.html">blackjax.mcmc.integrators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/laplace_dynamic_hmc/index.html">blackjax.mcmc.laplace_dynamic_hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/laplace_hmc/index.html">blackjax.mcmc.laplace_hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/laplace_marginal/index.html">blackjax.mcmc.laplace_marginal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/mala/index.html">blackjax.mcmc.mala</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/marginal_latent_gaussian/index.html">blackjax.mcmc.marginal_latent_gaussian</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/mclmc/index.html">blackjax.mcmc.mclmc</a></li>
@@ -216,10 +237,21 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/proposal/index.html">blackjax.mcmc.proposal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/random_walk/index.html">blackjax.mcmc.random_walk</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/rmhmc/index.html">blackjax.mcmc.rmhmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/slice/index.html">blackjax.mcmc.slice</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/termination/index.html">blackjax.mcmc.termination</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/trajectory/index.html">blackjax.mcmc.trajectory</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../autoapi/blackjax/ns/index.html">blackjax.ns</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/ns/adaptive/index.html">blackjax.ns.adaptive</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/ns/base/index.html">blackjax.ns.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/ns/from_mcmc/index.html">blackjax.ns.from_mcmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/ns/integrator/index.html">blackjax.ns.integrator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/ns/nss/index.html">blackjax.ns.nss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/ns/utils/index.html">blackjax.ns.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../autoapi/blackjax/progress_reader/index.html">blackjax.progress_reader</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../autoapi/blackjax/sgmcmc/index.html">blackjax.sgmcmc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/sgmcmc/csgld/index.html">blackjax.sgmcmc.csgld</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/sgmcmc/diffusions/index.html">blackjax.sgmcmc.diffusions</a></li>
@@ -230,12 +262,14 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../autoapi/blackjax/smc/index.html">blackjax.smc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/adaptive_persistent_sampling/index.html">blackjax.smc.adaptive_persistent_sampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/adaptive_tempered/index.html">blackjax.smc.adaptive_tempered</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/base/index.html">blackjax.smc.base</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/ess/index.html">blackjax.smc.ess</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/from_mcmc/index.html">blackjax.smc.from_mcmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/inner_kernel_tuning/index.html">blackjax.smc.inner_kernel_tuning</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/partial_posteriors_path/index.html">blackjax.smc.partial_posteriors_path</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/persistent_sampling/index.html">blackjax.smc.persistent_sampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/pretuning/index.html">blackjax.smc.pretuning</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/resampling/index.html">blackjax.smc.resampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/solver/index.html">blackjax.smc.solver</a></li>
@@ -249,7 +283,9 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../autoapi/blackjax/vi/index.html">blackjax.vi</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/vi/fullrank_vi/index.html">blackjax.vi.fullrank_vi</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/vi/meanfield_vi/index.html">blackjax.vi.meanfield_vi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/vi/multipathfinder/index.html">blackjax.vi.multipathfinder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/vi/pathfinder/index.html">blackjax.vi.pathfinder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/vi/schrodinger_follmer/index.html">blackjax.vi.schrodinger_follmer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/vi/svgd/index.html">blackjax.vi.svgd</a></li>
@@ -259,6 +295,11 @@
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../bib.html">Bibliography</a></li>
 </ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">DEVELOPER DOCUMENTATION</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../developer/design_principles.html">Design Principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer/new_algorithm_guide.html">Contributing a New Algorithm</a></li>
+</ul>
 
     </div>
 </nav></div>
@@ -266,9 +307,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -318,7 +364,7 @@
 
 
 <button onclick="toggleFullScreen()"
-  class="btn btn-sm btn-fullscreen-button"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
   title="Fullscreen mode"
   data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
@@ -332,24 +378,16 @@
 
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-  </button>
-`);
-</script>
+</button>
 
 </div></div>
       
@@ -456,9 +494,7 @@ document.write(`
 <a class="viewcode-back" href="../../../autoapi/blackjax/mcmc/trajectory/index.html#blackjax.mcmc.trajectory.append_to_trajectory">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">append_to_trajectory</span><span class="p">(</span><span class="n">trajectory</span><span class="p">:</span> <span class="n">Trajectory</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">IntegratorState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Trajectory</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Append a state to the (right of the) trajectory to form a new trajectory.&quot;&quot;&quot;</span>
-    <span class="n">momentum_sum</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span>
-        <span class="n">jnp</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">trajectory</span><span class="o">.</span><span class="n">momentum_sum</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">momentum</span>
-    <span class="p">)</span>
+    <span class="n">momentum_sum</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">trajectory</span><span class="o">.</span><span class="n">momentum_sum</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">momentum</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">Trajectory</span><span class="p">(</span>
         <span class="n">trajectory</span><span class="o">.</span><span class="n">leftmost_state</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">momentum_sum</span><span class="p">,</span> <span class="n">trajectory</span><span class="o">.</span><span class="n">num_states</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="p">)</span></div>
@@ -470,18 +506,32 @@ document.write(`
 <span class="k">def</span><span class="w"> </span><span class="nf">reorder_trajectories</span><span class="p">(</span>
     <span class="n">direction</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trajectory</span><span class="p">:</span> <span class="n">Trajectory</span><span class="p">,</span> <span class="n">new_trajectory</span><span class="p">:</span> <span class="n">Trajectory</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Trajectory</span><span class="p">,</span> <span class="n">Trajectory</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Order the two trajectories depending on the direction.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Order two trajectories depending on the integration direction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    direction</span>
+<span class="sd">        Integration direction: ``1`` for forward, ``-1`` for backward.</span>
+<span class="sd">    trajectory</span>
+<span class="sd">        The existing trajectory (from the previous expansion step).</span>
+<span class="sd">    new_trajectory</span>
+<span class="sd">        The newly sampled sub-trajectory.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A ``(left_trajectory, right_trajectory)`` tuple ordered so that</span>
+<span class="sd">    ``left_trajectory`` precedes ``right_trajectory`` in time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">cond</span><span class="p">(</span>
         <span class="n">direction</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="p">(</span>
+        <span class="k">lambda</span><span class="p">:</span> <span class="p">(</span>
             <span class="n">trajectory</span><span class="p">,</span>
             <span class="n">new_trajectory</span><span class="p">,</span>
         <span class="p">),</span>
-        <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="p">(</span>
+        <span class="k">lambda</span><span class="p">:</span> <span class="p">(</span>
             <span class="n">new_trajectory</span><span class="p">,</span>
             <span class="n">trajectory</span><span class="p">,</span>
         <span class="p">),</span>
-        <span class="n">operand</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
@@ -489,7 +539,21 @@ document.write(`
 <div class="viewcode-block" id="merge_trajectories">
 <a class="viewcode-back" href="../../../autoapi/blackjax/mcmc/trajectory/index.html#blackjax.mcmc.trajectory.merge_trajectories">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">merge_trajectories</span><span class="p">(</span><span class="n">left_trajectory</span><span class="p">:</span> <span class="n">Trajectory</span><span class="p">,</span> <span class="n">right_trajectory</span><span class="p">:</span> <span class="n">Trajectory</span><span class="p">):</span>
-    <span class="n">momentum_sum</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge two trajectories into one by concatenating left and right.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    left_trajectory</span>
+<span class="sd">        The left (earlier) sub-trajectory.</span>
+<span class="sd">    right_trajectory</span>
+<span class="sd">        The right (later) sub-trajectory.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A new Trajectory spanning from the leftmost state of ``left_trajectory``</span>
+<span class="sd">    to the rightmost state of ``right_trajectory``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">momentum_sum</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
         <span class="n">jnp</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">left_trajectory</span><span class="o">.</span><span class="n">momentum_sum</span><span class="p">,</span> <span class="n">right_trajectory</span><span class="o">.</span><span class="n">momentum_sum</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">Trajectory</span><span class="p">(</span>
@@ -515,12 +579,25 @@ document.write(`
     <span class="n">integrator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
     <span class="n">direction</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a trajectory by integrating several times in one direction.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a trajectory by integrating several times in one direction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    integrator</span>
+<span class="sd">        One-step symplectic integrator.</span>
+<span class="sd">    direction</span>
+<span class="sd">        Integration direction: ``1`` for forward, ``-1`` for backward.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    An ``integrate(initial_state, step_size, num_integration_steps)`` function</span>
+<span class="sd">    that returns the final IntegratorState after all steps.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">integrate</span><span class="p">(</span>
         <span class="n">initial_state</span><span class="p">:</span> <span class="n">IntegratorState</span><span class="p">,</span> <span class="n">step_size</span><span class="p">,</span> <span class="n">num_integration_steps</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntegratorState</span><span class="p">:</span>
-        <span class="n">directed_step_size</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span>
+        <span class="n">directed_step_size</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
             <span class="k">lambda</span> <span class="n">step_size</span><span class="p">:</span> <span class="n">direction</span> <span class="o">*</span> <span class="n">step_size</span><span class="p">,</span> <span class="n">step_size</span>
         <span class="p">)</span>
 
@@ -528,6 +605,74 @@ document.write(`
             <span class="k">return</span> <span class="n">integrator</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">directed_step_size</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">fori_loop</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_integration_steps</span><span class="p">,</span> <span class="n">one_step</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">integrate</span></div>
+
+
+
+<div class="viewcode-block" id="static_progressive_integration">
+<a class="viewcode-back" href="../../../autoapi/blackjax/mcmc/trajectory/index.html#blackjax.mcmc.trajectory.static_progressive_integration">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">static_progressive_integration</span><span class="p">(</span>
+    <span class="n">integrator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">kinetic_energy</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">num_integration_steps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">divergence_threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a trajectory by integrating a fixed number of steps and</span>
+<span class="sd">    progressively sampling proposals using multinomial weighting.</span>
+
+<span class="sd">    Unlike ``static_integration``, which returns only the trajectory endpoint,</span>
+<span class="sd">    this function samples one state from the *entire* trajectory proportional</span>
+<span class="sd">    to ``exp(-H(z_i))`` using progressive reservoir sampling</span>
+<span class="sd">    (``progressive_uniform_sampling``).  Only O(1) memory is needed regardless</span>
+<span class="sd">    of trajectory length.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    integrator</span>
+<span class="sd">        One-step symplectic integrator.</span>
+<span class="sd">    kinetic_energy</span>
+<span class="sd">        Function to compute the current value of the kinetic energy.</span>
+<span class="sd">    num_integration_steps</span>
+<span class="sd">        Number of integration steps to take.</span>
+<span class="sd">    divergence_threshold</span>
+<span class="sd">        Value of the difference of energy between two consecutive states above</span>
+<span class="sd">        which we say a transition is divergent.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    An ``integrate(rng_key, initial_state, step_size)`` function that returns</span>
+<span class="sd">    ``(proposal, is_diverging)``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">hmc_energy_fn</span> <span class="o">=</span> <span class="n">hmc_energy</span><span class="p">(</span><span class="n">kinetic_energy</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">generate_proposal</span> <span class="o">=</span> <span class="n">proposal_generator</span><span class="p">(</span><span class="n">hmc_energy_fn</span><span class="p">)</span>
+    <span class="n">sample_proposal</span> <span class="o">=</span> <span class="n">progressive_uniform_sampling</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">integrate</span><span class="p">(</span>
+        <span class="n">rng_key</span><span class="p">:</span> <span class="n">PRNGKey</span><span class="p">,</span>
+        <span class="n">initial_state</span><span class="p">:</span> <span class="n">IntegratorState</span><span class="p">,</span>
+        <span class="n">step_size</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">initial_energy</span> <span class="o">=</span> <span class="n">hmc_energy_fn</span><span class="p">(</span><span class="n">initial_state</span><span class="p">)</span>
+        <span class="n">init_proposal</span> <span class="o">=</span> <span class="n">Proposal</span><span class="p">(</span><span class="n">initial_state</span><span class="p">,</span> <span class="n">initial_energy</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="n">jnp</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">one_step</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">carry</span><span class="p">):</span>
+            <span class="n">current_state</span><span class="p">,</span> <span class="n">current_proposal</span><span class="p">,</span> <span class="n">any_divergent</span> <span class="o">=</span> <span class="n">carry</span>
+            <span class="n">step_key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">fold_in</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+
+            <span class="n">new_state</span> <span class="o">=</span> <span class="n">integrator</span><span class="p">(</span><span class="n">current_state</span><span class="p">,</span> <span class="n">step_size</span><span class="p">)</span>
+            <span class="n">new_proposal</span> <span class="o">=</span> <span class="n">generate_proposal</span><span class="p">(</span><span class="n">initial_energy</span><span class="p">,</span> <span class="n">new_state</span><span class="p">)</span>
+            <span class="n">is_diverging</span> <span class="o">=</span> <span class="o">-</span><span class="n">new_proposal</span><span class="o">.</span><span class="n">weight</span> <span class="o">&gt;</span> <span class="n">divergence_threshold</span>
+            <span class="n">any_divergent</span> <span class="o">=</span> <span class="n">any_divergent</span> <span class="o">|</span> <span class="n">is_diverging</span>
+            <span class="n">sampled_proposal</span> <span class="o">=</span> <span class="n">sample_proposal</span><span class="p">(</span><span class="n">step_key</span><span class="p">,</span> <span class="n">current_proposal</span><span class="p">,</span> <span class="n">new_proposal</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="p">(</span><span class="n">new_state</span><span class="p">,</span> <span class="n">sampled_proposal</span><span class="p">,</span> <span class="n">any_divergent</span><span class="p">)</span>
+
+        <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">final_proposal</span><span class="p">,</span> <span class="n">is_diverging</span><span class="p">)</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">fori_loop</span><span class="p">(</span>
+            <span class="mi">0</span><span class="p">,</span> <span class="n">num_integration_steps</span><span class="p">,</span> <span class="n">one_step</span><span class="p">,</span> <span class="p">(</span><span class="n">initial_state</span><span class="p">,</span> <span class="n">init_proposal</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">final_proposal</span><span class="p">,</span> <span class="n">is_diverging</span>
 
     <span class="k">return</span> <span class="n">integrate</span></div>
 
@@ -581,6 +726,9 @@ document.write(`
 <span class="sd">        Value of the difference of energy between two consecutive states above</span>
 <span class="sd">        which we say a transition is divergent.</span>
 
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    An ``integrate(rng_key, state, direction, termination_state, max_num_steps, step_size, initial_energy)`` function returning ``(proposal, new_trajectory, termination_state, is_diverging, has_terminated)``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">generate_proposal</span> <span class="o">=</span> <span class="n">proposal_generator</span><span class="p">(</span><span class="n">hmc_energy</span><span class="p">(</span><span class="n">kinetic_energy</span><span class="p">))</span>
     <span class="n">sample_proposal</span> <span class="o">=</span> <span class="n">progressive_uniform_sampling</span>
@@ -643,15 +791,14 @@ document.write(`
             <span class="c1"># take one step to get the leftmost state of the tree.</span>
             <span class="p">(</span><span class="n">new_trajectory</span><span class="p">,</span> <span class="n">sampled_proposal</span><span class="p">)</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">cond</span><span class="p">(</span>
                 <span class="n">step</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="p">(</span>
+                <span class="k">lambda</span><span class="p">:</span> <span class="p">(</span>
                     <span class="n">Trajectory</span><span class="p">(</span><span class="n">new_state</span><span class="p">,</span> <span class="n">new_state</span><span class="p">,</span> <span class="n">new_state</span><span class="o">.</span><span class="n">momentum</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
                     <span class="n">new_proposal</span><span class="p">,</span>
                 <span class="p">),</span>
-                <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="p">(</span>
+                <span class="k">lambda</span><span class="p">:</span> <span class="p">(</span>
                     <span class="n">append_to_trajectory</span><span class="p">(</span><span class="n">trajectory</span><span class="p">,</span> <span class="n">new_state</span><span class="p">),</span>
                     <span class="n">sample_proposal</span><span class="p">(</span><span class="n">proposal_key</span><span class="p">,</span> <span class="n">proposal</span><span class="p">,</span> <span class="n">new_proposal</span><span class="p">),</span>
                 <span class="p">),</span>
-                <span class="n">operand</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="p">)</span>
 
             <span class="n">new_termination_state</span> <span class="o">=</span> <span class="n">update_termination_state</span><span class="p">(</span>
@@ -691,14 +838,13 @@ document.write(`
         <span class="c1"># In the while_loop we always extend on the right most direction.</span>
         <span class="n">new_trajectory</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">cond</span><span class="p">(</span>
             <span class="n">direction</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">trajectory</span><span class="p">,</span>
-            <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">Trajectory</span><span class="p">(</span>
+            <span class="k">lambda</span><span class="p">:</span> <span class="n">trajectory</span><span class="p">,</span>
+            <span class="k">lambda</span><span class="p">:</span> <span class="n">Trajectory</span><span class="p">(</span>
                 <span class="n">trajectory</span><span class="o">.</span><span class="n">rightmost_state</span><span class="p">,</span>
                 <span class="n">trajectory</span><span class="o">.</span><span class="n">leftmost_state</span><span class="p">,</span>
                 <span class="n">trajectory</span><span class="o">.</span><span class="n">momentum_sum</span><span class="p">,</span>
                 <span class="n">trajectory</span><span class="o">.</span><span class="n">num_states</span><span class="p">,</span>
             <span class="p">),</span>
-            <span class="n">operand</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="k">return</span> <span class="p">(</span>
@@ -726,7 +872,7 @@ document.write(`
 <span class="sd">    until the termination criterion is met.</span>
 
 <span class="sd">    This is the implementation of Algorithm 6 from :cite:p:`hoffman2014no` with</span>
-<span class="sd">    multinomial sampling. The implemenation here is mostly for validating the</span>
+<span class="sd">    multinomial sampling. The implementation here is mostly for validating the</span>
 <span class="sd">    progressive implementation to make sure the two are equivalent. The recursive</span>
 <span class="sd">    implementation should not be used for actually sampling as it cannot be jitted and</span>
 <span class="sd">    thus likely slow.</span>
@@ -746,6 +892,9 @@ document.write(`
 <span class="sd">        Bool to indicate whether to perform additional U turn check between two</span>
 <span class="sd">        trajectory.</span>
 
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A ``buildtree_integrate(rng_key, state, direction, tree_depth, step_size, initial_energy)`` function returning ``(rng_key, proposal, trajectory, is_diverging, is_turning)``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">generate_proposal</span> <span class="o">=</span> <span class="n">proposal_generator</span><span class="p">(</span><span class="n">hmc_energy</span><span class="p">(</span><span class="n">kinetic_energy</span><span class="p">))</span>
     <span class="n">sample_proposal</span> <span class="o">=</span> <span class="n">progressive_uniform_sampling</span>
@@ -813,9 +962,8 @@ document.write(`
             <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">is_diverging</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="ow">not</span> <span class="n">is_turning</span><span class="p">):</span>
                 <span class="n">start_state</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">cond</span><span class="p">(</span>
                     <span class="n">direction</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
-                    <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">trajectory</span><span class="o">.</span><span class="n">rightmost_state</span><span class="p">,</span>
-                    <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">trajectory</span><span class="o">.</span><span class="n">leftmost_state</span><span class="p">,</span>
-                    <span class="n">operand</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="k">lambda</span><span class="p">:</span> <span class="n">trajectory</span><span class="o">.</span><span class="n">rightmost_state</span><span class="p">,</span>
+                    <span class="k">lambda</span><span class="p">:</span> <span class="n">trajectory</span><span class="o">.</span><span class="n">leftmost_state</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="p">(</span>
                     <span class="n">rng_key</span><span class="p">,</span>
@@ -843,7 +991,7 @@ document.write(`
                         <span class="n">trajectory</span><span class="o">.</span><span class="n">momentum_sum</span><span class="p">,</span>
                     <span class="p">)</span>
                     <span class="k">if</span> <span class="n">use_robust_uturn_check</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">tree_depth</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
-                        <span class="n">momentum_sum_left</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span>
+                        <span class="n">momentum_sum_left</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
                             <span class="n">jnp</span><span class="o">.</span><span class="n">add</span><span class="p">,</span>
                             <span class="n">left_trajectory</span><span class="o">.</span><span class="n">momentum_sum</span><span class="p">,</span>
                             <span class="n">right_trajectory</span><span class="o">.</span><span class="n">leftmost_state</span><span class="o">.</span><span class="n">momentum</span><span class="p">,</span>
@@ -853,7 +1001,7 @@ document.write(`
                             <span class="n">right_trajectory</span><span class="o">.</span><span class="n">leftmost_state</span><span class="o">.</span><span class="n">momentum</span><span class="p">,</span>
                             <span class="n">momentum_sum_left</span><span class="p">,</span>
                         <span class="p">)</span>
-                        <span class="n">momentum_sum_right</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span>
+                        <span class="n">momentum_sum_right</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
                             <span class="n">jnp</span><span class="o">.</span><span class="n">add</span><span class="p">,</span>
                             <span class="n">left_trajectory</span><span class="o">.</span><span class="n">rightmost_state</span><span class="o">.</span><span class="n">momentum</span><span class="p">,</span>
                             <span class="n">right_trajectory</span><span class="o">.</span><span class="n">momentum_sum</span><span class="p">,</span>
@@ -936,14 +1084,16 @@ document.write(`
 <span class="sd">        and the integrated trajectory.</span>
 <span class="sd">    uturn_check_fn</span>
 <span class="sd">        Function used to check the U-Turn criterion.</span>
-<span class="sd">    step_size</span>
-<span class="sd">        The step size used by the symplectic integrator.</span>
 <span class="sd">    max_num_expansions</span>
 <span class="sd">        The maximum number of trajectory expansions until the proposal is returned.</span>
 <span class="sd">    rate</span>
 <span class="sd">        The rate of the geometrical expansion. Typically 2 in NUTS, this is why</span>
 <span class="sd">        the literature often refers to &quot;tree doubling&quot;.</span>
 
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    An ``expand(rng_key, initial_expansion_state, initial_energy, step_size)``</span>
+<span class="sd">    function that returns ``(expansion_state, (is_diverging, is_turning))``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">proposal_sampler</span> <span class="o">=</span> <span class="n">progressive_biased_sampling</span>
 
@@ -984,9 +1134,8 @@ document.write(`
             <span class="n">direction</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">bernoulli</span><span class="p">(</span><span class="n">direction_key</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">start_state</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">cond</span><span class="p">(</span>
                 <span class="n">direction</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">trajectory</span><span class="o">.</span><span class="n">rightmost_state</span><span class="p">,</span>
-                <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">trajectory</span><span class="o">.</span><span class="n">leftmost_state</span><span class="p">,</span>
-                <span class="n">operand</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="k">lambda</span><span class="p">:</span> <span class="n">trajectory</span><span class="o">.</span><span class="n">rightmost_state</span><span class="p">,</span>
+                <span class="k">lambda</span><span class="p">:</span> <span class="n">trajectory</span><span class="o">.</span><span class="n">leftmost_state</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="p">(</span>
                 <span class="n">new_proposal</span><span class="p">,</span>
@@ -1066,6 +1215,20 @@ document.write(`
 <div class="viewcode-block" id="hmc_energy">
 <a class="viewcode-back" href="../../../autoapi/blackjax/mcmc/trajectory/index.html#blackjax.mcmc.trajectory.hmc_energy">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">hmc_energy</span><span class="p">(</span><span class="n">kinetic_energy</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the total HMC energy function from a kinetic energy function.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    kinetic_energy</span>
+<span class="sd">        A function that computes the kinetic energy given the momentum (and</span>
+<span class="sd">        optionally the position).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    An ``energy(state)`` function that returns the total energy</span>
+<span class="sd">    ``-logdensity + kinetic_energy(momentum)``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">energy</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
         <span class="k">return</span> <span class="o">-</span><span class="n">state</span><span class="o">.</span><span class="n">logdensity</span> <span class="o">+</span> <span class="n">kinetic_energy</span><span class="p">(</span>
             <span class="n">state</span><span class="o">.</span><span class="n">momentum</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">position</span>
@@ -1111,7 +1274,7 @@ By The Blackjax developers
 
   <p class="copyright">
     
-      © Copyright 2025, The Blackjax developers.
+      © Copyright 2026, The Blackjax developers.
       <br/>
     
   </p>
@@ -1135,8 +1298,8 @@ By The Blackjax developers
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
   </footer>

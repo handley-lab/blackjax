@@ -56,22 +56,35 @@ Module Contents
       :type:  float
 
 
+   .. py:attribute:: nonans
+      :type:  bool
+
+
 .. py:function:: init(position: blackjax.types.ArrayLike, logdensity_fn, rng_key)
 
-.. py:function:: build_kernel(logdensity_fn, inverse_mass_matrix, integrator, desired_energy_var_max_ratio=jnp.inf, desired_energy_var=0.0005)
+.. py:function:: build_kernel(integrator: Callable = isokinetic_mclachlan, desired_energy_var_max_ratio: float = jnp.inf, desired_energy_var: float = 0.0005)
 
-   Build a HMC kernel.
+   Build an MCLMC kernel.
 
-   :param integrator: The symplectic integrator to use to integrate the Hamiltonian dynamics.
-   :param L: the momentum decoherence rate.
-   :param step_size: step size of the integrator.
+   The returned kernel accepts ``inverse_mass_matrix`` as either a scalar / 1-D
+   array (diagonal preconditioning) **or** a
+   :class:`~blackjax.mcmc.metrics.LowRankInverseMassMatrix` NamedTuple
+   (Low-Rank + Diagonal preconditioning, O(dk) per step).
+
+   :param integrator: The isokinetic integrator to use.  The default
+                      :func:`~blackjax.mcmc.integrators.isokinetic_mclachlan` automatically
+                      dispatches to the O(dk) LRD path when ``inverse_mass_matrix`` is a
+                      :class:`~blackjax.mcmc.metrics.LowRankInverseMassMatrix`.
+   :param desired_energy_var_max_ratio: Maximum ratio of energy variance to desired energy variance before
+                                        rejecting a transition.
+   :param desired_energy_var: The target energy variance per dimension.
 
    :returns: * *A kernel that takes a rng_key and a Pytree that contains the current state*
              * *of the chain and that returns a new state of the chain along with*
              * *information about the transition.*
 
 
-.. py:function:: as_top_level_api(logdensity_fn: Callable, L, step_size, integrator=isokinetic_mclachlan, inverse_mass_matrix=1.0, desired_energy_var_max_ratio=jnp.inf) -> blackjax.base.SamplingAlgorithm
+.. py:function:: as_top_level_api(logdensity_fn: Callable, L, step_size, integrator=isokinetic_mclachlan, inverse_mass_matrix: blackjax.types.ArrayLike | blackjax.mcmc.metrics.LowRankInverseMassMatrix = 1.0, desired_energy_var_max_ratio=jnp.inf) -> blackjax.base.SamplingAlgorithm
 
    The general mclmc kernel builder (:meth:`blackjax.mcmc.mclmc.build_kernel`, alias `blackjax.mclmc.build_kernel`) can be
    cumbersome to manipulate. Since most users only need to specify the kernel

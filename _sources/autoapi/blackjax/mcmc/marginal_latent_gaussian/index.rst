@@ -37,21 +37,22 @@ Module Contents
 
    State of the RMH chain.
 
-   x
-       Current position of the chain.
-   log_p_x
+   position
+       Current position of the chain. Can be any PyTree.
+   logdensity
        Current value of the log-likelihood of the model
-   grad_x
-       Current value of the gradient of the log-likelihood of the model
+   logdensity_grad
+       Current value of the gradient of the log-likelihood of the model.
+       Has the same PyTree structure as ``position``.
    U_x
-       Auxiliary attributes
+       Position projected into the SVD basis (flat array).
    U_grad_x
-       Gradient of the auxiliary attributes
+       Gradient projected into the SVD basis (flat array).
 
 
 
    .. py:attribute:: position
-      :type:  blackjax.types.Array
+      :type:  blackjax.types.ArrayLikeTree
 
 
    .. py:attribute:: logdensity
@@ -59,7 +60,7 @@ Module Contents
 
 
    .. py:attribute:: logdensity_grad
-      :type:  blackjax.types.Array
+      :type:  blackjax.types.ArrayLikeTree
 
 
    .. py:attribute:: U_x
@@ -106,7 +107,7 @@ Module Contents
 
    Initialize the marginal version of the auxiliary gradient-based sampler.
 
-   :param position: The initial position of the chain.
+   :param position: The initial position of the chain. Can be any PyTree.
    :param logdensity_fn: The logarithm of the likelihood function for the latent Gaussian model.
    :param U_t: The unitary array of the covariance matrix.
 
@@ -122,7 +123,7 @@ Module Contents
              * *information about the transition.*
 
 
-.. py:function:: as_top_level_api(logdensity_fn: Callable, covariance: Optional[blackjax.types.Array] = None, mean: Optional[blackjax.types.Array] = None, cov_svd: Optional[CovarianceSVD] = None, step_size: float = 1.0) -> blackjax.base.SamplingAlgorithm
+.. py:function:: as_top_level_api(logdensity_fn: Callable, covariance: blackjax.types.Array | None = None, mean: blackjax.types.ArrayLikeTree | None = None, cov_svd: CovarianceSVD | None = None, step_size: float = 1.0) -> blackjax.base.SamplingAlgorithm
 
    Implements the marginal sampler for latent Gaussian model of :cite:p:`titsias2018auxiliary`.
 

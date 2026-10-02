@@ -67,7 +67,7 @@ Module Contents
       :type:  float
 
 
-.. py:function:: init(position: blackjax.types.ArrayLikeTree, rng_key: blackjax.types.PRNGKey, logdensity_fn: Callable) -> GHMCState
+.. py:function:: init(position: blackjax.types.ArrayLikeTree, logdensity_fn: Callable, rng_key: blackjax.types.PRNGKey) -> GHMCState
 
 .. py:function:: build_kernel(noise_fn: Callable = lambda _: 0.0, divergence_threshold: float = 1000)
 
@@ -92,7 +92,7 @@ Module Contents
              * *returns a new state of the chain along with information about the transition.*
 
 
-.. py:function:: as_top_level_api(logdensity_fn: Callable, step_size: float, momentum_inverse_scale: blackjax.types.ArrayLikeTree, alpha: float, delta: float, *, divergence_threshold: int = 1000, noise_gn: Callable = lambda _: 0.0) -> blackjax.base.SamplingAlgorithm
+.. py:function:: as_top_level_api(logdensity_fn: Callable, step_size: float, momentum_inverse_scale: blackjax.types.ArrayLikeTree | blackjax.mcmc.metrics.MetricTypes, alpha: float, delta: float, *, divergence_threshold: int = 1000, noise_fn: Callable = lambda _: 0.0) -> blackjax.base.SamplingAlgorithm
 
    Implements the (basic) user interface for the Generalized HMC kernel.
 
@@ -132,15 +132,23 @@ Module Contents
    :param step_size: A PyTree of the same structure as the target PyTree (position) with the
                      values used for as a step size for each dimension of the target space in
                      the velocity verlet integrator.
-   :param momentum_inverse_scale: Pytree with the same structure as the targeted position variable
-                                  specifying the per dimension inverse scaling transformation applied
-                                  to the persistent momentum variable prior to the integration step.
+   :param momentum_inverse_scale: Legacy usage: a Pytree with the same structure as the targeted
+                                  position variable (or a scalar/1-D array) specifying the per
+                                  dimension inverse *scale* applied to the persistent momentum
+                                  variable prior to the integration step; it is squared elementwise
+                                  to obtain the inverse mass matrix. To use a dense or low-rank
+                                  metric (mirroring ``hmc``/``nuts``), pass a ``(d, d)`` array (the
+                                  inverse mass matrix directly, no squaring), a
+                                  :class:`~blackjax.mcmc.metrics.LowRankInverseMassMatrix`, a
+                                  :class:`~blackjax.mcmc.metrics.Metric`, or a callable; these are
+                                  forwarded to :func:`~blackjax.mcmc.metrics.default_metric`
+                                  unchanged.
    :param alpha: The value defining the persistence of the momentum variable.
    :param delta: The value defining the deterministic translation of the slice variable.
    :param divergence_threshold: The absolute value of the difference in energy between two states above
                                 which we say that the transition is divergent. The default value is
                                 commonly found in other libraries, and yet is arbitrary.
-   :param noise_gn: A function that takes as input the slice variable and outputs a random
+   :param noise_fn: A function that takes as input the slice variable and outputs a random
                     variable used as a noise correction of the persistent slice update.
                     The parameter defaults to a random variable with a single atom at 0.
 

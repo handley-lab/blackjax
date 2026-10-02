@@ -34,7 +34,7 @@ Module Contents
 
 
    Stores both the sampling status and also a dictionary
-   with parameter names as keys and (n_particles, *) arrays as values.
+   with parameter names as keys and ``(n_particles, *)`` arrays as values.
    The latter represents a parameter per chain for the next mutation step.
 
 
@@ -43,7 +43,7 @@ Module Contents
 
 
    .. py:attribute:: parameter_override
-      :type:  Dict[str, blackjax.types.ArrayTree]
+      :type:  dict[str, blackjax.types.ArrayTree]
 
 
 .. py:function:: esjd(m)
@@ -77,7 +77,7 @@ Module Contents
 
 .. py:function:: default_measure_factory(state)
 
-.. py:function:: build_pretune(mcmc_init_fn: Callable, mcmc_step_fn: Callable, alpha: float, sigma_parameters: blackjax.types.ArrayLikeTree, n_particles: int, performance_of_chain_measure_factory: Callable = default_measure_factory, natural_parameters: Optional[List[str]] = None, positive_parameters: Optional[List[str]] = None)
+.. py:function:: build_pretune(mcmc_init_fn: Callable, mcmc_step_fn: Callable, alpha: float, sigma_parameters: blackjax.types.ArrayLikeTree, n_particles: int, performance_of_chain_measure_factory: Callable = default_measure_factory, natural_parameters: list[str] | None = None, positive_parameters: list[str] | None = None)
 
    Implements Buchholz et al https://arxiv.org/pdf/1808.07730 pretuning procedure.
    The goal is to maintain a probability distribution of parameters, in order
@@ -100,13 +100,25 @@ Module Contents
    :param logprior_fn: A function that computes the log density of the prior distribution
    :param loglikelihood_fn: A function that returns the probability at a given position.
    :param mcmc_step_fn: The transition kernel, should take as parameters the dictionary output of mcmc_parameter_update_fn.
-                        mcmc_step_fn(rng_key, state, tempered_logposterior_fn, **mcmc_parameter_update_fn())
+                        ``mcmc_step_fn(rng_key, state, tempered_logposterior_fn, **mcmc_parameter_update_fn())``
    :param mcmc_init_fn: A callable that initializes the inner kernel
    :param pretune_fn: A callable that can update the probability distribution of parameters.
-   :param extra_parameters: parameters to be used for the creation of the smc_algorithm.
+   :param extra_parameters: Parameters to be used for the creation of the smc_algorithm.
+
+   :rtype: A ``kernel(rng_key, state, \*\*extra_step_parameters) -> (StateWithParameterOverride, SMCInfo)`` function.
 
 
 .. py:function:: init(alg_init_fn, position, initial_parameter_value)
+
+   Initialize a pretuning SMC state.
+
+   :param alg_init_fn: The ``init`` function of the underlying SMC algorithm.
+   :param position: Initial particle positions (PyTree).
+   :param initial_parameter_value: Initial dict of MCMC parameters assigned to each chain.
+
+   :returns: * *A StateWithParameterOverride wrapping the SMC state and the initial*
+             * *parameter distribution.*
+
 
 .. py:function:: as_top_level_api(smc_algorithm, logprior_fn: Callable, loglikelihood_fn: Callable, mcmc_step_fn: Callable, mcmc_init_fn: Callable, resampling_fn: Callable, num_mcmc_steps: int, initial_parameter_value: blackjax.types.ArrayLikeTree, pretune_fn: Callable, **extra_parameters)
 
@@ -114,14 +126,19 @@ Module Contents
    MCMC that is used to perturbate/update each of the particles. This adaptation tunes some parameter of that MCMC,
    based on particles. The parameter type must be a valid JAX type.
 
-   :param smc_algorithm: Either blackjax.adaptive_tempered_smc or blackjax.tempered_smc (or any other implementation of
-                         a sampling algorithm that returns an SMCState and SMCInfo pair).
-   :param logprior_fn: A function that computes the log density of the prior distribution
-   :param loglikelihood_fn: A function that returns the probability at a given position.
-   :param mcmc_step_fn: The transition kernel, should take as parameters the dictionary output of mcmc_parameter_update_fn.
-                        mcmc_step_fn(rng_key, state, tempered_logposterior_fn, **mcmc_parameter_update_fn())
-   :param mcmc_init_fn: A callable that initializes the inner kernel
-   :param pretune_fn: A callable that can update the probability distribution of parameters.
-   :param extra_parameters: parameters to be used for the creation of the smc_algorithm.
+   :param smc_algorithm: Either ``blackjax.adaptive_tempered_smc`` or ``blackjax.tempered_smc``
+                         (or any implementation returning an SMCState/SMCInfo pair).
+   :param logprior_fn: A function that computes the log density of the prior distribution.
+   :param loglikelihood_fn: A function that returns the log-likelihood at a given position.
+   :param mcmc_step_fn: The transition kernel; takes parameters from ``mcmc_parameter_update_fn``.
+                        Signature: ``mcmc_step_fn(rng_key, state, tempered_logposterior_fn, **params)``.
+   :param mcmc_init_fn: A callable that initializes the inner MCMC kernel.
+   :param resampling_fn: Resampling function (from ``blackjax.smc.resampling``).
+   :param num_mcmc_steps: Number of MCMC steps per SMC iteration.
+   :param initial_parameter_value: Initial dict of MCMC parameters assigned to each chain.
+   :param pretune_fn: A callable that updates the probability distribution of parameters.
+   :param extra_parameters: Additional keyword arguments forwarded to the smc_algorithm.
+
+   :rtype: A ``SamplingAlgorithm`` with ``init`` and ``step`` methods.
 
 

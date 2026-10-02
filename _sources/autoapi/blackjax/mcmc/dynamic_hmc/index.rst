@@ -60,22 +60,30 @@ Module Contents
 
 .. py:function:: init(position: blackjax.types.ArrayLikeTree, logdensity_fn: Callable, random_generator_arg: blackjax.types.Array)
 
-.. py:function:: build_kernel(integrator: Callable = integrators.velocity_verlet, divergence_threshold: float = 1000, next_random_arg_fn: Callable = lambda key: jax.random.split(key)[1], integration_steps_fn: Callable = lambda key: jax.random.randint(key, (), 1, 10))
+.. py:function:: build_kernel(integrator: Callable = integrators.velocity_verlet, divergence_threshold: float = 1000, next_random_arg_fn: Callable = lambda key: jax.random.split(key)[1], integration_steps_fn: Callable = lambda key: jax.random.randint(key, (), 1, 10), build_proposal: Callable = hmc_proposal)
 
    Build a Dynamic HMC kernel where the number of integration steps is chosen randomly.
 
    :param integrator: The symplectic integrator to use to integrate the Hamiltonian dynamics.
    :param divergence_threshold: Value of the difference in energy above which we consider that the transition is divergent.
    :param next_random_arg_fn: Function that generates the next `random_generator_arg` from its previous value.
-   :param integration_steps_fn: Function that generates the next pseudo or quasi-random number of integration steps in the
-                                sequence, given the current `random_generator_arg`. Needs to return an `int`.
+   :param integration_steps_fn: Callable with signature ``(random_generator_arg, *integration_steps_params) -> int``
+                                that draws the number of integration steps for a single transition.
+                                Extra positional arguments beyond ``random_generator_arg`` are supplied
+                                at call time via ``integration_steps_params`` on the inner kernel, so
+                                tunable parameters (e.g. average number of steps, distribution bounds)
+                                can be adapted without rebuilding the kernel.
+   :param build_proposal: A callable with signature
+                          ``(integrator, kinetic_energy, step_size, num_integration_steps,
+                          divergence_threshold) -> generate`` that builds the proposal function.
+                          Defaults to :func:`hmc_proposal` (standard endpoint HMC).
 
    :returns: * *A kernel that takes a rng_key and a Pytree that contains the current state*
              * *of the chain and that returns a new state of the chain along with*
              * *information about the transition.*
 
 
-.. py:function:: as_top_level_api(logdensity_fn: Callable, step_size: float, inverse_mass_matrix: blackjax.types.Array, *, divergence_threshold: int = 1000, integrator: Callable = integrators.velocity_verlet, next_random_arg_fn: Callable = lambda key: jax.random.split(key)[1], integration_steps_fn: Callable = lambda key: jax.random.randint(key, (), 1, 10)) -> blackjax.base.SamplingAlgorithm
+.. py:function:: as_top_level_api(logdensity_fn: Callable, step_size: float, inverse_mass_matrix: blackjax.types.Array, *, divergence_threshold: int = 1000, integrator: Callable = integrators.velocity_verlet, next_random_arg_fn: Callable = lambda key: jax.random.split(key)[1], integration_steps_fn: Callable = lambda key: jax.random.randint(key, (), 1, 10), integration_steps_params: tuple = (), build_proposal: Callable = hmc_proposal) -> blackjax.base.SamplingAlgorithm
 
    Implements the (basic) user interface for the dynamic HMC kernel.
 
@@ -88,11 +96,27 @@ Module Contents
                                 commonly found in other libraries, and yet is arbitrary.
    :param integrator: (algorithm parameter) The symplectic integrator to use to integrate the trajectory.
    :param next_random_arg_fn: Function that generates the next `random_generator_arg` from its previous value.
-   :param integration_steps_fn: Function that generates the next pseudo or quasi-random number of integration steps in the
-                                sequence, given the current `random_generator_arg`.
+   :param integration_steps_fn: Callable with signature ``(random_generator_arg, *integration_steps_params) -> int``
+                                that draws the number of integration steps for a single transition.
+   :param integration_steps_params: Extra positional arguments unpacked into ``integration_steps_fn`` after
+                                    ``random_generator_arg`` on every step.  Use this to pass tunable
+                                    parameters (e.g. ``(avg_num_integration_steps,)`` or
+                                    ``(lower_bound, upper_bound)``) without rebuilding the kernel.
+                                    Defaults to ``()`` so that a plain 1-arg ``integration_steps_fn`` works
+                                    unchanged.
+   :param build_proposal: A callable with signature
+                          ``(integrator, kinetic_energy, step_size, num_integration_steps,
+                          divergence_threshold) -> generate`` that builds the proposal function.
+                          Defaults to :func:`hmc_proposal` (standard endpoint HMC).  Pass
+                          :func:`multinomial_hmc_proposal` for multinomial trajectory sampling.
 
    :rtype: A ``SamplingAlgorithm``.
 
 
 .. py:function:: halton_sequence(i: blackjax.types.Array, max_bits: int = 10) -> float
+
+   Generate the (i+1)-th element of the Halton sequence.
+
+   Warning: max_bits should be less than the bit width of i.dtype to prevent integer overflow (e.g., max_bits <= 63 for int64).
+
 

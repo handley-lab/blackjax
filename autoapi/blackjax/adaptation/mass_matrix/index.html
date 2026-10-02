@@ -16,43 +16,47 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=e37d73aa" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="../../../../_static/documentation_options.js?v=9eb32ce0"></script>
-    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'autoapi/blackjax/adaptation/mass_matrix/index';</script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="blackjax.adaptation.mclmc_adaptation" href="../mclmc_adaptation/index.html" />
-    <link rel="prev" title="blackjax.adaptation.chees_adaptation" href="../chees_adaptation/index.html" />
+    <link rel="prev" title="blackjax.adaptation.low_rank_adaptation" href="../low_rank_adaptation/index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.1.dev1+g351bb9a14" />
   </head>
   
   
@@ -68,19 +72,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../../../../search.html"
       method="get">
@@ -88,7 +81,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search..."
          aria-label="Search..."
          autocomplete="off"
@@ -96,8 +88,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -113,7 +105,8 @@
       
       
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -143,30 +136,29 @@
     
     
     <img src="../../../../_static/blackjax.png" class="logo__image only-light" alt=" - Home"/>
-    <script>document.write(`<img src="../../../../_static/blackjax.png" class="logo__image only-dark" alt=" - Home"/>`);</script>
+    <img src="../../../../_static/blackjax.png" class="logo__image only-dark pst-js-only" alt=" - Home"/>
   
   
 </a></div>
         <div class="sidebar-primary-item">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script></div>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/diagnostics.html">MCMC Diagnostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/speed_up_guide.html">Speed-up Guide</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">PPL INTEGRATION</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_aesara.html">Aesara</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_pytensor.html">PyTensor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_numpyro.html">Numpyro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_funsor.html">Funsor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_oryx.html">Oryx</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_pymc.html">PyMC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_tfp.html">Tensorflow-Probability</a></li>
@@ -174,9 +166,11 @@
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">HOW TO</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_sample_multiple_chains.html">Sample with multiple chains?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_progress_bar.html">Show progress during sampling?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_custom_gradients.html">Use custom gradients?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_other_frameworks.html">Use non-JAX log-prob functions?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_metropolis_within_gibbs.html">Build a Metropolis-Within-Gibbs sampler?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_laplace_hmc.html">Use Laplace-preconditioned HMC?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_reproduce_the_blackjax_image.html">Sample from the word BlackJAX using BlackJAX?</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">LEARN BY EXAMPLE</span></p>
@@ -190,25 +184,52 @@
 <li class="toctree-l3"><a class="reference internal" href="../adjusted_mclmc_adaptation/index.html">blackjax.adaptation.adjusted_mclmc_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../base/index.html">blackjax.adaptation.base</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../chees_adaptation/index.html">blackjax.adaptation.chees_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../laps/index.html">blackjax.adaptation.laps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../laps_burn_in/index.html">blackjax.adaptation.laps_burn_in</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../low_rank_adaptation/index.html">blackjax.adaptation.low_rank_adaptation</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">blackjax.adaptation.mass_matrix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../mclmc_adaptation/index.html">blackjax.adaptation.mclmc_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mclmc_lrd_adaptation/index.html">blackjax.adaptation.mclmc_lrd_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../meads_adaptation/index.html">blackjax.adaptation.meads_adaptation</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../meta/index.html">blackjax.adaptation.meta</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../meta/builders/index.html">blackjax.adaptation.meta.builders</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../meta/verdict/index.html">blackjax.adaptation.meta.verdict</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../meta_adaptation/index.html">blackjax.adaptation.meta_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../metric_buffers/index.html">blackjax.adaptation.metric_buffers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../metric_estimators/index.html">blackjax.adaptation.metric_estimators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../metric_recipes/index.html">blackjax.adaptation.metric_recipes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../pathfinder_adaptation/index.html">blackjax.adaptation.pathfinder_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../staged_adaptation/index.html">blackjax.adaptation.staged_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../step_size/index.html">blackjax.adaptation.step_size</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../window_adaptation/index.html">blackjax.adaptation.window_adaptation</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../../diagnostics/index.html">blackjax.diagnostics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../eca/index.html">blackjax.eca</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../mcmc/index.html">blackjax.mcmc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../mcmc/adjusted_mclmc/index.html">blackjax.mcmc.adjusted_mclmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../mcmc/adjusted_mclmc_dynamic/index.html">blackjax.mcmc.adjusted_mclmc_dynamic</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../mcmc/barker/index.html">blackjax.mcmc.barker</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../mcmc/composed/index.html">blackjax.mcmc.composed</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../mcmc/composed/step_size/index.html">blackjax.mcmc.composed.step_size</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../mcmc/composed/trajectory_length/index.html">blackjax.mcmc.composed.trajectory_length</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../mcmc/coupled_hmc/index.html">blackjax.mcmc.coupled_hmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../mcmc/diffusions/index.html">blackjax.mcmc.diffusions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../mcmc/dynamic_hmc/index.html">blackjax.mcmc.dynamic_hmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../mcmc/elliptical_slice/index.html">blackjax.mcmc.elliptical_slice</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../mcmc/ghmc/index.html">blackjax.mcmc.ghmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../mcmc/gist/index.html">blackjax.mcmc.gist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../mcmc/gist_step_size/index.html">blackjax.mcmc.gist_step_size</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../mcmc/gist_trajectory_length/index.html">blackjax.mcmc.gist_trajectory_length</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../mcmc/hmc/index.html">blackjax.mcmc.hmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../mcmc/integrators/index.html">blackjax.mcmc.integrators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../mcmc/laplace_dynamic_hmc/index.html">blackjax.mcmc.laplace_dynamic_hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../mcmc/laplace_hmc/index.html">blackjax.mcmc.laplace_hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../mcmc/laplace_marginal/index.html">blackjax.mcmc.laplace_marginal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../mcmc/mala/index.html">blackjax.mcmc.mala</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../mcmc/marginal_latent_gaussian/index.html">blackjax.mcmc.marginal_latent_gaussian</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../mcmc/mclmc/index.html">blackjax.mcmc.mclmc</a></li>
@@ -218,10 +239,21 @@
 <li class="toctree-l3"><a class="reference internal" href="../../mcmc/proposal/index.html">blackjax.mcmc.proposal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../mcmc/random_walk/index.html">blackjax.mcmc.random_walk</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../mcmc/rmhmc/index.html">blackjax.mcmc.rmhmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../mcmc/slice/index.html">blackjax.mcmc.slice</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../mcmc/termination/index.html">blackjax.mcmc.termination</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../mcmc/trajectory/index.html">blackjax.mcmc.trajectory</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../ns/index.html">blackjax.ns</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../ns/adaptive/index.html">blackjax.ns.adaptive</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ns/base/index.html">blackjax.ns.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ns/from_mcmc/index.html">blackjax.ns.from_mcmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ns/integrator/index.html">blackjax.ns.integrator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ns/nss/index.html">blackjax.ns.nss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ns/utils/index.html">blackjax.ns.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../progress_reader/index.html">blackjax.progress_reader</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../sgmcmc/index.html">blackjax.sgmcmc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../sgmcmc/csgld/index.html">blackjax.sgmcmc.csgld</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../sgmcmc/diffusions/index.html">blackjax.sgmcmc.diffusions</a></li>
@@ -232,12 +264,14 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../smc/index.html">blackjax.smc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/adaptive_persistent_sampling/index.html">blackjax.smc.adaptive_persistent_sampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../smc/adaptive_tempered/index.html">blackjax.smc.adaptive_tempered</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../smc/base/index.html">blackjax.smc.base</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../smc/ess/index.html">blackjax.smc.ess</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../smc/from_mcmc/index.html">blackjax.smc.from_mcmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../smc/inner_kernel_tuning/index.html">blackjax.smc.inner_kernel_tuning</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../smc/partial_posteriors_path/index.html">blackjax.smc.partial_posteriors_path</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/persistent_sampling/index.html">blackjax.smc.persistent_sampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../smc/pretuning/index.html">blackjax.smc.pretuning</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../smc/resampling/index.html">blackjax.smc.resampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../smc/solver/index.html">blackjax.smc.solver</a></li>
@@ -251,7 +285,9 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../vi/index.html">blackjax.vi</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../vi/fullrank_vi/index.html">blackjax.vi.fullrank_vi</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../vi/meanfield_vi/index.html">blackjax.vi.meanfield_vi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../vi/multipathfinder/index.html">blackjax.vi.multipathfinder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../vi/pathfinder/index.html">blackjax.vi.pathfinder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../vi/schrodinger_follmer/index.html">blackjax.vi.schrodinger_follmer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../vi/svgd/index.html">blackjax.vi.svgd</a></li>
@@ -261,6 +297,11 @@
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../bib.html">Bibliography</a></li>
 </ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">DEVELOPER DOCUMENTATION</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../developer/design_principles.html">Design Principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developer/new_algorithm_guide.html">Contributing a New Algorithm</a></li>
+</ul>
 
     </div>
 </nav></div>
@@ -268,9 +309,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -320,7 +366,7 @@
 
 
 <button onclick="toggleFullScreen()"
-  class="btn btn-sm btn-fullscreen-button"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
   title="Fullscreen mode"
   data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
@@ -334,25 +380,17 @@
 
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-  </button>
-`);
-</script>
-<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
 </button>
 </div></div>
@@ -389,6 +427,11 @@ document.write(`
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.adaptation.mass_matrix.MassMatrixAdaptationState.wc_state"><code class="docutils literal notranslate"><span class="pre">MassMatrixAdaptationState.wc_state</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.adaptation.mass_matrix.FisherMassMatrixAdaptationState"><code class="docutils literal notranslate"><span class="pre">FisherMassMatrixAdaptationState</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.adaptation.mass_matrix.FisherMassMatrixAdaptationState.inverse_mass_matrix"><code class="docutils literal notranslate"><span class="pre">FisherMassMatrixAdaptationState.inverse_mass_matrix</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.adaptation.mass_matrix.FisherMassMatrixAdaptationState.fisher_block"><code class="docutils literal notranslate"><span class="pre">FisherMassMatrixAdaptationState.fisher_block</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.adaptation.mass_matrix.mass_matrix_adaptation"><code class="docutils literal notranslate"><span class="pre">mass_matrix_adaptation()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.adaptation.mass_matrix.welford_algorithm"><code class="docutils literal notranslate"><span class="pre">welford_algorithm()</span></code></a></li>
 </ul>
@@ -408,7 +451,7 @@ document.write(`
 <span id="blackjax-adaptation-mass-matrix"></span><h1>blackjax.adaptation.mass_matrix<a class="headerlink" href="#module-blackjax.adaptation.mass_matrix" title="Link to this heading">#</a></h1>
 <p>Algorithms to adapt the mass matrix used by algorithms in the Hamiltonian
 Monte Carlo family to the current geometry.</p>
-<p>The Stan Manual <span id="id1">[<a class="reference internal" href="../../../../bib.html#id5" title="HMC Algorithm Parameters, stan manual. URL: https://mc-stan.org/docs/2_20/reference-manual/hmc-algorithm-parameters.html.">stab</a>]</span> is a very good reference on automatic tuning of
+<p>The Stan Manual <span id="id1">[<a class="reference internal" href="../../../../bib.html#id8" title="HMC Algorithm Parameters, stan manual. URL: https://mc-stan.org/docs/2_20/reference-manual/hmc-algorithm-parameters.html.">stab</a>]</span> is a very good reference on automatic tuning of
 parameters used in Hamiltonian Monte Carlo.</p>
 <section id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">#</a></h2>
@@ -419,6 +462,9 @@ parameters used in Hamiltonian Monte Carlo.</p>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#blackjax.adaptation.mass_matrix.MassMatrixAdaptationState" title="blackjax.adaptation.mass_matrix.MassMatrixAdaptationState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MassMatrixAdaptationState</span></code></a></p></td>
 <td><p>State carried through the mass matrix adaptation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.adaptation.mass_matrix.FisherMassMatrixAdaptationState" title="blackjax.adaptation.mass_matrix.FisherMassMatrixAdaptationState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FisherMassMatrixAdaptationState</span></code></a></p></td>
+<td><p>State for the Fisher-diagonal mass matrix adaptation.</p></td>
 </tr>
 </tbody>
 </table>
@@ -442,7 +488,7 @@ parameters used in Hamiltonian Monte Carlo.</p>
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="blackjax.adaptation.mass_matrix.WelfordAlgorithmState">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">WelfordAlgorithmState</span></span><a class="reference internal" href="../../../../_modules/blackjax/adaptation/mass_matrix.html#WelfordAlgorithmState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.adaptation.mass_matrix.WelfordAlgorithmState" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">WelfordAlgorithmState</span></span><a class="reference internal" href="../../../../_modules/blackjax/adaptation/mass_matrix.html#WelfordAlgorithmState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.adaptation.mass_matrix.WelfordAlgorithmState" title="Link to this definition">#</a></dt>
 <dd><p>State carried through the Welford algorithm.</p>
 <dl class="simple">
 <dt>mean</dt><dd><p>The running sample mean.</p>
@@ -456,24 +502,24 @@ also the current number of iterations of the algorithm.</p>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="blackjax.adaptation.mass_matrix.WelfordAlgorithmState.mean">
-<span class="sig-name descname"><span class="pre">mean</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span></em><a class="reference internal" href="../../../../_modules/blackjax/adaptation/mass_matrix.html#WelfordAlgorithmState.mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.adaptation.mass_matrix.WelfordAlgorithmState.mean" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">mean</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span></span><a class="reference internal" href="../../../../_modules/blackjax/adaptation/mass_matrix.html#WelfordAlgorithmState.mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.adaptation.mass_matrix.WelfordAlgorithmState.mean" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="blackjax.adaptation.mass_matrix.WelfordAlgorithmState.m2">
-<span class="sig-name descname"><span class="pre">m2</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span></em><a class="reference internal" href="../../../../_modules/blackjax/adaptation/mass_matrix.html#WelfordAlgorithmState.m2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.adaptation.mass_matrix.WelfordAlgorithmState.m2" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">m2</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span></span><a class="reference internal" href="../../../../_modules/blackjax/adaptation/mass_matrix.html#WelfordAlgorithmState.m2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.adaptation.mass_matrix.WelfordAlgorithmState.m2" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="blackjax.adaptation.mass_matrix.WelfordAlgorithmState.sample_size">
-<span class="sig-name descname"><span class="pre">sample_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></em><a class="reference internal" href="../../../../_modules/blackjax/adaptation/mass_matrix.html#WelfordAlgorithmState.sample_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.adaptation.mass_matrix.WelfordAlgorithmState.sample_size" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">sample_size</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../_modules/blackjax/adaptation/mass_matrix.html#WelfordAlgorithmState.sample_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.adaptation.mass_matrix.WelfordAlgorithmState.sample_size" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="blackjax.adaptation.mass_matrix.MassMatrixAdaptationState">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MassMatrixAdaptationState</span></span><a class="reference internal" href="../../../../_modules/blackjax/adaptation/mass_matrix.html#MassMatrixAdaptationState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.adaptation.mass_matrix.MassMatrixAdaptationState" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">MassMatrixAdaptationState</span></span><a class="reference internal" href="../../../../_modules/blackjax/adaptation/mass_matrix.html#MassMatrixAdaptationState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.adaptation.mass_matrix.MassMatrixAdaptationState" title="Link to this definition">#</a></dt>
 <dd><p>State carried through the mass matrix adaptation.</p>
 <dl class="simple">
 <dt>inverse_mass_matrix</dt><dd><p>The curent value of the inverse mass matrix.</p>
@@ -483,25 +529,121 @@ also the current number of iterations of the algorithm.</p>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="blackjax.adaptation.mass_matrix.MassMatrixAdaptationState.inverse_mass_matrix">
-<span class="sig-name descname"><span class="pre">inverse_mass_matrix</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span></em><a class="reference internal" href="../../../../_modules/blackjax/adaptation/mass_matrix.html#MassMatrixAdaptationState.inverse_mass_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.adaptation.mass_matrix.MassMatrixAdaptationState.inverse_mass_matrix" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">inverse_mass_matrix</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span></span><a class="reference internal" href="../../../../_modules/blackjax/adaptation/mass_matrix.html#MassMatrixAdaptationState.inverse_mass_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.adaptation.mass_matrix.MassMatrixAdaptationState.inverse_mass_matrix" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="blackjax.adaptation.mass_matrix.MassMatrixAdaptationState.wc_state">
-<span class="sig-name descname"><span class="pre">wc_state</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#blackjax.adaptation.mass_matrix.WelfordAlgorithmState" title="blackjax.adaptation.mass_matrix.WelfordAlgorithmState"><span class="pre">WelfordAlgorithmState</span></a></em><a class="reference internal" href="../../../../_modules/blackjax/adaptation/mass_matrix.html#MassMatrixAdaptationState.wc_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.adaptation.mass_matrix.MassMatrixAdaptationState.wc_state" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">wc_state</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#blackjax.adaptation.mass_matrix.WelfordAlgorithmState" title="blackjax.adaptation.mass_matrix.WelfordAlgorithmState"><span class="pre">WelfordAlgorithmState</span></a></span><a class="reference internal" href="../../../../_modules/blackjax/adaptation/mass_matrix.html#MassMatrixAdaptationState.wc_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.adaptation.mass_matrix.MassMatrixAdaptationState.wc_state" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="blackjax.adaptation.mass_matrix.FisherMassMatrixAdaptationState">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">FisherMassMatrixAdaptationState</span></span><a class="reference internal" href="../../../../_modules/blackjax/adaptation/mass_matrix.html#FisherMassMatrixAdaptationState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.adaptation.mass_matrix.FisherMassMatrixAdaptationState" title="Link to this definition">#</a></dt>
+<dd><p>State for the Fisher-diagonal mass matrix adaptation.</p>
+<p>Used when <code class="docutils literal notranslate"><span class="pre">diagonal_estimator=&quot;fisher&quot;</span></code> is passed to
+<a class="reference internal" href="#blackjax.adaptation.mass_matrix.mass_matrix_adaptation" title="blackjax.adaptation.mass_matrix.mass_matrix_adaptation"><code class="xref py py-func docutils literal notranslate"><span class="pre">mass_matrix_adaptation()</span></code></a>.  Replaces the single Welford state in
+<a class="reference internal" href="#blackjax.adaptation.mass_matrix.MassMatrixAdaptationState" title="blackjax.adaptation.mass_matrix.MassMatrixAdaptationState"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassMatrixAdaptationState</span></code></a> with a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">_FisherMomentBlock</span></code> that
+accumulates per-coordinate position AND gradient variance in CGL-mergeable
+diagonal form.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inverse_mass_matrix</strong> – Current value of the (diagonal) inverse mass matrix, shape <code class="docutils literal notranslate"><span class="pre">(d,)</span></code>.</p></li>
+<li><p><strong>fisher_block</strong> – CGL-mergeable moment block accumulating diagonal position and gradient
+statistics for the current window.  Reset to zeros at each
+<a class="reference internal" href="#blackjax.adaptation.mass_matrix.mass_matrix_adaptation" title="blackjax.adaptation.mass_matrix.mass_matrix_adaptation"><code class="xref py py-func docutils literal notranslate"><span class="pre">mass_matrix_adaptation()</span></code></a> <code class="docutils literal notranslate"><span class="pre">final()</span></code> call (window boundary).</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The Fisher-diagonal IMM is <code class="docutils literal notranslate"><span class="pre">sqrt(Var[x]</span> <span class="pre">/</span> <span class="pre">Var[∇</span> <span class="pre">log</span> <span class="pre">p])</span></code> per coordinate
+(see
+<a class="reference internal" href="../metric_estimators/index.html#blackjax.adaptation.metric_estimators.fisher_score_diagonal_from_moments" title="blackjax.adaptation.metric_estimators.fisher_score_diagonal_from_moments"><code class="xref py py-func docutils literal notranslate"><span class="pre">fisher_score_diagonal_from_moments()</span></code></a>).
+This state type accumulates the moments needed to compute those per-window
+variances without storing raw draw arrays.  The IMM computation is
+deliberately NOT performed inside <code class="docutils literal notranslate"><span class="pre">mass_matrix_adaptation</span></code>’s <code class="docutils literal notranslate"><span class="pre">final()</span></code>
+— it is composed by the consumer
+(<code class="xref py py-func docutils literal notranslate"><span class="pre">_build_fisher_diag_core()</span></code>)
+to avoid a circular import between this module and <code class="docutils literal notranslate"><span class="pre">metric_estimators</span></code>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.adaptation.mass_matrix.FisherMassMatrixAdaptationState.inverse_mass_matrix">
+<span class="sig-name descname"><span class="pre">inverse_mass_matrix</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span></span><a class="reference internal" href="../../../../_modules/blackjax/adaptation/mass_matrix.html#FisherMassMatrixAdaptationState.inverse_mass_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.adaptation.mass_matrix.FisherMassMatrixAdaptationState.inverse_mass_matrix" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.adaptation.mass_matrix.FisherMassMatrixAdaptationState.fisher_block">
+<span class="sig-name descname"><span class="pre">fisher_block</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.adaptation.metric_buffers._FisherMomentBlock</span></span><a class="reference internal" href="../../../../_modules/blackjax/adaptation/mass_matrix.html#FisherMassMatrixAdaptationState.fisher_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.adaptation.mass_matrix.FisherMassMatrixAdaptationState.fisher_block" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="blackjax.adaptation.mass_matrix.mass_matrix_adaptation">
-<span class="sig-name descname"><span class="pre">mass_matrix_adaptation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">is_diagonal_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/blackjax/adaptation/mass_matrix.html#mass_matrix_adaptation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.adaptation.mass_matrix.mass_matrix_adaptation" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">mass_matrix_adaptation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">is_diagonal_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imm_shrinkage_to_previous</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diagonal_estimator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'welford'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/blackjax/adaptation/mass_matrix.html#mass_matrix_adaptation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.adaptation.mass_matrix.mass_matrix_adaptation" title="Link to this definition">#</a></dt>
 <dd><p>Adapts the values in the mass matrix by computing the covariance
 between parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>is_diagonal_matrix</strong> – When True the algorithm adapts and returns a diagonal mass matrix
-(default), otherwise adaps and returns a dense mass matrix.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>is_diagonal_matrix</strong> – When True the algorithm adapts and returns a diagonal mass matrix
+(default), otherwise adaps and returns a dense mass matrix.</p></li>
+<li><p><strong>diagonal_estimator</strong> – <p>Which diagonal-variance estimator to use for the (window-local)
+inverse mass matrix.  <code class="docutils literal notranslate"><span class="pre">&quot;welford&quot;</span></code> (default) is Stan’s classic
+online-covariance estimator and reproduces all pre-existing behavior
+exactly.  <code class="docutils literal notranslate"><span class="pre">&quot;fisher&quot;</span></code> instead uses the Fisher-divergence-minimising
+diagonal estimator of <span id="id2">[<a class="reference internal" href="../../../../bib.html#id3" title="Adrian Seyboldt, Eliot L. Carlson, and Bob Carpenter. Preconditioning hamiltonian monte carlo by minimizing fisher divergence. arXiv preprint arXiv:2603.18845, 2026.">SCC26</a>]</span> (see
+<a class="reference internal" href="../metric_estimators/index.html#blackjax.adaptation.metric_estimators.fisher_score_diagonal" title="blackjax.adaptation.metric_estimators.fisher_score_diagonal"><code class="xref py py-func docutils literal notranslate"><span class="pre">fisher_score_diagonal()</span></code></a>),
+which additionally requires the log-density gradient at each
+accumulated position (passed to <code class="docutils literal notranslate"><span class="pre">update</span></code> as <code class="docutils literal notranslate"><span class="pre">grad</span></code>).</p>
+<p>Constraints for <code class="docutils literal notranslate"><span class="pre">&quot;fisher&quot;</span></code>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">is_diagonal_matrix=True</span></code> is required (the Fisher-diagonal
+estimator only produces a diagonal metric).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">imm_shrinkage_to_previous=0.0</span></code> is required (the Fisher estimator
+does not blend with a previous IMM or an identity target).</p></li>
+</ul>
+<p>Both constraints are validated at construction time with a
+<code class="docutils literal notranslate"><span class="pre">ValueError</span></code> before any JIT tracing.</p>
+</p></li>
+<li><p><strong>imm_shrinkage_to_previous</strong> – <p>Bayesian pseudo-count controlling shrinkage of the per-window adapted
+IMM toward the previous window’s IMM. Interpretable as “the number of
+imaginary additional samples in the current window’s accumulator that
+have already settled to <code class="docutils literal notranslate"><span class="pre">IMM_prev</span></code>’s value”. Combined with the
+existing Stan-pseudo-count 5 (which targets <code class="docutils literal notranslate"><span class="pre">1e-3·I</span></code>) and the
+actual <code class="docutils literal notranslate"><span class="pre">count</span></code> samples in the window, the final IMM is the
+precision-weighted average:</p>
+<div class="math notranslate nohighlight">
+\[\text{IMM}_\text{new} =
+\frac{\text{count}}{\text{denom}} \cdot \text{cov}_\text{window} +
+\frac{k_\text{prev}}{\text{denom}} \cdot \text{IMM}_\text{prev} +
+\frac{5}{\text{denom}} \cdot 10^{-3} \cdot I\]</div>
+<p>where <span class="math notranslate nohighlight">\(\text{denom} = \text{count} + 5 + k_\text{prev}\)</span> and
+<span class="math notranslate nohighlight">\(k_\text{prev}\)</span> is this argument.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">0.0</span></code> (default): Stan-vanilla behavior, no shrinkage to previous.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">5</span></code>: matches Stan’s existing identity-shrinkage scale; mild,
+barely-perceptible persistence across windows.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">≈</span> <span class="pre">window_size</span> <span class="pre">/</span> <span class="pre">4</span></code>: ~20% weight on the previous IMM; moderate
+persistence.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">≈</span> <span class="pre">window_size</span></code>: ~50% weight; previous IMM treated as equally
+informative as the new window’s data.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span> <span class="pre">window_size</span></code>: weight saturates near 100%; Welford effectively
+disabled (anti-pattern unless the prior IMM is <em>much</em> better than
+the chain can produce).</p></li>
+</ul>
+<p>Stan-default window sizes range 25 → 500 across Phase II, so the
+practical “moderate persistence” band is roughly
+<code class="docutils literal notranslate"><span class="pre">5</span> <span class="pre">≤</span> <span class="pre">k_prev</span> <span class="pre">≤</span> <span class="pre">50</span></code>. Use larger values only when the prior IMM
+comes from a high-confidence source (e.g., a converged pre-warmup
+Pathfinder/multipathfinder fit on the right model). No upper bound
+is enforced — only <code class="docutils literal notranslate"><span class="pre">k_prev</span> <span class="pre">&gt;=</span> <span class="pre">0.0</span></code> is validated (raises
+<code class="docutils literal notranslate"><span class="pre">ValueError</span></code> on negative).</p>
+</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
@@ -517,7 +659,7 @@ state.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="blackjax.adaptation.mass_matrix.welford_algorithm">
-<span class="sig-name descname"><span class="pre">welford_algorithm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">is_diagonal_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/blackjax/adaptation/mass_matrix.html#welford_algorithm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.adaptation.mass_matrix.welford_algorithm" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">welford_algorithm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">is_diagonal_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/blackjax/adaptation/mass_matrix.html#welford_algorithm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.adaptation.mass_matrix.welford_algorithm" title="Link to this definition">#</a></dt>
 <dd><p>Welford’s online estimator of covariance.</p>
 <p>It is possible to compute the variance of a population of values in an
 on-line fashion to avoid storing intermediate results. The naive recurrence
@@ -555,12 +697,12 @@ but this covariance estimator is used in other parts of the library.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../chees_adaptation/index.html"
+       href="../low_rank_adaptation/index.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">blackjax.adaptation.chees_adaptation</p>
+        <p class="prev-next-title">blackjax.adaptation.low_rank_adaptation</p>
       </div>
     </a>
     <a class="right-next"
@@ -579,14 +721,16 @@ but this covariance estimator is used in other parts of the library.</p>
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> Contents
   </div>
-  <nav class="bd-toc-nav page-toc">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classes">Classes</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a></li>
@@ -600,6 +744,11 @@ but this covariance estimator is used in other parts of the library.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.adaptation.mass_matrix.MassMatrixAdaptationState"><code class="docutils literal notranslate"><span class="pre">MassMatrixAdaptationState</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.adaptation.mass_matrix.MassMatrixAdaptationState.inverse_mass_matrix"><code class="docutils literal notranslate"><span class="pre">MassMatrixAdaptationState.inverse_mass_matrix</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.adaptation.mass_matrix.MassMatrixAdaptationState.wc_state"><code class="docutils literal notranslate"><span class="pre">MassMatrixAdaptationState.wc_state</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.adaptation.mass_matrix.FisherMassMatrixAdaptationState"><code class="docutils literal notranslate"><span class="pre">FisherMassMatrixAdaptationState</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.adaptation.mass_matrix.FisherMassMatrixAdaptationState.inverse_mass_matrix"><code class="docutils literal notranslate"><span class="pre">FisherMassMatrixAdaptationState.inverse_mass_matrix</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.adaptation.mass_matrix.FisherMassMatrixAdaptationState.fisher_block"><code class="docutils literal notranslate"><span class="pre">FisherMassMatrixAdaptationState.fisher_block</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.adaptation.mass_matrix.mass_matrix_adaptation"><code class="docutils literal notranslate"><span class="pre">mass_matrix_adaptation()</span></code></a></li>
@@ -630,7 +779,7 @@ By The Blackjax developers
 
   <p class="copyright">
     
-      © Copyright 2025, The Blackjax developers.
+      © Copyright 2026, The Blackjax developers.
       <br/>
     
   </p>
@@ -654,8 +803,8 @@ By The Blackjax developers
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
   </footer>

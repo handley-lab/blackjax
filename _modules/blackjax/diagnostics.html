@@ -15,40 +15,44 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
-    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=e37d73aa" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/blackjax/diagnostics';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.1.dev1+g351bb9a14" />
   </head>
   
   
@@ -64,19 +68,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../../search.html"
       method="get">
@@ -84,7 +77,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search..."
          aria-label="Search..."
          autocomplete="off"
@@ -92,8 +84,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -111,7 +103,8 @@
       
         
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -141,30 +134,29 @@
     
     
     <img src="../../_static/blackjax.png" class="logo__image only-light" alt=" - Home"/>
-    <script>document.write(`<img src="../../_static/blackjax.png" class="logo__image only-dark" alt=" - Home"/>`);</script>
+    <img src="../../_static/blackjax.png" class="logo__image only-dark pst-js-only" alt=" - Home"/>
   
   
 </a></div>
         <div class="sidebar-primary-item">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script></div>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../examples/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/diagnostics.html">MCMC Diagnostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/speed_up_guide.html">Speed-up Guide</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">PPL INTEGRATION</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../../examples/howto_use_aesara.html">Aesara</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/howto_use_pytensor.html">PyTensor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/howto_use_numpyro.html">Numpyro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/howto_use_funsor.html">Funsor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/howto_use_oryx.html">Oryx</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/howto_use_pymc.html">PyMC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/howto_use_tfp.html">Tensorflow-Probability</a></li>
@@ -172,9 +164,11 @@
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">HOW TO</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../examples/howto_sample_multiple_chains.html">Sample with multiple chains?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/howto_progress_bar.html">Show progress during sampling?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/howto_custom_gradients.html">Use custom gradients?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/howto_other_frameworks.html">Use non-JAX log-prob functions?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/howto_metropolis_within_gibbs.html">Build a Metropolis-Within-Gibbs sampler?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/howto_laplace_hmc.html">Use Laplace-preconditioned HMC?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/howto_reproduce_the_blackjax_image.html">Sample from the word BlackJAX using BlackJAX?</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">LEARN BY EXAMPLE</span></p>
@@ -188,25 +182,52 @@
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/adaptation/adjusted_mclmc_adaptation/index.html">blackjax.adaptation.adjusted_mclmc_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/adaptation/base/index.html">blackjax.adaptation.base</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/adaptation/chees_adaptation/index.html">blackjax.adaptation.chees_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/adaptation/laps/index.html">blackjax.adaptation.laps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/adaptation/laps_burn_in/index.html">blackjax.adaptation.laps_burn_in</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/adaptation/low_rank_adaptation/index.html">blackjax.adaptation.low_rank_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/adaptation/mass_matrix/index.html">blackjax.adaptation.mass_matrix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/adaptation/mclmc_adaptation/index.html">blackjax.adaptation.mclmc_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/adaptation/mclmc_lrd_adaptation/index.html">blackjax.adaptation.mclmc_lrd_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/adaptation/meads_adaptation/index.html">blackjax.adaptation.meads_adaptation</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/blackjax/adaptation/meta/index.html">blackjax.adaptation.meta</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/blackjax/adaptation/meta/builders/index.html">blackjax.adaptation.meta.builders</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/blackjax/adaptation/meta/verdict/index.html">blackjax.adaptation.meta.verdict</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/adaptation/meta_adaptation/index.html">blackjax.adaptation.meta_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/adaptation/metric_buffers/index.html">blackjax.adaptation.metric_buffers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/adaptation/metric_estimators/index.html">blackjax.adaptation.metric_estimators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/adaptation/metric_recipes/index.html">blackjax.adaptation.metric_recipes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/adaptation/pathfinder_adaptation/index.html">blackjax.adaptation.pathfinder_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/adaptation/staged_adaptation/index.html">blackjax.adaptation.staged_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/adaptation/step_size/index.html">blackjax.adaptation.step_size</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/adaptation/window_adaptation/index.html">blackjax.adaptation.window_adaptation</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../../autoapi/blackjax/diagnostics/index.html">blackjax.diagnostics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../autoapi/blackjax/eca/index.html">blackjax.eca</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../autoapi/blackjax/mcmc/index.html">blackjax.mcmc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/adjusted_mclmc/index.html">blackjax.mcmc.adjusted_mclmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/adjusted_mclmc_dynamic/index.html">blackjax.mcmc.adjusted_mclmc_dynamic</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/barker/index.html">blackjax.mcmc.barker</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/blackjax/mcmc/composed/index.html">blackjax.mcmc.composed</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/blackjax/mcmc/composed/step_size/index.html">blackjax.mcmc.composed.step_size</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/blackjax/mcmc/composed/trajectory_length/index.html">blackjax.mcmc.composed.trajectory_length</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/coupled_hmc/index.html">blackjax.mcmc.coupled_hmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/diffusions/index.html">blackjax.mcmc.diffusions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/dynamic_hmc/index.html">blackjax.mcmc.dynamic_hmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/elliptical_slice/index.html">blackjax.mcmc.elliptical_slice</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/ghmc/index.html">blackjax.mcmc.ghmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/gist/index.html">blackjax.mcmc.gist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/gist_step_size/index.html">blackjax.mcmc.gist_step_size</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/gist_trajectory_length/index.html">blackjax.mcmc.gist_trajectory_length</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/hmc/index.html">blackjax.mcmc.hmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/integrators/index.html">blackjax.mcmc.integrators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/laplace_dynamic_hmc/index.html">blackjax.mcmc.laplace_dynamic_hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/laplace_hmc/index.html">blackjax.mcmc.laplace_hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/laplace_marginal/index.html">blackjax.mcmc.laplace_marginal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/mala/index.html">blackjax.mcmc.mala</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/marginal_latent_gaussian/index.html">blackjax.mcmc.marginal_latent_gaussian</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/mclmc/index.html">blackjax.mcmc.mclmc</a></li>
@@ -216,10 +237,21 @@
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/proposal/index.html">blackjax.mcmc.proposal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/random_walk/index.html">blackjax.mcmc.random_walk</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/rmhmc/index.html">blackjax.mcmc.rmhmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/slice/index.html">blackjax.mcmc.slice</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/termination/index.html">blackjax.mcmc.termination</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/mcmc/trajectory/index.html">blackjax.mcmc.trajectory</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../autoapi/blackjax/ns/index.html">blackjax.ns</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/ns/adaptive/index.html">blackjax.ns.adaptive</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/ns/base/index.html">blackjax.ns.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/ns/from_mcmc/index.html">blackjax.ns.from_mcmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/ns/integrator/index.html">blackjax.ns.integrator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/ns/nss/index.html">blackjax.ns.nss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/ns/utils/index.html">blackjax.ns.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../autoapi/blackjax/progress_reader/index.html">blackjax.progress_reader</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../autoapi/blackjax/sgmcmc/index.html">blackjax.sgmcmc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/sgmcmc/csgld/index.html">blackjax.sgmcmc.csgld</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/sgmcmc/diffusions/index.html">blackjax.sgmcmc.diffusions</a></li>
@@ -230,12 +262,14 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../autoapi/blackjax/smc/index.html">blackjax.smc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/smc/adaptive_persistent_sampling/index.html">blackjax.smc.adaptive_persistent_sampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/smc/adaptive_tempered/index.html">blackjax.smc.adaptive_tempered</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/smc/base/index.html">blackjax.smc.base</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/smc/ess/index.html">blackjax.smc.ess</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/smc/from_mcmc/index.html">blackjax.smc.from_mcmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/smc/inner_kernel_tuning/index.html">blackjax.smc.inner_kernel_tuning</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/smc/partial_posteriors_path/index.html">blackjax.smc.partial_posteriors_path</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/smc/persistent_sampling/index.html">blackjax.smc.persistent_sampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/smc/pretuning/index.html">blackjax.smc.pretuning</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/smc/resampling/index.html">blackjax.smc.resampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/smc/solver/index.html">blackjax.smc.solver</a></li>
@@ -249,7 +283,9 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../autoapi/blackjax/vi/index.html">blackjax.vi</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/vi/fullrank_vi/index.html">blackjax.vi.fullrank_vi</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/vi/meanfield_vi/index.html">blackjax.vi.meanfield_vi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/vi/multipathfinder/index.html">blackjax.vi.multipathfinder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/vi/pathfinder/index.html">blackjax.vi.pathfinder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/vi/schrodinger_follmer/index.html">blackjax.vi.schrodinger_follmer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/blackjax/vi/svgd/index.html">blackjax.vi.svgd</a></li>
@@ -259,6 +295,11 @@
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="../../bib.html">Bibliography</a></li>
 </ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">DEVELOPER DOCUMENTATION</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../developer/design_principles.html">Design Principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer/new_algorithm_guide.html">Contributing a New Algorithm</a></li>
+</ul>
 
     </div>
 </nav></div>
@@ -266,9 +307,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -318,7 +364,7 @@
 
 
 <button onclick="toggleFullScreen()"
-  class="btn btn-sm btn-fullscreen-button"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
   title="Fullscreen mode"
   data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
@@ -332,24 +378,16 @@
 
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-  </button>
-`);
-</script>
+</button>
 
 </div></div>
       
@@ -390,6 +428,8 @@ document.write(`
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
 <span class="sd">&quot;&quot;&quot;MCMC diagnostics.&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NamedTuple</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -397,7 +437,19 @@ document.write(`
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">blackjax.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">ArrayLike</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;potential_scale_reduction&quot;</span><span class="p">,</span> <span class="s2">&quot;effective_sample_size&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;potential_scale_reduction&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;effective_sample_size&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;rhat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ess_bulk&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ess_tail&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pareto_khat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;psis_weights&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DivergenceConcentrationReport&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;divergence_concentration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;divergence_concentration_from_counts&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;format_divergence_warning&quot;</span><span class="p">,</span>
+<span class="p">]</span>
 
 
 <div class="viewcode-block" id="potential_scale_reduction">
@@ -425,7 +477,7 @@ document.write(`
 <span class="sd">    -----</span>
 <span class="sd">    The diagnostic is computed by:</span>
 
-<span class="sd">    .. math:: \\hat{R} = \\frac{\\hat{V}}{W}</span>
+<span class="sd">    .. math:: \\hat{R} = \\sqrt{\\frac{\\hat{V}}{W}}</span>
 
 <span class="sd">    where :math:`W` is the within-chain variance and :math:`\\hat{V}` is the posterior variance</span>
 <span class="sd">    estimate for the pooled traces. This is the potential scale reduction factor, which</span>
@@ -456,6 +508,86 @@ document.write(`
 
 
 
+<div class="viewcode-block" id="rhat">
+<a class="viewcode-back" href="../../autoapi/blackjax/diagnostics/index.html#blackjax.diagnostics.rhat">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">rhat</span><span class="p">(</span><span class="n">input_array</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">chain_axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sample_axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rank-normalized split-R̂ (Vehtari et al. 2021).</span>
+
+<span class="sd">    The modern improved R̂ diagnostic.  Combines two split-chain R̂ values —</span>
+<span class="sd">    one on rank-normalized draws and one on rank-normalized *folded* draws —</span>
+<span class="sd">    and returns the maximum.  The folded component catches scale/variance</span>
+<span class="sd">    non-convergence that the bulk component can miss.</span>
+
+<span class="sd">    This matches the default ``az.rhat(method=&quot;rank&quot;)`` convention in ArviZ.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_array</span>
+<span class="sd">        An array representing multiple chains of MCMC samples. The array must</span>
+<span class="sd">        contain a chain dimension and a sample dimension.  At least 2 chains</span>
+<span class="sd">        and at least 4 draws per chain are required.</span>
+<span class="sd">    chain_axis</span>
+<span class="sd">        The axis indicating the multiple chains. Default 0.</span>
+<span class="sd">    sample_axis</span>
+<span class="sd">        The axis indicating a single chain of MCMC samples. Default 1.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    NDArray of the resulting R̂ values, with chain and sample dimensions</span>
+<span class="sd">    squeezed.  Values close to 1.0 indicate convergence; values above 1.01</span>
+<span class="sd">    suggest chains have not converged.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Algorithm (Vehtari et al. 2021, § 4):</span>
+
+<span class="sd">    1. Split each chain in half → 2× chains.</span>
+<span class="sd">    2. Rank-normalize with the Blom plotting position</span>
+<span class="sd">       :math:`z_r = \\Phi^{-1}((r - 3/8) / (n + 1/4))` over the joint pool.</span>
+<span class="sd">    3. Compute the standard split-R̂ on the rank-normalized draws (**bulk**).</span>
+<span class="sd">    4. Compute the folded draws :math:`|x - \\mathrm{median}(x)|`, rank-normalize</span>
+<span class="sd">       them, and compute split-R̂ again (**tail**).</span>
+<span class="sd">    5. Return :math:`\\max(\\hat{R}_{\\text{bulk}}, \\hat{R}_{\\text{tail}})`.</span>
+
+<span class="sd">    .. warning::</span>
+
+<span class="sd">       ``NaN`` from this function does **not** uniquely mean &quot;the draws</span>
+<span class="sd">       contained a missing observation&quot;.  The folded component subtracts the</span>
+<span class="sd">       pooled median, so when at least half of a component&#39;s pooled draws are</span>
+<span class="sd">       ``+inf`` (or ``-inf``) the median is infinite and the fold evaluates</span>
+<span class="sd">       ``inf - inf``, which is ``NaN``.  Such a component returns ``NaN`` from</span>
+<span class="sd">       :func:`rhat` while containing no ``NaN`` at all — and while</span>
+<span class="sd">       :func:`ess_bulk` and :func:`ess_tail` still return finite values for it.</span>
+<span class="sd">       Infinity handling is a separate open question from the missing-data</span>
+<span class="sd">       contract; this is documented, not yet decided.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. cite:p:`vehtari2021rank`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">_to_standard_axes</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">input_array</span><span class="p">),</span> <span class="n">chain_axis</span><span class="p">,</span> <span class="n">sample_axis</span><span class="p">)</span>
+    <span class="c1"># Split each chain in half → (2*nchains, nsamples//2, …).</span>
+    <span class="n">x_split</span> <span class="o">=</span> <span class="n">_split_chains</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="c1"># Bulk: rank-normalize split draws, then compute split-R̂.</span>
+    <span class="n">x_rn</span> <span class="o">=</span> <span class="n">_rank_normalize</span><span class="p">(</span><span class="n">x_split</span><span class="p">)</span>
+    <span class="n">rhat_bulk</span> <span class="o">=</span> <span class="n">potential_scale_reduction</span><span class="p">(</span><span class="n">x_rn</span><span class="p">,</span> <span class="n">chain_axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sample_axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Tail: fold the split draws about their joint median, rank-normalize,</span>
+    <span class="c1"># then compute split-R̂.  Catches variance non-convergence.</span>
+    <span class="n">nchains_split</span> <span class="o">=</span> <span class="n">x_split</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">nsamples_split</span> <span class="o">=</span> <span class="n">x_split</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">extra_shape</span> <span class="o">=</span> <span class="n">x_split</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+    <span class="n">x_flat</span> <span class="o">=</span> <span class="n">x_split</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nchains_split</span> <span class="o">*</span> <span class="n">nsamples_split</span><span class="p">,</span> <span class="o">*</span><span class="n">extra_shape</span><span class="p">)</span>
+    <span class="c1"># Global median per trailing dimension (scalar when extra_shape is empty).</span>
+    <span class="n">x_folded</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x_split</span> <span class="o">-</span> <span class="n">jnp</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">x_flat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">x_folded_rn</span> <span class="o">=</span> <span class="n">_rank_normalize</span><span class="p">(</span><span class="n">x_folded</span><span class="p">)</span>
+    <span class="n">rhat_tail</span> <span class="o">=</span> <span class="n">potential_scale_reduction</span><span class="p">(</span><span class="n">x_folded_rn</span><span class="p">,</span> <span class="n">chain_axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sample_axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">rhat_bulk</span><span class="p">,</span> <span class="n">rhat_tail</span><span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="effective_sample_size">
 <a class="viewcode-back" href="../../autoapi/blackjax/diagnostics/index.html#blackjax.diagnostics.effective_sample_size">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">effective_sample_size</span><span class="p">(</span>
@@ -476,6 +608,11 @@ document.write(`
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    NDArray of the resulting statistics (ess), with the chain and sample dimensions squeezed.</span>
+<span class="sd">    Variables whose within-chain variance is numerically zero have an effective</span>
+<span class="sd">    sample size of zero.  Variables containing a ``NaN`` draw are undefined and</span>
+<span class="sd">    report ``NaN``; the reduction is per variable, so an independent finite</span>
+<span class="sd">    variable is unaffected.  Infinities are ordered values and are not treated</span>
+<span class="sd">    as missing.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -502,6 +639,13 @@ document.write(`
         <span class="n">num_samples</span> <span class="o">&gt;</span> <span class="mi">1</span>
     <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;The input array must have at least 2 samples, got only </span><span class="si">{</span><span class="n">num_samples</span><span class="si">}</span><span class="s2">.&quot;</span>
 
+    <span class="n">first_sample</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">input_array</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="n">sample_axis</span><span class="p">)</span>
+    <span class="n">has_within_chain_variation</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">any</span><span class="p">(</span>
+        <span class="n">input_array</span> <span class="o">!=</span> <span class="n">first_sample</span><span class="p">,</span>
+        <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="n">chain_axis</span><span class="p">,</span> <span class="n">sample_axis</span><span class="p">),</span>
+        <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
     <span class="n">mean_across_chain</span> <span class="o">=</span> <span class="n">input_array</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="n">sample_axis</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="c1"># Compute autocovariance estimates for every lag for the input array using FFT.</span>
     <span class="n">centered_array</span> <span class="o">=</span> <span class="n">input_array</span> <span class="o">-</span> <span class="n">mean_across_chain</span>
@@ -518,6 +662,9 @@ document.write(`
         <span class="o">*</span> <span class="n">num_samples</span>
         <span class="o">/</span> <span class="p">(</span><span class="n">num_samples</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
     <span class="p">)</span>
+    <span class="n">is_numerically_degenerate</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">mean_var0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span>
+        <span class="o">~</span><span class="n">has_within_chain_variation</span> <span class="o">|</span> <span class="p">(</span><span class="n">mean_var0</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="p">)</span>
     <span class="n">weighted_var</span> <span class="o">=</span> <span class="n">mean_var0</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_samples</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_samples</span>
     <span class="n">weighted_var</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">cond</span><span class="p">(</span>
         <span class="n">num_chains</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">,</span>
@@ -525,6 +672,9 @@ document.write(`
         <span class="o">+</span> <span class="n">mean_across_chain</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="n">chain_axis</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
         <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">weighted_var</span><span class="p">,</span>
         <span class="n">operand</span><span class="o">=</span><span class="n">mean_across_chain</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">weighted_var</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">is_numerically_degenerate</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">weighted_var</span><span class="p">),</span> <span class="n">weighted_var</span>
     <span class="p">)</span>
 
     <span class="c1"># Geyer&#39;s initial positive sequence</span>
@@ -588,8 +738,892 @@ document.write(`
 
     <span class="n">tau_hat</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">tau_hat</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">ess_raw</span><span class="p">))</span>
     <span class="n">ess</span> <span class="o">=</span> <span class="n">ess_raw</span> <span class="o">/</span> <span class="n">tau_hat</span>
+    <span class="n">ess</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_numerically_degenerate</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">ess</span><span class="o">.</span><span class="n">squeeze</span><span class="p">())</span>
 
-    <span class="k">return</span> <span class="n">ess</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span></div>
+    <span class="c1"># A NaN draw is a missing observation, not a value the estimator can use.</span>
+    <span class="c1"># Geyer&#39;s truncation above gates on partial sums being &gt; 0, and every such</span>
+    <span class="c1"># comparison is False for NaN, so the truncation collapses and tau_hat</span>
+    <span class="c1"># falls back to its 1 / log10(MN) floor — manufacturing a large, entirely</span>
+    <span class="c1"># fictitious sample size.  Report the component as undefined instead.  The</span>
+    <span class="c1"># reduction runs over the chain and draw axes only, so a contaminated</span>
+    <span class="c1"># component never poisons an independent finite one, and ``.squeeze()``</span>
+    <span class="c1"># mirrors the squeeze applied to ``ess`` just above.</span>
+    <span class="n">has_nan</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">input_array</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="n">chain_axis</span><span class="p">,</span> <span class="n">sample_axis</span><span class="p">))</span>
+    <span class="n">ess</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">has_nan</span><span class="p">),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">ess</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ess</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">splitR</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">num_chains</span><span class="p">,</span> <span class="n">superchain_size</span><span class="p">,</span> <span class="n">func_for_splitR</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">square</span><span class="p">):</span>
+    <span class="c1"># combine the chains in super-chains to compute expectation values</span>
+    <span class="n">func_mk</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">func_for_splitR</span><span class="p">)(</span><span class="n">position</span><span class="p">)</span>  <span class="c1"># shape = (# chains, # func)</span>
+    <span class="n">func_mk</span> <span class="o">=</span> <span class="n">func_mk</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+        <span class="n">num_chains</span> <span class="o">//</span> <span class="n">superchain_size</span><span class="p">,</span> <span class="n">superchain_size</span><span class="p">,</span> <span class="n">func_mk</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="p">)</span>  <span class="c1"># shape = (# superchains, # chains in superchain, # func)</span>
+    <span class="n">func_k</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">func_mk</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># shape = (# superchains, # func)</span>
+    <span class="n">func_sq_k</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">average</span><span class="p">(</span>
+        <span class="n">jnp</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">func_mk</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">)</span>  <span class="c1"># shape = (# superchains, # func)</span>
+    <span class="n">W_k</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="n">func_sq_k</span> <span class="o">-</span> <span class="n">jnp</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">func_k</span><span class="p">))</span> <span class="o">*</span> <span class="n">superchain_size</span> <span class="o">/</span> <span class="p">(</span><span class="n">superchain_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">)</span>  <span class="c1"># variance withing k-th superchain</span>
+    <span class="n">W</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">W_k</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># average within superchain variance</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">func_k</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># between superchain variance</span>
+
+    <span class="n">R</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="p">(</span><span class="n">B</span> <span class="o">/</span> <span class="n">W</span><span class="p">))</span>  <span class="c1"># splitR, shape = (# func)</span>
+
+    <span class="k">return</span> <span class="n">R</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_to_standard_axes</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">chain_axis</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">sample_axis</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Move chain and sample dimensions to positions 0 and 1 via ``jnp.transpose``.</span>
+
+<span class="sd">    All other dimensions are appended in their original relative order.  The</span>
+<span class="sd">    function handles negative axis indices correctly.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ndim</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">chain_axis</span> <span class="o">%</span> <span class="n">ndim</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">sample_axis</span> <span class="o">%</span> <span class="n">ndim</span>
+    <span class="n">rest</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">c</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">s</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">[</span><span class="n">c</span><span class="p">,</span> <span class="n">s</span><span class="p">]</span> <span class="o">+</span> <span class="n">rest</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_split_chains</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Split each chain in half along the sample axis (axis 1).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x</span>
+<span class="sd">        Array of shape ``(nchains, nsamples, …)``.  If ``nsamples`` is odd the</span>
+<span class="sd">        last sample is dropped so both halves are equal-length.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Array of shape ``(2 * nchains, nsamples // 2, …)``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nsamples</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">half</span> <span class="o">=</span> <span class="n">nsamples</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="c1"># Trim to even length so both halves are the same size.</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">half</span><span class="p">]</span>
+    <span class="n">first</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="p">:</span><span class="n">half</span><span class="p">]</span>
+    <span class="n">second</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="n">half</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_average_ranks</span><span class="p">(</span><span class="n">x_flat</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;One-indexed ranks along axis 0, averaging the ranks of tied values.</span>
+
+<span class="sd">    Equal values form a *tie group* and all receive the mean of the ordinal</span>
+<span class="sd">    ranks that the group spans.  This makes the ranking invariant to the</span>
+<span class="sd">    permutation of the pooled draws, which ordinal (``argsort``-of-``argsort``)</span>
+<span class="sd">    ranking is not.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x_flat</span>
+<span class="sd">        Array of shape ``(n, …)``; ranks are computed along axis 0</span>
+<span class="sd">        independently for each element of the trailing dimensions.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Array of the same shape holding 1-indexed average ranks.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The implementation is written with sort and cumulative-reduction</span>
+<span class="sd">    primitives only, so it is ``jit``/``vmap``-compatible and has no</span>
+<span class="sd">    data-dependent shapes.</span>
+
+<span class="sd">    A ``NaN`` is a missing or invalid observation, not an ordered value that</span>
+<span class="sd">    could be tied with anything, so a component containing one cannot be</span>
+<span class="sd">    ranked: the whole component returns ``NaN``.  The reduction runs over</span>
+<span class="sd">    axis 0 alone, so an invalid component never poisons an independent finite</span>
+<span class="sd">    sibling.</span>
+
+<span class="sd">    Infinities are ordered values and are ranked normally *by this function*.</span>
+<span class="sd">    That does not make the whole diagnostic pipeline infinity-safe: see the</span>
+<span class="sd">    note on folding in :func:`rhat`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">x_flat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">extra_shape</span> <span class="o">=</span> <span class="n">x_flat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="n">order</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">x_flat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">x_sorted</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">x_flat</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Adjacent sorted entries share a tie group when they are equal.</span>
+    <span class="n">same_as_prev</span> <span class="o">=</span> <span class="n">x_sorted</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="n">x_sorted</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">true_row</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">extra_shape</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">is_first</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">true_row</span><span class="p">,</span> <span class="o">~</span><span class="n">same_as_prev</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">is_last</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="o">~</span><span class="n">same_as_prev</span><span class="p">,</span> <span class="n">true_row</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">positions</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span>
+        <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">extra_shape</span><span class="p">))),</span> <span class="n">x_flat</span><span class="o">.</span><span class="n">shape</span>
+    <span class="p">)</span>
+    <span class="c1"># Running max/min of the group boundary markers gives, for every sorted</span>
+    <span class="c1"># position, the first and last 0-indexed position of its tie group.</span>
+    <span class="n">group_start</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">cummax</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_first</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">group_end</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">cummin</span><span class="p">(</span>
+        <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_last</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Mean of the 1-indexed ordinal ranks spanned by the group.</span>
+    <span class="n">avg_rank_sorted</span> <span class="o">=</span> <span class="p">(</span><span class="n">group_start</span> <span class="o">+</span> <span class="n">group_end</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="mf">1.0</span>
+
+    <span class="c1"># Scatter back to the original positions.</span>
+    <span class="n">inverse</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">ranks</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">avg_rank_sorted</span><span class="p">,</span> <span class="n">inverse</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># A component holding a missing observation has no valid ranking.</span>
+    <span class="n">contaminated</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x_flat</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">contaminated</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">ranks</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_propagate_nan_components</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the entries of ``value`` whose draws contain a ``NaN`` to ``NaN``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    value</span>
+<span class="sd">        Diagnostic values of shape ``x.shape[2:]``.</span>
+<span class="sd">    x</span>
+<span class="sd">        Draws of shape ``(nchains, nsamples, …)``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``value`` with every contaminated component replaced by ``NaN``.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The reduction runs over the chain and draw axes only, so a component</span>
+<span class="sd">    holding a missing observation never poisons an independent finite one.</span>
+
+<span class="sd">    ``x`` here is the *split* array, so with an odd number of draws the last</span>
+<span class="sd">    draw has already been trimmed by :func:`_split_chains` and a ``NaN``</span>
+<span class="sd">    sitting only in that draw is not seen.  The contract is therefore &quot;a</span>
+<span class="sd">    ``NaN`` among the draws the diagnostic actually uses&quot;, which is narrower</span>
+<span class="sd">    than &quot;a ``NaN`` anywhere in the input&quot;.</span>
+
+<span class="sd">    The guard is needed because the estimators downstream do not propagate</span>
+<span class="sd">    ``NaN`` on their own.  Geyer&#39;s initial-positive-sequence truncation in</span>
+<span class="sd">    :func:`effective_sample_size` compares partial autocorrelation sums</span>
+<span class="sd">    against zero; every such comparison is ``False`` for ``NaN``, so the</span>
+<span class="sd">    truncation collapses and :math:`\\hat{\\tau}` falls back to its</span>
+<span class="sd">    ``1 / log10(MN)`` floor — turning an all-``NaN`` input into a large and</span>
+<span class="sd">    entirely fictitious sample size instead of ``NaN``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">contaminated</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="c1"># ``effective_sample_size`` ends with a bare ``.squeeze()``, which drops</span>
+    <span class="c1"># genuine size-1 event axes as well as the chain/draw axes.  Squeeze the</span>
+    <span class="c1"># mask the same way, or ``jnp.where`` broadcasts a (…, 1) mask against a</span>
+    <span class="c1"># squeezed value and silently changes both the shape and the numbers.</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">contaminated</span><span class="p">),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_rank_normalize</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rank-normalize draws using the Blom plotting position.</span>
+
+<span class="sd">    Ranks are computed over the joint pool of all ``nchains * nsamples`` values</span>
+<span class="sd">    independently for each element of the trailing dimensions.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x</span>
+<span class="sd">        Array of shape ``(nchains, nsamples, …)`` with chains on axis 0 and</span>
+<span class="sd">        draws on axis 1.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Array of the same shape containing rank-normalized z-scores.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The plotting position follows Vehtari et al. (2021), equation (12):</span>
+
+<span class="sd">    .. math:: z_r = \\Phi^{-1}\\!\\left(\\frac{r - 3/8}{n + 1/4}\\right)</span>
+
+<span class="sd">    where :math:`r` is the 1-indexed rank and :math:`n = \\text{nchains}</span>
+<span class="sd">    \\times \\text{nsamples}`.</span>
+
+<span class="sd">    Tied draws receive the *average* of the ordinal ranks their tie group</span>
+<span class="sd">    spans (see :func:`_average_ranks`), matching Vehtari et al. (2021) and</span>
+<span class="sd">    ``scipy.stats.rankdata(method=&quot;average&quot;)``.  Ordinal ranking would give</span>
+<span class="sd">    equal values different scores depending on where they sit in the pooled</span>
+<span class="sd">    array, manufacturing chain/time structure out of ties — a constant input</span>
+<span class="sd">    would acquire a spurious spread, and repeated states would inflate R̂ and</span>
+<span class="sd">    deflate bulk ESS.  The damage scales with how large and how scattered the</span>
+<span class="sd">    tie groups are: it is severe for indicator and discrete observables, and</span>
+<span class="sd">    mild for rejection repeats in a continuous chain, where the repeats form</span>
+<span class="sd">    short contiguous runs.  A constant input now maps to a constant field of</span>
+<span class="sd">    zeros, leaving R̂ undefined (0/0) and the ESS degeneracy guard free to</span>
+<span class="sd">    report 0.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nchains</span><span class="p">,</span> <span class="n">nsamples</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">extra_shape</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">nchains</span> <span class="o">*</span> <span class="n">nsamples</span>
+
+    <span class="c1"># Pool chains and draws into the leading axis: (n, …extra).</span>
+    <span class="n">x_flat</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="o">*</span><span class="n">extra_shape</span><span class="p">)</span>
+
+    <span class="c1"># Average ranks, so that tied draws receive identical scores.</span>
+    <span class="n">ranks</span> <span class="o">=</span> <span class="n">_average_ranks</span><span class="p">(</span><span class="n">x_flat</span><span class="p">)</span>
+
+    <span class="c1"># Blom plotting position.</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">ndtri</span><span class="p">((</span><span class="n">ranks</span> <span class="o">-</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="mi">8</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mi">4</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">z</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nchains</span><span class="p">,</span> <span class="n">nsamples</span><span class="p">,</span> <span class="o">*</span><span class="n">extra_shape</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ess_bulk">
+<a class="viewcode-back" href="../../autoapi/blackjax/diagnostics/index.html#blackjax.diagnostics.ess_bulk">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ess_bulk</span><span class="p">(</span>
+    <span class="n">input_array</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">chain_axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sample_axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Bulk effective sample size (rank-normalized split-chain ESS).</span>
+
+<span class="sd">    Computes the bulk ESS from Vehtari et al. (2021): rank-normalizes draws</span>
+<span class="sd">    after splitting each chain in half, then applies the standard</span>
+<span class="sd">    autocorrelation-based :func:`effective_sample_size` estimator.  This</span>
+<span class="sd">    diagnostic is robust to non-stationarity and multimodality.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_array</span>
+<span class="sd">        An array representing multiple chains of MCMC samples. The array must</span>
+<span class="sd">        contain a chain dimension and a sample dimension.</span>
+<span class="sd">    chain_axis</span>
+<span class="sd">        The axis indicating the multiple chains. Default 0.</span>
+<span class="sd">    sample_axis</span>
+<span class="sd">        The axis indicating a single chain of MCMC samples. Default 1.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    NDArray of the resulting bulk-ESS, with chain and sample dimensions squeezed.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Algorithm:</span>
+
+<span class="sd">    1. Split each chain in half → 2× chains.</span>
+<span class="sd">    2. Pool all draws and rank-normalize with :math:`z_r = \\Phi^{-1}((r-3/8)/(n+1/4))`.</span>
+<span class="sd">    3. Apply :func:`effective_sample_size` to the rank-normalized draws.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. cite:p:`vehtari2021rank`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">_to_standard_axes</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">input_array</span><span class="p">),</span> <span class="n">chain_axis</span><span class="p">,</span> <span class="n">sample_axis</span><span class="p">)</span>
+    <span class="n">x_split</span> <span class="o">=</span> <span class="n">_split_chains</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">x_rn</span> <span class="o">=</span> <span class="n">_rank_normalize</span><span class="p">(</span><span class="n">x_split</span><span class="p">)</span>
+    <span class="c1"># A contaminated component is already all-NaN after _rank_normalize, and</span>
+    <span class="c1"># effective_sample_size propagates that on its own.</span>
+    <span class="k">return</span> <span class="n">effective_sample_size</span><span class="p">(</span><span class="n">x_rn</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ess_tail">
+<a class="viewcode-back" href="../../autoapi/blackjax/diagnostics/index.html#blackjax.diagnostics.ess_tail">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ess_tail</span><span class="p">(</span>
+    <span class="n">input_array</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+    <span class="n">chain_axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">sample_axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">prob</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.90</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tail effective sample size.</span>
+
+<span class="sd">    Computes the tail ESS from Vehtari et al. (2021) as the minimum of the</span>
+<span class="sd">    ESS of the lower- and upper-tail indicator functions applied to split-chain</span>
+<span class="sd">    draws.</span>
+
+<span class="sd">    The tail quantiles are determined by ``prob``: the lower tail uses the</span>
+<span class="sd">    ``(1 - prob) / 2`` quantile and the upper tail uses the</span>
+<span class="sd">    ``(1 + prob) / 2`` quantile.  The default ``prob=0.90`` corresponds to</span>
+<span class="sd">    the 5th/95th percentiles, matching ArviZ&#39;s default ``prob=(0.05, 0.95)``.</span>
+
+<span class="sd">    .. warning::</span>
+
+<span class="sd">       The agreement with ``az.ess(method=&quot;tail&quot;)`` holds for **continuous**</span>
+<span class="sd">       draws only.  The upper-tail indicator here is</span>
+<span class="sd">       :math:`\\mathbf{1}(x \\ge q_{\\text{high}})`, whereas Vehtari et al.</span>
+<span class="sd">       and ArviZ use :math:`\\mathbf{1}(x \\le q)` for both tails.  On</span>
+<span class="sd">       continuous draws the two are exact complements and the ESS is</span>
+<span class="sd">       identical, but on tied draws they are not: for iid Bernoulli(0.1),</span>
+<span class="sd">       :math:`P(x \\ge q_{95})` is 0.097 rather than 0.05, and for a 5-level</span>
+<span class="sd">       grid it is 0.21.  This is a separate known defect in the tail</span>
+<span class="sd">       estimator&#39;s tie handling, tracked independently of the</span>
+<span class="sd">       rank-normalization fix; note that simply switching to ``&lt;=`` does not</span>
+<span class="sd">       resolve it, since that indicator is identically 1 on such draws and</span>
+<span class="sd">       would be reported as degenerate.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_array</span>
+<span class="sd">        An array representing multiple chains of MCMC samples. The array must</span>
+<span class="sd">        contain a chain dimension and a sample dimension.</span>
+<span class="sd">    chain_axis</span>
+<span class="sd">        The axis indicating the multiple chains. Default 0.</span>
+<span class="sd">    sample_axis</span>
+<span class="sd">        The axis indicating a single chain of MCMC samples. Default 1.</span>
+<span class="sd">    prob</span>
+<span class="sd">        Central-interval probability that determines the tail quantiles.</span>
+<span class="sd">        Lower quantile: ``(1 - prob) / 2``; upper quantile:</span>
+<span class="sd">        ``(1 + prob) / 2``.  Default ``0.90`` gives the 5th/95th-percentile</span>
+<span class="sd">        tail, matching ``az.ess(method=&quot;tail&quot;)`` (ArviZ default).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    NDArray of the resulting tail-ESS, with chain and sample dimensions squeezed.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Algorithm:</span>
+
+<span class="sd">    1. Split each chain in half → 2× chains.</span>
+<span class="sd">    2. Compute pooled lower/upper quantiles (at ``(1-prob)/2`` and</span>
+<span class="sd">       ``(1+prob)/2``) across all split chains and draws.</span>
+<span class="sd">    3. Form indicator series :math:`\\mathbf{1}(x \\le q_{\\text{low}})` and</span>
+<span class="sd">       :math:`\\mathbf{1}(x \\ge q_{\\text{high}})`.</span>
+<span class="sd">    4. Compute :func:`effective_sample_size` for each indicator.</span>
+<span class="sd">    5. Return :math:`\\min(\\text{ESS}_\\text{lower}, \\text{ESS}_\\text{upper})`.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. cite:p:`vehtari2021rank`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">_to_standard_axes</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">input_array</span><span class="p">),</span> <span class="n">chain_axis</span><span class="p">,</span> <span class="n">sample_axis</span><span class="p">)</span>
+    <span class="n">x_split</span> <span class="o">=</span> <span class="n">_split_chains</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="n">nchains</span><span class="p">,</span> <span class="n">nsamples</span> <span class="o">=</span> <span class="n">x_split</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x_split</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">extra_shape</span> <span class="o">=</span> <span class="n">x_split</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+
+    <span class="c1"># Tail quantiles derived from the central-interval probability.</span>
+    <span class="n">q_low</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">prob</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="n">q_high</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">prob</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+
+    <span class="c1"># Pooled quantiles over all chains and draws, per trailing dimension.</span>
+    <span class="n">x_flat</span> <span class="o">=</span> <span class="n">x_split</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nchains</span> <span class="o">*</span> <span class="n">nsamples</span><span class="p">,</span> <span class="o">*</span><span class="n">extra_shape</span><span class="p">)</span>
+    <span class="n">q_lo</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">x_flat</span><span class="p">,</span> <span class="n">q_low</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">q_hi</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">x_flat</span><span class="p">,</span> <span class="n">q_high</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Indicator series (float for ESS computation).</span>
+    <span class="c1"># Broadcast q_lo/q_hi over the (nchains, nsamples) leading axes.</span>
+    <span class="n">I_lower</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_split</span> <span class="o">&lt;=</span> <span class="n">q_lo</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">I_upper</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_split</span> <span class="o">&gt;=</span> <span class="n">q_hi</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="n">ess_lower</span> <span class="o">=</span> <span class="n">effective_sample_size</span><span class="p">(</span><span class="n">I_lower</span><span class="p">)</span>
+    <span class="n">ess_upper</span> <span class="o">=</span> <span class="n">effective_sample_size</span><span class="p">(</span><span class="n">I_upper</span><span class="p">)</span>
+
+    <span class="c1"># A NaN draw makes the pooled quantiles NaN, every indicator comparison</span>
+    <span class="c1"># False, and the resulting all-zero series degenerate — which would report</span>
+    <span class="c1"># 0 rather than &quot;undefined&quot;.  Guard once on the reduced value: the</span>
+    <span class="c1"># indicators themselves are never NaN, so the estimator cannot propagate</span>
+    <span class="c1"># this on its own the way it does for ess_bulk.</span>
+    <span class="k">return</span> <span class="n">_propagate_nan_components</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">ess_lower</span><span class="p">,</span> <span class="n">ess_upper</span><span class="p">),</span> <span class="n">x_split</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="pareto_khat">
+<a class="viewcode-back" href="../../autoapi/blackjax/diagnostics/index.html#blackjax.diagnostics.pareto_khat">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">pareto_khat</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">tail</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">tail_frac</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pareto shape parameter k̂ for tail diagnosis.</span>
+
+<span class="sd">    Fits a Generalised Pareto Distribution (GPD) to the upper and/or lower</span>
+<span class="sd">    tail of a 1-D sample and returns the estimated shape parameter k̂.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x</span>
+<span class="sd">        1-D array of draws (or any array; it is ravelled before use).</span>
+<span class="sd">    tail</span>
+<span class="sd">        Which tail to fit: ``&quot;upper&quot;``, ``&quot;lower&quot;``, or ``&quot;both&quot;`` (default).</span>
+<span class="sd">        When ``&quot;both&quot;``, returns the maximum of the two k̂ estimates.</span>
+<span class="sd">    tail_frac</span>
+<span class="sd">        Fraction of samples used as the tail. Default 0.10 (10 %).</span>
+<span class="sd">        A minimum of 5 tail samples is always enforced.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Scalar Array: the Pareto shape estimate k̂.  Values below 0.5 indicate</span>
+<span class="sd">    reliable tail estimates; 0.5–0.7 are moderate; above 0.7 may be</span>
+<span class="sd">    unreliable.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Uses the Zhang &amp; Stephens (2009) empirical-Bayes estimator implemented</span>
+<span class="sd">    in the internal :func:`_gpdfit`.  The upper tail is modelled directly;</span>
+<span class="sd">    the lower tail is reflected and modelled as an upper tail.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x_flat</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">x_flat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">tail_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">tail_frac</span> <span class="o">*</span> <span class="n">n</span><span class="p">),</span> <span class="mi">5</span><span class="p">)</span>
+
+    <span class="n">x_sorted</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">x_flat</span><span class="p">)</span>  <span class="c1"># ascending</span>
+
+    <span class="k">if</span> <span class="n">tail</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="s2">&quot;both&quot;</span><span class="p">):</span>
+        <span class="n">upper_tail</span> <span class="o">=</span> <span class="n">x_sorted</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">tail_size</span> <span class="p">:]</span>
+        <span class="n">threshold_upper</span> <span class="o">=</span> <span class="n">x_sorted</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">tail_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">exc_upper</span> <span class="o">=</span> <span class="n">upper_tail</span> <span class="o">-</span> <span class="n">threshold_upper</span>  <span class="c1"># &gt;= 0, ascending</span>
+        <span class="n">k_upper</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_gpdfit</span><span class="p">(</span><span class="n">exc_upper</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">tail</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="s2">&quot;both&quot;</span><span class="p">):</span>
+        <span class="c1"># Reflect the lower tail so it becomes an upper-tail problem.</span>
+        <span class="n">lower_tail_reflected</span> <span class="o">=</span> <span class="o">-</span><span class="n">x_sorted</span><span class="p">[:</span><span class="n">tail_size</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># ascending</span>
+        <span class="n">threshold_lower</span> <span class="o">=</span> <span class="o">-</span><span class="n">x_sorted</span><span class="p">[</span><span class="n">tail_size</span><span class="p">]</span>
+        <span class="n">exc_lower</span> <span class="o">=</span> <span class="n">lower_tail_reflected</span> <span class="o">-</span> <span class="n">threshold_lower</span>  <span class="c1"># &gt;= 0, ascending</span>
+        <span class="n">k_lower</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_gpdfit</span><span class="p">(</span><span class="n">exc_lower</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">tail</span> <span class="o">==</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">k_upper</span>
+    <span class="k">if</span> <span class="n">tail</span> <span class="o">==</span> <span class="s2">&quot;lower&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">k_lower</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">k_upper</span><span class="p">,</span> <span class="n">k_lower</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_gpdfit</span><span class="p">(</span><span class="n">exceedances</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">Array</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Empirical Bayes GPD fit via Zhang &amp; Stephens (2009).</span>
+
+<span class="sd">    Fits a Generalised Pareto Distribution to ``exceedances`` (a 1-D array of</span>
+<span class="sd">    non-negative values in *ascending* order) using the Bayesian model-averaging</span>
+<span class="sd">    estimator.  All operations on fixed-shape arrays so the function is</span>
+<span class="sd">    JIT-compatible (``exceedances.shape[0]`` must be static).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">exceedances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># static at trace time</span>
+    <span class="n">prior_bs</span><span class="p">,</span> <span class="n">prior_k</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">10</span>
+    <span class="n">m_est</span> <span class="o">=</span> <span class="mi">30</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">**</span><span class="mf">0.5</span><span class="p">)</span>  <span class="c1"># static</span>
+
+    <span class="c1"># Guard against the degenerate case where all exceedances are zero</span>
+    <span class="c1"># (e.g. all importance weights equal).  In that case k=0, sigma=0</span>
+    <span class="c1"># and the caller will leave the tail unchanged.</span>
+    <span class="n">tiny</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">exceedances</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">tiny</span>
+    <span class="n">is_degenerate</span> <span class="o">=</span> <span class="n">exceedances</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">tiny</span>
+    <span class="n">safe_exc</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_degenerate</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">exceedances</span><span class="p">),</span> <span class="n">exceedances</span><span class="p">)</span>
+
+    <span class="c1"># Grid of candidate rate parameters b.</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">m_est</span> <span class="o">/</span> <span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m_est</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">))</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">b</span> <span class="o">/</span> <span class="p">(</span><span class="n">prior_bs</span> <span class="o">*</span> <span class="n">safe_exc</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">b</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">safe_exc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># k estimate for each b (mean log1p).</span>
+    <span class="n">k_ary</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="o">-</span><span class="n">b</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">safe_exc</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Profile log-likelihood weights.</span>
+    <span class="n">len_scale</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="o">-</span><span class="n">b</span> <span class="o">/</span> <span class="n">k_ary</span><span class="p">)</span> <span class="o">-</span> <span class="n">k_ary</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">len_scale</span> <span class="o">-</span> <span class="n">jax</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">logsumexp</span><span class="p">(</span><span class="n">len_scale</span><span class="p">))</span>
+
+    <span class="c1"># Posterior mean of b, then derive k and sigma.</span>
+    <span class="n">b_post</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">b</span> <span class="o">*</span> <span class="n">w</span><span class="p">)</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="o">-</span><span class="n">b_post</span> <span class="o">*</span> <span class="n">safe_exc</span><span class="p">))</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="o">-</span><span class="n">k</span> <span class="o">/</span> <span class="n">b_post</span>
+    <span class="c1"># Weakly informative prior shrinks k toward 0.5.</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="n">k</span> <span class="o">+</span> <span class="n">prior_k</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="n">prior_k</span><span class="p">)</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_degenerate</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(()),</span> <span class="n">k</span><span class="p">)</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_degenerate</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(()),</span> <span class="n">sigma</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">k</span><span class="p">,</span> <span class="n">sigma</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_gpinv</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">sigma</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;GPD quantile function (inverse CDF).&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">jnp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-10</span><span class="p">,</span>
+        <span class="o">-</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="o">-</span><span class="n">p</span><span class="p">),</span>
+        <span class="n">sigma</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">expm1</span><span class="p">(</span><span class="o">-</span><span class="n">k</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="o">-</span><span class="n">p</span><span class="p">))</span> <span class="o">/</span> <span class="n">k</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="psis_weights">
+<a class="viewcode-back" href="../../autoapi/blackjax/diagnostics/index.html#blackjax.diagnostics.psis_weights">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">psis_weights</span><span class="p">(</span><span class="n">log_ratios</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">r_eff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">Array</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pareto Smoothed Importance Sampling (PSIS) log weights.</span>
+
+<span class="sd">    Implements the PSIS smoothing step from :cite:p:`vehtari2017practical`:</span>
+<span class="sd">    the ``M`` largest importance ratios (in ratio space) are replaced by sorted</span>
+<span class="sd">    Generalised Pareto quantiles fitted by the empirical Bayes estimator of</span>
+<span class="sd">    Zhang &amp; Stephens (2009), then all weights are normalised.</span>
+
+<span class="sd">    This is a pure-JAX, JIT-compatible implementation faithful to Algorithm 1</span>
+<span class="sd">    of Vehtari, Gelman &amp; Gabry (2017).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    log_ratios</span>
+<span class="sd">        Log importance ratios ``log p(θ) − log q(θ)``, shape ``(n,)``.</span>
+<span class="sd">        Need not be normalised.</span>
+<span class="sd">    r_eff</span>
+<span class="sd">        Relative effective sample size of the proposal, ``S_eff / n``.</span>
+<span class="sd">        Use the default of ``1.0`` for i.i.d. draws (e.g. Pathfinder);</span>
+<span class="sd">        set to the actual ESS ratio for correlated MCMC chains.  Values</span>
+<span class="sd">        below 1 increase the tail size ``M`` to compensate for correlation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    log_weights</span>
+<span class="sd">        Normalised log importance weights, shape ``(n,)``.</span>
+<span class="sd">        ``jnp.exp(log_weights).sum() == 1`` up to floating-point precision.</span>
+<span class="sd">    pareto_k</span>
+<span class="sd">        Pareto shape parameter estimate (scalar ``Array``).  Values below 0.5</span>
+<span class="sd">        indicate reliable estimates; 0.5–0.7 are moderate; above 0.7 may give</span>
+<span class="sd">        unreliable estimates.  ``jnp.inf`` means the tail was too small to fit</span>
+<span class="sd">        (fewer than 5 samples).</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Tail size: ``M = min(floor(3*sqrt(n/r_eff)), n//5)``, matching the paper.</span>
+<span class="sd">    The GPD is only applied when ``k &gt;= 1/3``; lighter tails are left</span>
+<span class="sd">    unsmoothed (only normalised).  Fitting uses empirical Bayes in</span>
+<span class="sd">    importance-ratio space, the same approach as ArviZ.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">log_ratios</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="n">r_eff</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">),</span> <span class="mi">5</span><span class="p">),</span> <span class="n">n</span> <span class="o">//</span> <span class="mi">5</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">M</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="c1"># Too few tail samples for a reliable GPD fit; return normalised</span>
+        <span class="c1"># weights and k=inf to signal this to the caller.</span>
+        <span class="n">log_w</span> <span class="o">=</span> <span class="n">log_ratios</span> <span class="o">-</span> <span class="n">jax</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">logsumexp</span><span class="p">(</span><span class="n">log_ratios</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">log_w</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+
+    <span class="c1"># Stabilise numerically.</span>
+    <span class="n">lw</span> <span class="o">=</span> <span class="n">log_ratios</span> <span class="o">-</span> <span class="n">log_ratios</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+    <span class="c1"># Sort ascending so that the M largest are at positions [n-M:].</span>
+    <span class="n">sorted_idx</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">lw</span><span class="p">)</span>
+    <span class="n">lw_sorted</span> <span class="o">=</span> <span class="n">lw</span><span class="p">[</span><span class="n">sorted_idx</span><span class="p">]</span>
+
+    <span class="c1"># Threshold: largest value below the tail (in log and ratio space).</span>
+    <span class="n">threshold_log</span> <span class="o">=</span> <span class="n">lw_sorted</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">M</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">threshold_ratio</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">threshold_log</span><span class="p">)</span>
+
+    <span class="c1"># Work in ratio (non-log) space for GPD fitting, as in the original paper.</span>
+    <span class="n">tail_ratio</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">lw_sorted</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">M</span> <span class="p">:])</span>  <span class="c1"># ascending, shape (M,)</span>
+    <span class="n">exceedances</span> <span class="o">=</span> <span class="n">tail_ratio</span> <span class="o">-</span> <span class="n">threshold_ratio</span>  <span class="c1"># &gt;= 0, ascending</span>
+
+    <span class="n">k</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="n">_gpdfit</span><span class="p">(</span><span class="n">exceedances</span><span class="p">)</span>
+
+    <span class="c1"># Uniform quantile positions within the tail: (0.5/M, 1.5/M, ..., (M-0.5)/M).</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">M</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">/</span> <span class="n">M</span>  <span class="c1"># ascending</span>
+    <span class="n">smoothed</span> <span class="o">=</span> <span class="n">threshold_ratio</span> <span class="o">+</span> <span class="n">_gpinv</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+    <span class="c1"># Cap smoothed values at the observed tail maximum.</span>
+    <span class="n">smoothed</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">smoothed</span><span class="p">,</span> <span class="n">tail_ratio</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># Only replace the tail when k &gt;= 1/3 (paper Algorithm 1, step 7).</span>
+    <span class="c1"># For lighter tails the raw order statistics are already reliable.</span>
+    <span class="n">lw_smooth</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">k</span> <span class="o">&gt;=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">,</span>
+        <span class="n">lw_sorted</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="n">M</span> <span class="p">:]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">smoothed</span><span class="p">)),</span>
+        <span class="n">lw_sorted</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Restore original ordering and normalise.</span>
+    <span class="n">lw_orig</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lw_smooth</span><span class="p">)</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">sorted_idx</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">lw_smooth</span><span class="p">)</span>
+    <span class="n">log_w</span> <span class="o">=</span> <span class="n">lw_orig</span> <span class="o">-</span> <span class="n">jax</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">logsumexp</span><span class="p">(</span><span class="n">lw_orig</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">log_w</span><span class="p">,</span> <span class="n">k</span></div>
+
+
+
+<div class="viewcode-block" id="DivergenceConcentrationReport">
+<a class="viewcode-back" href="../../autoapi/blackjax/diagnostics/index.html#blackjax.diagnostics.DivergenceConcentrationReport">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DivergenceConcentrationReport</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Per-run divergence-concentration diagnostic report.</span>
+
+<span class="sd">    All fields are plain JAX numerics — no strings — so the statistic</span>
+<span class="sd">    itself stays JIT-compilable.  Pass the report to</span>
+<span class="sd">    :func:`format_divergence_warning` to render a human-readable message</span>
+<span class="sd">    from concrete (non-traced) values.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    warn</span>
+<span class="sd">        Bool. Whether a minority of chains (see the module notes on</span>
+<span class="sd">        :func:`divergence_concentration`) crossed ``rate_threshold``.</span>
+<span class="sd">    flagged</span>
+<span class="sd">        Bool array, shape ``(n_chains,)``. Which chains crossed</span>
+<span class="sd">        ``rate_threshold``, independent of whether ``warn`` ends up true.</span>
+<span class="sd">    num_flagged</span>
+<span class="sd">        Number of flagged chains, ``flagged.sum()``.</span>
+<span class="sd">    rates</span>
+<span class="sd">        Per-chain sampling-phase divergence rate, shape ``(n_chains,)``.</span>
+<span class="sd">    early_rate, late_rate</span>
+<span class="sd">        Per-chain divergence rate in the first and last quarter of the</span>
+<span class="sd">        sampling draws, shape ``(n_chains,)``. ``NaN`` when computed from</span>
+<span class="sd">        :func:`divergence_concentration_from_counts` (no per-draw</span>
+<span class="sd">        resolution available).</span>
+<span class="sd">    median_other_rate</span>
+<span class="sd">        For each chain, the median ``rates`` value across the *other*</span>
+<span class="sd">        ``n_chains - 1`` chains, shape ``(n_chains,)``. ``NaN`` when</span>
+<span class="sd">        ``n_chains &lt;= 1``.</span>
+<span class="sd">    total_divergences</span>
+<span class="sd">        Total divergence count ``D`` summed over all chains.</span>
+<span class="sd">    num_chains</span>
+<span class="sd">        Number of chains ``M``.</span>
+<span class="sd">    rate_threshold</span>
+<span class="sd">        The threshold that was applied (echoed back for the message /</span>
+<span class="sd">        for callers that only keep the report).</span>
+<span class="sd">    multinomial_p_value</span>
+<span class="sd">        Bonferroni-corrected exchangeable-null tail probability for the</span>
+<span class="sd">        single worst chain, ``min(1, M * P(Binomial(D, 1/M) &gt;= d_max))``.</span>
+<span class="sd">        Context only; never drives ``warn``. ``NaN`` when ``D=0``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DivergenceConcentrationReport.warn">
+<a class="viewcode-back" href="../../autoapi/blackjax/diagnostics/index.html#blackjax.diagnostics.DivergenceConcentrationReport.warn">[docs]</a>
+    <span class="n">warn</span><span class="p">:</span> <span class="n">Array</span></div>
+
+<div class="viewcode-block" id="DivergenceConcentrationReport.flagged">
+<a class="viewcode-back" href="../../autoapi/blackjax/diagnostics/index.html#blackjax.diagnostics.DivergenceConcentrationReport.flagged">[docs]</a>
+    <span class="n">flagged</span><span class="p">:</span> <span class="n">Array</span></div>
+
+<div class="viewcode-block" id="DivergenceConcentrationReport.num_flagged">
+<a class="viewcode-back" href="../../autoapi/blackjax/diagnostics/index.html#blackjax.diagnostics.DivergenceConcentrationReport.num_flagged">[docs]</a>
+    <span class="n">num_flagged</span><span class="p">:</span> <span class="n">Array</span></div>
+
+<div class="viewcode-block" id="DivergenceConcentrationReport.rates">
+<a class="viewcode-back" href="../../autoapi/blackjax/diagnostics/index.html#blackjax.diagnostics.DivergenceConcentrationReport.rates">[docs]</a>
+    <span class="n">rates</span><span class="p">:</span> <span class="n">Array</span></div>
+
+<div class="viewcode-block" id="DivergenceConcentrationReport.early_rate">
+<a class="viewcode-back" href="../../autoapi/blackjax/diagnostics/index.html#blackjax.diagnostics.DivergenceConcentrationReport.early_rate">[docs]</a>
+    <span class="n">early_rate</span><span class="p">:</span> <span class="n">Array</span></div>
+
+<div class="viewcode-block" id="DivergenceConcentrationReport.late_rate">
+<a class="viewcode-back" href="../../autoapi/blackjax/diagnostics/index.html#blackjax.diagnostics.DivergenceConcentrationReport.late_rate">[docs]</a>
+    <span class="n">late_rate</span><span class="p">:</span> <span class="n">Array</span></div>
+
+<div class="viewcode-block" id="DivergenceConcentrationReport.median_other_rate">
+<a class="viewcode-back" href="../../autoapi/blackjax/diagnostics/index.html#blackjax.diagnostics.DivergenceConcentrationReport.median_other_rate">[docs]</a>
+    <span class="n">median_other_rate</span><span class="p">:</span> <span class="n">Array</span></div>
+
+<div class="viewcode-block" id="DivergenceConcentrationReport.total_divergences">
+<a class="viewcode-back" href="../../autoapi/blackjax/diagnostics/index.html#blackjax.diagnostics.DivergenceConcentrationReport.total_divergences">[docs]</a>
+    <span class="n">total_divergences</span><span class="p">:</span> <span class="n">Array</span></div>
+
+<div class="viewcode-block" id="DivergenceConcentrationReport.num_chains">
+<a class="viewcode-back" href="../../autoapi/blackjax/diagnostics/index.html#blackjax.diagnostics.DivergenceConcentrationReport.num_chains">[docs]</a>
+    <span class="n">num_chains</span><span class="p">:</span> <span class="n">Array</span></div>
+
+<div class="viewcode-block" id="DivergenceConcentrationReport.rate_threshold">
+<a class="viewcode-back" href="../../autoapi/blackjax/diagnostics/index.html#blackjax.diagnostics.DivergenceConcentrationReport.rate_threshold">[docs]</a>
+    <span class="n">rate_threshold</span><span class="p">:</span> <span class="n">Array</span></div>
+
+<div class="viewcode-block" id="DivergenceConcentrationReport.multinomial_p_value">
+<a class="viewcode-back" href="../../autoapi/blackjax/diagnostics/index.html#blackjax.diagnostics.DivergenceConcentrationReport.multinomial_p_value">[docs]</a>
+    <span class="n">multinomial_p_value</span><span class="p">:</span> <span class="n">Array</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="divergence_concentration">
+<a class="viewcode-back" href="../../autoapi/blackjax/diagnostics/index.html#blackjax.diagnostics.divergence_concentration">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">divergence_concentration</span><span class="p">(</span>
+    <span class="n">is_divergent</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">rate_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.02</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DivergenceConcentrationReport</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Flag a run where sampling-phase divergences concentrate on a minority of chains.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    is_divergent</span>
+<span class="sd">        Per-draw divergence flags (bool or 0/1) for the sampling</span>
+<span class="sd">        (post-warmup) phase only, shape ``(n_chains, n_draws)``.</span>
+<span class="sd">    rate_threshold</span>
+<span class="sd">        Minimum per-chain divergence rate for chain ``k`` to count as</span>
+<span class="sd">        flagged. Default ``0.02`` (2%).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    :class:`DivergenceConcentrationReport`. ``warn`` is true iff between</span>
+<span class="sd">    1 and ``max(1, n_chains // 4)`` chains are flagged -- a</span>
+<span class="sd">    minority-outlier trigger; an ensemble where most/all chains cross the</span>
+<span class="sd">    threshold returns populated fields but no warning.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - Counting is sampling-phase only; warmup divergences are out of scope.</span>
+<span class="sd">    - Concatenating warmup draws in front of sampling draws dilutes a real</span>
+<span class="sd">      signal below threshold rather than raising a false alarm -- slice to</span>
+<span class="sd">      sampling draws only before calling this.</span>
+<span class="sd">    - ``multinomial_p_value`` is context only; it never decides ``warn``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># NaN must flag, not silently pass.</span>
+    <span class="n">is_divergent</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">is_divergent</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">n_draws</span> <span class="o">=</span> <span class="n">is_divergent</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">num_chains</span> <span class="o">=</span> <span class="n">is_divergent</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">is_divergent</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">quarter</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">n_draws</span> <span class="o">//</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">early_rate</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">is_divergent</span><span class="p">[:,</span> <span class="p">:</span><span class="n">quarter</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">quarter</span>
+    <span class="n">late_rate</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">is_divergent</span><span class="p">[:,</span> <span class="n">n_draws</span> <span class="o">-</span> <span class="n">quarter</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">quarter</span>
+
+    <span class="k">return</span> <span class="n">_divergence_concentration_core</span><span class="p">(</span>
+        <span class="n">counts</span><span class="p">,</span>
+        <span class="n">n_draws</span><span class="p">,</span>
+        <span class="n">num_chains</span><span class="p">,</span>
+        <span class="n">early_rate</span><span class="p">,</span>
+        <span class="n">late_rate</span><span class="p">,</span>
+        <span class="n">rate_threshold</span><span class="o">=</span><span class="n">rate_threshold</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="divergence_concentration_from_counts">
+<a class="viewcode-back" href="../../autoapi/blackjax/diagnostics/index.html#blackjax.diagnostics.divergence_concentration_from_counts">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">divergence_concentration_from_counts</span><span class="p">(</span>
+    <span class="n">chain_divergence_counts</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+    <span class="n">n_draws</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">rate_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.02</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DivergenceConcentrationReport</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Same as :func:`divergence_concentration`, from precomputed per-chain counts.</span>
+
+<span class="sd">    Use when per-draw flags are not retained but per-chain totals are.</span>
+<span class="sd">    ``early_rate`` / ``late_rate`` are ``NaN`` (no per-draw resolution for</span>
+<span class="sd">    a quarter profile); :func:`format_divergence_warning` omits that part</span>
+<span class="sd">    of the message rather than printing &quot;nan%&quot;.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    chain_divergence_counts</span>
+<span class="sd">        Per-chain divergence counts for the sampling phase, shape</span>
+<span class="sd">        ``(n_chains,)``.</span>
+<span class="sd">    n_draws</span>
+<span class="sd">        Number of sampling draws per chain.</span>
+<span class="sd">    rate_threshold</span>
+<span class="sd">        See :func:`divergence_concentration`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    :class:`DivergenceConcentrationReport`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># NaN must flag (as fully divergent), not silently pass.</span>
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">chain_divergence_counts</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">n_draws</span><span class="p">)),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">n_draws</span><span class="p">))</span>
+    <span class="n">num_chains</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">nan_quarters</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">num_chains</span><span class="p">,),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_divergence_concentration_core</span><span class="p">(</span>
+        <span class="n">counts</span><span class="p">,</span>
+        <span class="n">n_draws</span><span class="p">,</span>
+        <span class="n">num_chains</span><span class="p">,</span>
+        <span class="n">nan_quarters</span><span class="p">,</span>
+        <span class="n">nan_quarters</span><span class="p">,</span>
+        <span class="n">rate_threshold</span><span class="o">=</span><span class="n">rate_threshold</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_divergence_concentration_core</span><span class="p">(</span>
+    <span class="n">counts</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+    <span class="n">n_draws</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">num_chains</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">early_rate</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+    <span class="n">late_rate</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">rate_threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DivergenceConcentrationReport</span><span class="p">:</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">max_count</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">rates</span> <span class="o">=</span> <span class="n">counts</span> <span class="o">/</span> <span class="n">n_draws</span>
+    <span class="n">flagged</span> <span class="o">=</span> <span class="n">rates</span> <span class="o">&gt;=</span> <span class="n">rate_threshold</span>
+    <span class="n">num_flagged</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">flagged</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">cap</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_chains</span> <span class="o">//</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="n">warn</span> <span class="o">=</span> <span class="p">(</span><span class="n">num_flagged</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">num_flagged</span> <span class="o">&lt;=</span> <span class="n">cap</span><span class="p">)</span>
+
+    <span class="c1"># Static per-chain index gather keeps this jit-safe (num_chains is a</span>
+    <span class="c1"># Python int); no &quot;others&quot; exist when num_chains == 1.</span>
+    <span class="k">if</span> <span class="n">num_chains</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">median_other_rate</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">jnp</span><span class="o">.</span><span class="n">median</span><span class="p">(</span>
+                    <span class="n">rates</span><span class="p">[</span>
+                        <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_chains</span><span class="p">)])</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_chains</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">median_other_rate</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">num_chains</span><span class="p">,),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+    <span class="c1"># Exact binomial tail via the regularized incomplete beta function;</span>
+    <span class="c1"># D == 0 is guarded so betainc never sees a == 0.</span>
+    <span class="n">has_divergences</span> <span class="o">=</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="n">safe_total</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">has_divergences</span><span class="p">,</span> <span class="n">total</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">safe_max</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">has_divergences</span><span class="p">,</span> <span class="n">max_count</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">tail</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">betainc</span><span class="p">(</span>
+        <span class="n">safe_max</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">safe_total</span> <span class="o">-</span> <span class="n">safe_max</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span>
+        <span class="mf">1.0</span> <span class="o">/</span> <span class="n">num_chains</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">p_value</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">has_divergences</span><span class="p">,</span>
+        <span class="n">jnp</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">num_chains</span> <span class="o">*</span> <span class="n">tail</span><span class="p">),</span>
+        <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">DivergenceConcentrationReport</span><span class="p">(</span>
+        <span class="n">warn</span><span class="o">=</span><span class="n">warn</span><span class="p">,</span>
+        <span class="n">flagged</span><span class="o">=</span><span class="n">flagged</span><span class="p">,</span>
+        <span class="n">num_flagged</span><span class="o">=</span><span class="n">num_flagged</span><span class="p">,</span>
+        <span class="n">rates</span><span class="o">=</span><span class="n">rates</span><span class="p">,</span>
+        <span class="n">early_rate</span><span class="o">=</span><span class="n">early_rate</span><span class="p">,</span>
+        <span class="n">late_rate</span><span class="o">=</span><span class="n">late_rate</span><span class="p">,</span>
+        <span class="n">median_other_rate</span><span class="o">=</span><span class="n">median_other_rate</span><span class="p">,</span>
+        <span class="n">total_divergences</span><span class="o">=</span><span class="n">total</span><span class="p">,</span>
+        <span class="n">num_chains</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">num_chains</span><span class="p">),</span>
+        <span class="n">rate_threshold</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">rate_threshold</span><span class="p">),</span>
+        <span class="n">multinomial_p_value</span><span class="o">=</span><span class="n">p_value</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="format_divergence_warning">
+<a class="viewcode-back" href="../../autoapi/blackjax/diagnostics/index.html#blackjax.diagnostics.format_divergence_warning">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">format_divergence_warning</span><span class="p">(</span><span class="n">report</span><span class="p">:</span> <span class="n">DivergenceConcentrationReport</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render a :class:`DivergenceConcentrationReport` as a human-readable message.</span>
+
+<span class="sd">    Returns ``&quot;&quot;`` when ``report.warn`` is false. Otherwise returns one</span>
+<span class="sd">    sentence per flagged chain (newline-separated when more than one</span>
+<span class="sd">    chain is flagged). Not JIT-compatible by design — call it on concrete</span>
+<span class="sd">    report values (e.g. after a sampling run has completed), not inside</span>
+<span class="sd">    traced code.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    report</span>
+<span class="sd">        A report produced by :func:`divergence_concentration` or</span>
+<span class="sd">        :func:`divergence_concentration_from_counts`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``str``, empty when there is nothing to warn about.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">warn</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">flagged</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">flagged</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">flagged</span><span class="p">):</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">pct</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%.1f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">rates</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">*</span> <span class="mf">100.0</span><span class="p">)</span>
+        <span class="n">median</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%.1f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">median_other_rate</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">*</span> <span class="mf">100.0</span><span class="p">)</span>
+        <span class="n">early</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">early_rate</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+        <span class="n">late</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">late_rate</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">early</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">late</span><span class="p">):</span>
+            <span class="n">early_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%.1f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">early</span> <span class="o">*</span> <span class="mf">100.0</span><span class="p">)</span>
+            <span class="n">late_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%.1f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">late</span> <span class="o">*</span> <span class="mf">100.0</span><span class="p">)</span>
+            <span class="n">quarters</span> <span class="o">=</span> <span class="s2">&quot; (</span><span class="si">{}% i</span><span class="s2">n the first quarter, </span><span class="si">{}% i</span><span class="s2">n the last)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">early_str</span><span class="p">,</span>
+                <span class="n">late_str</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">quarters</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;chain </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">pct</span><span class="si">}</span><span class="s2">% of its sampling draws diverged</span><span class="si">{</span><span class="n">quarters</span><span class="si">}</span><span class="s2"> — &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;significantly more than the other chains (</span><span class="si">{</span><span class="n">median</span><span class="si">}</span><span class="s2">% median)&quot;</span>
+            <span class="s2">&quot;; draws from this chain, especially early ones, may be &quot;</span>
+            <span class="s2">&quot;untrustworthy.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
 
 </pre></div>
 
@@ -629,7 +1663,7 @@ By The Blackjax developers
 
   <p class="copyright">
     
-      © Copyright 2025, The Blackjax developers.
+      © Copyright 2026, The Blackjax developers.
       <br/>
     
   </p>
@@ -653,8 +1687,8 @@ By The Blackjax developers
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
   </footer>

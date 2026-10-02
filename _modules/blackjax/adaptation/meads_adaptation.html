@@ -15,40 +15,44 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=e37d73aa" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="../../../_static/documentation_options.js?v=9eb32ce0"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/blackjax/adaptation/meads_adaptation';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.1.dev1+g351bb9a14" />
   </head>
   
   
@@ -64,19 +68,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../../../search.html"
       method="get">
@@ -84,7 +77,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search..."
          aria-label="Search..."
          autocomplete="off"
@@ -92,8 +84,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -111,7 +103,8 @@
       
         
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -141,30 +134,29 @@
     
     
     <img src="../../../_static/blackjax.png" class="logo__image only-light" alt=" - Home"/>
-    <script>document.write(`<img src="../../../_static/blackjax.png" class="logo__image only-dark" alt=" - Home"/>`);</script>
+    <img src="../../../_static/blackjax.png" class="logo__image only-dark pst-js-only" alt=" - Home"/>
   
   
 </a></div>
         <div class="sidebar-primary-item">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script></div>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/diagnostics.html">MCMC Diagnostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/speed_up_guide.html">Speed-up Guide</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">PPL INTEGRATION</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_aesara.html">Aesara</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_pytensor.html">PyTensor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_numpyro.html">Numpyro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_funsor.html">Funsor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_oryx.html">Oryx</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_pymc.html">PyMC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_tfp.html">Tensorflow-Probability</a></li>
@@ -172,9 +164,11 @@
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">HOW TO</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_sample_multiple_chains.html">Sample with multiple chains?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_progress_bar.html">Show progress during sampling?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_custom_gradients.html">Use custom gradients?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_other_frameworks.html">Use non-JAX log-prob functions?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_metropolis_within_gibbs.html">Build a Metropolis-Within-Gibbs sampler?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_laplace_hmc.html">Use Laplace-preconditioned HMC?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_reproduce_the_blackjax_image.html">Sample from the word BlackJAX using BlackJAX?</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">LEARN BY EXAMPLE</span></p>
@@ -188,25 +182,52 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/adjusted_mclmc_adaptation/index.html">blackjax.adaptation.adjusted_mclmc_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/base/index.html">blackjax.adaptation.base</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/chees_adaptation/index.html">blackjax.adaptation.chees_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/laps/index.html">blackjax.adaptation.laps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/laps_burn_in/index.html">blackjax.adaptation.laps_burn_in</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/low_rank_adaptation/index.html">blackjax.adaptation.low_rank_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/mass_matrix/index.html">blackjax.adaptation.mass_matrix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/mclmc_adaptation/index.html">blackjax.adaptation.mclmc_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/mclmc_lrd_adaptation/index.html">blackjax.adaptation.mclmc_lrd_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/meads_adaptation/index.html">blackjax.adaptation.meads_adaptation</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/meta/index.html">blackjax.adaptation.meta</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/meta/builders/index.html">blackjax.adaptation.meta.builders</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/meta/verdict/index.html">blackjax.adaptation.meta.verdict</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/meta_adaptation/index.html">blackjax.adaptation.meta_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/metric_buffers/index.html">blackjax.adaptation.metric_buffers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/metric_estimators/index.html">blackjax.adaptation.metric_estimators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/metric_recipes/index.html">blackjax.adaptation.metric_recipes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/pathfinder_adaptation/index.html">blackjax.adaptation.pathfinder_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/staged_adaptation/index.html">blackjax.adaptation.staged_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/step_size/index.html">blackjax.adaptation.step_size</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/adaptation/window_adaptation/index.html">blackjax.adaptation.window_adaptation</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../autoapi/blackjax/diagnostics/index.html">blackjax.diagnostics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../autoapi/blackjax/eca/index.html">blackjax.eca</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/index.html">blackjax.mcmc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/adjusted_mclmc/index.html">blackjax.mcmc.adjusted_mclmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/adjusted_mclmc_dynamic/index.html">blackjax.mcmc.adjusted_mclmc_dynamic</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/barker/index.html">blackjax.mcmc.barker</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/composed/index.html">blackjax.mcmc.composed</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/composed/step_size/index.html">blackjax.mcmc.composed.step_size</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/composed/trajectory_length/index.html">blackjax.mcmc.composed.trajectory_length</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/coupled_hmc/index.html">blackjax.mcmc.coupled_hmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/diffusions/index.html">blackjax.mcmc.diffusions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/dynamic_hmc/index.html">blackjax.mcmc.dynamic_hmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/elliptical_slice/index.html">blackjax.mcmc.elliptical_slice</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/ghmc/index.html">blackjax.mcmc.ghmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/gist/index.html">blackjax.mcmc.gist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/gist_step_size/index.html">blackjax.mcmc.gist_step_size</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/gist_trajectory_length/index.html">blackjax.mcmc.gist_trajectory_length</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/hmc/index.html">blackjax.mcmc.hmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/integrators/index.html">blackjax.mcmc.integrators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/laplace_dynamic_hmc/index.html">blackjax.mcmc.laplace_dynamic_hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/laplace_hmc/index.html">blackjax.mcmc.laplace_hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/laplace_marginal/index.html">blackjax.mcmc.laplace_marginal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/mala/index.html">blackjax.mcmc.mala</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/marginal_latent_gaussian/index.html">blackjax.mcmc.marginal_latent_gaussian</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/mclmc/index.html">blackjax.mcmc.mclmc</a></li>
@@ -216,10 +237,21 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/proposal/index.html">blackjax.mcmc.proposal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/random_walk/index.html">blackjax.mcmc.random_walk</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/rmhmc/index.html">blackjax.mcmc.rmhmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/slice/index.html">blackjax.mcmc.slice</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/termination/index.html">blackjax.mcmc.termination</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/mcmc/trajectory/index.html">blackjax.mcmc.trajectory</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../autoapi/blackjax/ns/index.html">blackjax.ns</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/ns/adaptive/index.html">blackjax.ns.adaptive</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/ns/base/index.html">blackjax.ns.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/ns/from_mcmc/index.html">blackjax.ns.from_mcmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/ns/integrator/index.html">blackjax.ns.integrator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/ns/nss/index.html">blackjax.ns.nss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/ns/utils/index.html">blackjax.ns.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../autoapi/blackjax/progress_reader/index.html">blackjax.progress_reader</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../autoapi/blackjax/sgmcmc/index.html">blackjax.sgmcmc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/sgmcmc/csgld/index.html">blackjax.sgmcmc.csgld</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/sgmcmc/diffusions/index.html">blackjax.sgmcmc.diffusions</a></li>
@@ -230,12 +262,14 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../autoapi/blackjax/smc/index.html">blackjax.smc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/adaptive_persistent_sampling/index.html">blackjax.smc.adaptive_persistent_sampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/adaptive_tempered/index.html">blackjax.smc.adaptive_tempered</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/base/index.html">blackjax.smc.base</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/ess/index.html">blackjax.smc.ess</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/from_mcmc/index.html">blackjax.smc.from_mcmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/inner_kernel_tuning/index.html">blackjax.smc.inner_kernel_tuning</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/partial_posteriors_path/index.html">blackjax.smc.partial_posteriors_path</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/persistent_sampling/index.html">blackjax.smc.persistent_sampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/pretuning/index.html">blackjax.smc.pretuning</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/resampling/index.html">blackjax.smc.resampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/smc/solver/index.html">blackjax.smc.solver</a></li>
@@ -249,7 +283,9 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../autoapi/blackjax/vi/index.html">blackjax.vi</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/vi/fullrank_vi/index.html">blackjax.vi.fullrank_vi</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/vi/meanfield_vi/index.html">blackjax.vi.meanfield_vi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/vi/multipathfinder/index.html">blackjax.vi.multipathfinder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/vi/pathfinder/index.html">blackjax.vi.pathfinder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/vi/schrodinger_follmer/index.html">blackjax.vi.schrodinger_follmer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../autoapi/blackjax/vi/svgd/index.html">blackjax.vi.svgd</a></li>
@@ -259,6 +295,11 @@
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../bib.html">Bibliography</a></li>
 </ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">DEVELOPER DOCUMENTATION</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../developer/design_principles.html">Design Principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer/new_algorithm_guide.html">Contributing a New Algorithm</a></li>
+</ul>
 
     </div>
 </nav></div>
@@ -266,9 +307,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -318,7 +364,7 @@
 
 
 <button onclick="toggleFullScreen()"
-  class="btn btn-sm btn-fullscreen-button"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
   title="Fullscreen mode"
   data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
@@ -332,24 +378,16 @@
 
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-  </button>
-`);
-</script>
+</button>
 
 </div></div>
       
@@ -393,10 +431,14 @@ document.write(`
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jax.flatten_util</span><span class="w"> </span><span class="kn">import</span> <span class="n">ravel_pytree</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">blackjax.mcmc</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mcmc</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">blackjax.adaptation.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AdaptationResults</span><span class="p">,</span> <span class="n">return_all_adapt_info</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blackjax.adaptation.metric_buffers</span><span class="w"> </span><span class="kn">import</span> <span class="n">MomentBlock</span><span class="p">,</span> <span class="n">cgl_update_batch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blackjax.adaptation.metric_estimators</span><span class="w"> </span><span class="kn">import</span> <span class="n">sample_covariance_eigh_low_rank</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">blackjax.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AdaptationAlgorithm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blackjax.mcmc.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">LowRankInverseMassMatrix</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">blackjax.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">ArrayLikeTree</span><span class="p">,</span> <span class="n">ArrayTree</span><span class="p">,</span> <span class="n">PRNGKey</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;MEADSAdaptationState&quot;</span><span class="p">,</span> <span class="s2">&quot;base&quot;</span><span class="p">,</span> <span class="s2">&quot;maximum_eigenvalue&quot;</span><span class="p">,</span> <span class="s2">&quot;meads_adaptation&quot;</span><span class="p">]</span>
@@ -407,16 +449,17 @@ document.write(`
 <span class="k">class</span><span class="w"> </span><span class="nc">MEADSAdaptationState</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;State of the MEADS adaptation scheme.</span>
 
+<span class="sd">    current_iteration</span>
+<span class="sd">        Current iteration of the adaptation.</span>
 <span class="sd">    step_size</span>
-<span class="sd">        Value of the step_size parameter of the generalized HMC algorithm.</span>
+<span class="sd">        Step size for each fold, shape (num_folds,).</span>
 <span class="sd">    position_sigma</span>
-<span class="sd">        PyTree containing the per dimension sample standard deviation of the</span>
-<span class="sd">        position variable. Used to scale the momentum variable on the generalized</span>
-<span class="sd">        HMC algorithm.</span>
+<span class="sd">        PyTree with per-fold per-dimension sample standard deviation of the</span>
+<span class="sd">        position variable, leading axis has size num_folds.</span>
 <span class="sd">    alpha</span>
-<span class="sd">        Value of the alpha parameter of the generalized HMC algorithm.</span>
+<span class="sd">        Alpha parameter (momentum persistence) for each fold, shape (num_folds,).</span>
 <span class="sd">    delta</span>
-<span class="sd">        Value of the delta parameter of the generalized HMC algorithm.</span>
+<span class="sd">        Delta parameter (slice translation) for each fold, shape (num_folds,).</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -426,7 +469,7 @@ document.write(`
 
 <div class="viewcode-block" id="MEADSAdaptationState.step_size">
 <a class="viewcode-back" href="../../../autoapi/blackjax/adaptation/meads_adaptation/index.html#blackjax.adaptation.meads_adaptation.MEADSAdaptationState.step_size">[docs]</a>
-    <span class="n">step_size</span><span class="p">:</span> <span class="nb">float</span></div>
+    <span class="n">step_size</span><span class="p">:</span> <span class="n">Array</span></div>
 
 <div class="viewcode-block" id="MEADSAdaptationState.position_sigma">
 <a class="viewcode-back" href="../../../autoapi/blackjax/adaptation/meads_adaptation/index.html#blackjax.adaptation.meads_adaptation.MEADSAdaptationState.position_sigma">[docs]</a>
@@ -434,62 +477,81 @@ document.write(`
 
 <div class="viewcode-block" id="MEADSAdaptationState.alpha">
 <a class="viewcode-back" href="../../../autoapi/blackjax/adaptation/meads_adaptation/index.html#blackjax.adaptation.meads_adaptation.MEADSAdaptationState.alpha">[docs]</a>
-    <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span></div>
+    <span class="n">alpha</span><span class="p">:</span> <span class="n">Array</span></div>
 
 <div class="viewcode-block" id="MEADSAdaptationState.delta">
 <a class="viewcode-back" href="../../../autoapi/blackjax/adaptation/meads_adaptation/index.html#blackjax.adaptation.meads_adaptation.MEADSAdaptationState.delta">[docs]</a>
-    <span class="n">delta</span><span class="p">:</span> <span class="nb">float</span></div>
+    <span class="n">delta</span><span class="p">:</span> <span class="n">Array</span></div>
 </div>
 
 
 
 <div class="viewcode-block" id="base">
 <a class="viewcode-back" href="../../../autoapi/blackjax/adaptation/meads_adaptation/index.html#blackjax.adaptation.meads_adaptation.base">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">base</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">base</span><span class="p">(</span>
+    <span class="n">num_folds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="n">step_size_multiplier</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">damping_slowdown</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Maximum-Eigenvalue Adaptation of damping and step size for the generalized</span>
 <span class="sd">    Hamiltonian Monte Carlo kernel :cite:p:`hoffman2022tuning`.</span>
 
+<span class="sd">    Full implementation of Algorithm 3 with K-fold cross-chain adaptation and</span>
+<span class="sd">    chain shuffling. Chains are divided into ``num_folds`` folds; at each step</span>
+<span class="sd">    statistics from fold ``t mod K`` are used to update the parameters for fold</span>
+<span class="sd">    ``(t+1) mod K``. Every K steps all chains are reshuffled across folds.</span>
 
-<span class="sd">    This algorithm performs a cross-chain adaptation scheme for the generalized</span>
-<span class="sd">    HMC algorithm that automatically selects values for the generalized HMC&#39;s</span>
-<span class="sd">    tunable parameters based on statistics collected from a population of many</span>
-<span class="sd">    chains. It uses heuristics determined by the maximum eigenvalue of the</span>
-<span class="sd">    covariance and gradient matrices given by the grouped samples of all chains</span>
-<span class="sd">    with shape.</span>
-
-<span class="sd">    This is an implementation of Algorithm 3 of :cite:p:`hoffman2022tuning` using cross-chain</span>
-<span class="sd">    adaptation instead of parallel ensemble chain adaptation.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    num_folds</span>
+<span class="sd">        Number of folds K to split chains into. Must divide num_chains evenly.</span>
+<span class="sd">    step_size_multiplier</span>
+<span class="sd">        Multiplicative factor applied to the raw step size heuristic (default 0.5</span>
+<span class="sd">        as in the paper).</span>
+<span class="sd">    damping_slowdown</span>
+<span class="sd">        Controls the damping floor in early iterations. The floor on γ is</span>
+<span class="sd">        ``damping_slowdown / (t·ε)``, so higher values force stronger damping</span>
+<span class="sd">        (higher α) in early iterations. Default is 1.0 as in the paper.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    init</span>
-<span class="sd">        Function that initializes the warmup.</span>
+<span class="sd">        Function that initializes the warmup state.</span>
 <span class="sd">    update</span>
-<span class="sd">        Function that moves the warmup one step.</span>
+<span class="sd">        Function that moves the warmup one step forward.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">num_folds</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;num_folds must be &gt;= 1, got </span><span class="si">{</span><span class="n">num_folds</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_parameters</span><span class="p">(</span>
-        <span class="n">positions</span><span class="p">:</span> <span class="n">ArrayLikeTree</span><span class="p">,</span> <span class="n">logdensity_grad</span><span class="p">:</span> <span class="n">ArrayLikeTree</span><span class="p">,</span> <span class="n">current_iteration</span><span class="p">:</span> <span class="nb">int</span>
+        <span class="n">positions</span><span class="p">:</span> <span class="n">ArrayLikeTree</span><span class="p">,</span>
+        <span class="n">logdensity_grad</span><span class="p">:</span> <span class="n">ArrayLikeTree</span><span class="p">,</span>
+        <span class="n">current_iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute values for the parameters based on statistics collected from</span>
-<span class="sd">        multiple chains.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute GHMC parameters from a single fold&#39;s chains.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        positions:</span>
-<span class="sd">            A PyTree that contains the current position of every chains.</span>
-<span class="sd">        logdensity_grad:</span>
-<span class="sd">            A PyTree that contains the gradients of the logdensity</span>
-<span class="sd">            function evaluated at the current position of every chains.</span>
-<span class="sd">        current_iteration:</span>
-<span class="sd">            The current iteration index in the adaptation process.</span>
+<span class="sd">        positions</span>
+<span class="sd">            PyTree with leading axis of size n_per_fold.</span>
+<span class="sd">        logdensity_grad</span>
+<span class="sd">            PyTree with leading axis of size n_per_fold.</span>
+<span class="sd">        current_iteration</span>
+<span class="sd">            Global adaptation iteration index.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        New values of the step size, and the alpha and delta parameters</span>
-<span class="sd">        of the generalized HMC algorithm.</span>
+<span class="sd">        step_size, position_sigma, alpha, delta</span>
 
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This function uses the same chains&#39; positions for both step-size and</span>
+<span class="sd">        damping estimation. The full MEADS algorithm (Algorithm 3) uses</span>
+<span class="sd">        cross-fold statistics: step size comes from the source fold, while</span>
+<span class="sd">        damping uses the target fold&#39;s own positions. ``meads_adaptation``</span>
+<span class="sd">        implements this correctly; this lower-level helper is an approximation</span>
+<span class="sd">        suitable for direct use of ``base()``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">mean_position</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">positions</span><span class="p">)</span>
         <span class="n">sd_position</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">positions</span><span class="p">)</span>
@@ -499,17 +561,24 @@ document.write(`
             <span class="n">mean_position</span><span class="p">,</span>
             <span class="n">sd_position</span><span class="p">,</span>
         <span class="p">)</span>
-
         <span class="n">batch_grad_scaled</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
             <span class="k">lambda</span> <span class="n">grad</span><span class="p">,</span> <span class="n">sd</span><span class="p">:</span> <span class="n">grad</span> <span class="o">*</span> <span class="n">sd</span><span class="p">,</span> <span class="n">logdensity_grad</span><span class="p">,</span> <span class="n">sd_position</span>
         <span class="p">)</span>
 
+        <span class="c1"># Algorithm 3, line 8: ε = min(1, step_size_multiplier / sqrt(λ_max(ḡ)))</span>
         <span class="n">epsilon</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span>
-            <span class="mf">0.5</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">maximum_eigenvalue</span><span class="p">(</span><span class="n">batch_grad_scaled</span><span class="p">)),</span> <span class="mf">1.0</span>
+            <span class="n">step_size_multiplier</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">maximum_eigenvalue</span><span class="p">(</span><span class="n">batch_grad_scaled</span><span class="p">)),</span>
+            <span class="mf">1.0</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="c1"># Algorithm 3, line 9 (paper parameterization):</span>
+        <span class="c1">#   γ = max(1/sqrt(λ_max(θ̄)), damping_slowdown / (t·ε))</span>
+        <span class="c1"># With α = 1 - exp(-2·ε·γ) the floor gives</span>
+        <span class="c1">#   α_floor = 1 - exp(-2·damping_slowdown/t)</span>
+        <span class="c1"># Higher damping_slowdown → higher α_floor → stronger damping in early</span>
+        <span class="c1"># iterations.</span>
         <span class="n">gamma</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span>
             <span class="mf">1.0</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">maximum_eigenvalue</span><span class="p">(</span><span class="n">normalized_positions</span><span class="p">)),</span>
-            <span class="mf">1.0</span> <span class="o">/</span> <span class="p">((</span><span class="n">current_iteration</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">epsilon</span><span class="p">),</span>
+            <span class="n">damping_slowdown</span> <span class="o">/</span> <span class="p">((</span><span class="n">current_iteration</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">epsilon</span><span class="p">),</span>
         <span class="p">)</span>
         <span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">epsilon</span> <span class="o">*</span> <span class="n">gamma</span><span class="p">)</span>
         <span class="n">delta</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">/</span> <span class="mi">2</span>
@@ -518,47 +587,167 @@ document.write(`
     <span class="k">def</span><span class="w"> </span><span class="nf">init</span><span class="p">(</span>
         <span class="n">positions</span><span class="p">:</span> <span class="n">ArrayLikeTree</span><span class="p">,</span> <span class="n">logdensity_grad</span><span class="p">:</span> <span class="n">ArrayLikeTree</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MEADSAdaptationState</span><span class="p">:</span>
-        <span class="n">parameters</span> <span class="o">=</span> <span class="n">compute_parameters</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">logdensity_grad</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">MEADSAdaptationState</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">*</span><span class="n">parameters</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize with parameters computed from all chains, replicated per fold.&quot;&quot;&quot;</span>
+        <span class="n">step_size</span><span class="p">,</span> <span class="n">sd_position</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">delta</span> <span class="o">=</span> <span class="n">compute_parameters</span><span class="p">(</span>
+            <span class="n">positions</span><span class="p">,</span> <span class="n">logdensity_grad</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="p">)</span>
+        <span class="c1"># Replicate scalar params across folds</span>
+        <span class="n">step_sizes</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">num_folds</span><span class="p">,),</span> <span class="n">step_size</span><span class="p">)</span>
+        <span class="n">alphas</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">num_folds</span><span class="p">,),</span> <span class="n">alpha</span><span class="p">)</span>
+        <span class="n">deltas</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">num_folds</span><span class="p">,),</span> <span class="n">delta</span><span class="p">)</span>
+        <span class="c1"># Replicate pytree params: (num_folds, *dims) per leaf</span>
+        <span class="n">sigmas</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="kc">None</span><span class="p">],</span> <span class="n">num_folds</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">sd_position</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">MEADSAdaptationState</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">step_sizes</span><span class="p">,</span> <span class="n">sigmas</span><span class="p">,</span> <span class="n">alphas</span><span class="p">,</span> <span class="n">deltas</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span>
         <span class="n">adaptation_state</span><span class="p">:</span> <span class="n">MEADSAdaptationState</span><span class="p">,</span>
         <span class="n">positions</span><span class="p">:</span> <span class="n">ArrayLikeTree</span><span class="p">,</span>
         <span class="n">logdensity_grad</span><span class="p">:</span> <span class="n">ArrayLikeTree</span><span class="p">,</span>
+        <span class="n">source_fold</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MEADSAdaptationState</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the adaptation state and parameter values.</span>
-
-<span class="sd">        We find new optimal values for the parameters of the generalized HMC</span>
-<span class="sd">        kernel using heuristics based on the maximum eigenvalue of the</span>
-<span class="sd">        covariance and gradient matrices given by an ensemble of chains.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the target fold&#39;s parameters using the source fold&#39;s statistics.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        adaptation_state</span>
-<span class="sd">            The current state of the adaptation algorithm</span>
+<span class="sd">            Current adaptation state.</span>
 <span class="sd">        positions</span>
-<span class="sd">            The current position of every chain.</span>
+<span class="sd">            Positions of chains in the source fold only.</span>
 <span class="sd">        logdensity_grad</span>
-<span class="sd">            The gradients of the logdensity function evaluated at the</span>
-<span class="sd">            current position of every chain.</span>
+<span class="sd">            Gradients of chains in the source fold only.</span>
+<span class="sd">        source_fold</span>
+<span class="sd">            Index of the fold whose statistics are used. The target fold that</span>
+<span class="sd">            receives the updated parameters is ``(source_fold + 1) % num_folds``.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        New adaptation state that contains the step size, alpha and delta</span>
-<span class="sd">        parameters of the generalized HMC kernel.</span>
-
+<span class="sd">        Updated adaptation state.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">current_iteration</span> <span class="o">=</span> <span class="n">adaptation_state</span><span class="o">.</span><span class="n">current_iteration</span>
-        <span class="n">step_size</span><span class="p">,</span> <span class="n">position_sigma</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">delta</span> <span class="o">=</span> <span class="n">compute_parameters</span><span class="p">(</span>
-            <span class="n">positions</span><span class="p">,</span> <span class="n">logdensity_grad</span><span class="p">,</span> <span class="n">current_iteration</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="p">(</span><span class="n">source_fold</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">num_folds</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">adaptation_state</span><span class="o">.</span><span class="n">current_iteration</span>
+
+        <span class="n">new_step_size</span><span class="p">,</span> <span class="n">new_sigma</span><span class="p">,</span> <span class="n">new_alpha</span><span class="p">,</span> <span class="n">new_delta</span> <span class="o">=</span> <span class="n">compute_parameters</span><span class="p">(</span>
+            <span class="n">positions</span><span class="p">,</span> <span class="n">logdensity_grad</span><span class="p">,</span> <span class="n">t</span>
         <span class="p">)</span>
 
+        <span class="n">new_step_sizes</span> <span class="o">=</span> <span class="n">adaptation_state</span><span class="o">.</span><span class="n">step_size</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">target</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">new_step_size</span><span class="p">)</span>
+        <span class="n">new_sigmas</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">target</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">v</span><span class="p">),</span>
+            <span class="n">adaptation_state</span><span class="o">.</span><span class="n">position_sigma</span><span class="p">,</span>
+            <span class="n">new_sigma</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">new_alphas</span> <span class="o">=</span> <span class="n">adaptation_state</span><span class="o">.</span><span class="n">alpha</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">target</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">new_alpha</span><span class="p">)</span>
+        <span class="n">new_deltas</span> <span class="o">=</span> <span class="n">adaptation_state</span><span class="o">.</span><span class="n">delta</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">target</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">new_delta</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">MEADSAdaptationState</span><span class="p">(</span>
-            <span class="n">current_iteration</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">step_size</span><span class="p">,</span> <span class="n">position_sigma</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">delta</span>
+            <span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">new_step_sizes</span><span class="p">,</span> <span class="n">new_sigmas</span><span class="p">,</span> <span class="n">new_alphas</span><span class="p">,</span> <span class="n">new_deltas</span>
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">init</span><span class="p">,</span> <span class="n">update</span></div>
 
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_low_rank_apply</span><span class="p">(</span><span class="n">element</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">U</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">lam_pow</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Batched ``element + U @ ((lam_pow - 1) * (U.T @ element))``.</span>
+
+<span class="sd">    ``element`` has shape ``(n, d)`` (a batch of ``n`` flat vectors), ``U``</span>
+<span class="sd">    has shape ``(d, k)``, ``lam_pow`` has shape ``(k,)``. Shared building</span>
+<span class="sd">    block for the two low-rank whitening transforms below -- it mirrors the</span>
+<span class="sd">    ``B`` / ``A*`` matrices inside</span>
+<span class="sd">    :func:`~blackjax.mcmc.metrics.gaussian_euclidean_low_rank`&#39;s ``scale``</span>
+<span class="sd">    closure, specialized to a batch of vectors so it composes with MEADS&#39;s</span>
+<span class="sd">    per-fold ``jax.vmap``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Ue</span> <span class="o">=</span> <span class="n">element</span> <span class="o">@</span> <span class="n">U</span>  <span class="c1"># (n, k)</span>
+    <span class="k">return</span> <span class="n">element</span> <span class="o">+</span> <span class="p">(</span><span class="n">Ue</span> <span class="o">*</span> <span class="p">(</span><span class="n">lam_pow</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">))</span> <span class="o">@</span> <span class="n">U</span><span class="o">.</span><span class="n">T</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_low_rank_precondition_pos</span><span class="p">(</span><span class="n">pos</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">sigma</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">U</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">lam</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Low-rank generalization of the legacy ``pos / sigma`` preconditioning.</span>
+
+<span class="sd">    Mirrors ``M^{1/2} pos`` (i.e. ``metric.scale(_, pos, inv=False,</span>
+<span class="sd">    trans=False)`` for</span>
+<span class="sd">    :func:`~blackjax.mcmc.metrics.gaussian_euclidean_low_rank`); reduces to</span>
+<span class="sd">    ``pos / sigma`` when ``lam == 1`` (the diagonal limit), matching the</span>
+<span class="sd">    legacy preconditioning bit-for-bit.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_low_rank_apply</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">lam</span><span class="p">))</span> <span class="o">/</span> <span class="n">sigma</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_lrd_from_accumulated_covariance</span><span class="p">(</span>
+    <span class="n">acc</span><span class="p">:</span> <span class="n">MomentBlock</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Array</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract ``(sigma, U, lam)`` from a window-accumulated covariance</span>
+<span class="sd">    (effective ``n = num_chains * window_steps``) via ``eigh`` of the</span>
+<span class="sd">    accumulated correlation matrix, selecting the top-``k`` directions by</span>
+<span class="sd">    ``|lam - 1|`` (the directions that deviate most from isotropic). This is</span>
+<span class="sd">    what makes the low-rank metric estimable at high dimension (``d &gt;&gt;</span>
+<span class="sd">    num_chains``): a single ``num_chains``-sized ensemble snapshot is</span>
+<span class="sd">    ``p &gt;&gt; n`` noise-dominated once ``d`` exceeds ``num_chains``, but the</span>
+<span class="sd">    window-accumulated covariance&#39;s effective ``n`` can comfortably exceed</span>
+<span class="sd">    ``d`` given enough window steps.</span>
+
+<span class="sd">    Delegates to</span>
+<span class="sd">    :func:`~blackjax.adaptation.metric_estimators.sample_covariance_eigh_low_rank`</span>
+<span class="sd">    (behavior-identical).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lrd</span> <span class="o">=</span> <span class="n">sample_covariance_eigh_low_rank</span><span class="p">(</span><span class="n">acc</span><span class="o">.</span><span class="n">m2</span><span class="p">,</span> <span class="n">acc</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">lrd</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span> <span class="n">lrd</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="n">lrd</span><span class="o">.</span><span class="n">lam</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_lrd_diagonal_fallback</span><span class="p">(</span><span class="n">flat_positions</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Array</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Diagonal-only fallback ``(sigma, U, lam)`` for MEADS-LRD&#39;s momentum</span>
+<span class="sd">    metric, used before the accumulation window holds enough pooled samples</span>
+<span class="sd">    to support a rank-``k`` estimate (FIX 1).</span>
+
+<span class="sd">    Estimating an eigenbasis from a single ``num_chains``-sized ensemble</span>
+<span class="sd">    snapshot is exactly the noise-dominated (``p &gt;&gt; n``) estimator that</span>
+<span class="sd">    causes the high-d step-size/momentum instability these fixes address --</span>
+<span class="sd">    measured directly: routing through it even as a *pre-window* fallback</span>
+<span class="sd">    (rather than attempting a low-rank correction from too little data) was</span>
+<span class="sd">    enough to blow up the ensemble and collapse epsilon at ``d=40,</span>
+<span class="sd">    num_chains=32``. So instead this returns ``lam = 1`` (no correction --</span>
+<span class="sd">    ``_low_rank_apply``&#39;s ``(lam_pow - 1)`` term vanishes identically),</span>
+<span class="sd">    degenerating the momentum metric to exactly the diagonal-only</span>
+<span class="sd">    preconditioning ``low_rank_rank=None`` uses. ``U``&#39;s columns are then</span>
+<span class="sd">    irrelevant (they multiply a zero coefficient) -- any orthonormal set</span>
+<span class="sd">    works; the leading standard basis vectors are the cheapest choice. Only</span>
+<span class="sd">    ``sigma`` (a per-dimension population statistic, well-estimated from as</span>
+<span class="sd">    few as 2 samples per dimension, unlike a joint eigenbasis) carries real</span>
+<span class="sd">    information here.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">flat_positions</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sigma</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">flat_positions</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+    <span class="n">lam</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">k</span><span class="p">,))</span>
+    <span class="k">return</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">lam</span>
+
+
+<span class="n">_LRD_EIGENVALUE_FLOOR</span> <span class="o">=</span> <span class="mf">1e-6</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_floor_lrd_eigenvalues</span><span class="p">(</span><span class="n">lam</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Clamp low-rank eigenvalues away from 0.</span>
+
+<span class="sd">    A collinear or otherwise rank-deficient ensemble (e.g. a rank-1</span>
+<span class="sd">    initial ensemble) can make the sample/accumulated correlation matrix</span>
+<span class="sd">    singular along one or more of the selected top-k directions, giving</span>
+<span class="sd">    ``lam ~ 0`` — and ``float32`` ``eigh`` can even return slightly</span>
+<span class="sd">    *negative* eigenvalues, whose ``sqrt`` is NaN. The whitening transform</span>
+<span class="sd">    (``_low_rank_precondition_pos``) and the momentum metric both scale by</span>
+<span class="sd">    ``sqrt(lam)``, so flooring keeps those factors finite. This guard is</span>
+<span class="sd">    intentionally redundant with the step-size decoupling (which keeps</span>
+<span class="sd">    ``sqrt(lam)`` out of the step-size heuristic entirely): the degenerate</span>
+<span class="sd">    collapse (``rhat = inf``, NaN step size) only occurs if *both* guards</span>
+<span class="sd">    are defeated.</span>
+
+<span class="sd">    ``jnp.maximum(lam, floor)`` guards against small/negative-but-finite</span>
+<span class="sd">    eigenvalues only — NaN passes through (``maximum(NaN, floor) = NaN``).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">lam</span><span class="p">,</span> <span class="n">_LRD_EIGENVALUE_FLOOR</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="meads_adaptation">
@@ -566,77 +755,396 @@ document.write(`
 <span class="k">def</span><span class="w"> </span><span class="nf">meads_adaptation</span><span class="p">(</span>
     <span class="n">logdensity_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
     <span class="n">num_chains</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">num_folds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="n">step_size_multiplier</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">damping_slowdown</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">adaptation_info_fn</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">return_all_adapt_info</span><span class="p">,</span>
+    <span class="n">low_rank_rank</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">low_rank_window_fraction</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AdaptationAlgorithm</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Adapt the parameters of the Generalized HMC algorithm.</span>
 
-<span class="sd">    The Generalized HMC algorithm depends on three parameters, each controlling</span>
-<span class="sd">    one element of its behaviour: step size controls the integrator&#39;s dynamics,</span>
-<span class="sd">    alpha controls the persistency of the momentum variable, and delta controls</span>
-<span class="sd">    the deterministic transformation of the slice variable used to perform the</span>
-<span class="sd">    non-reversible Metropolis-Hastings accept/reject step.</span>
+<span class="sd">    Full implementation of Algorithm 3 from :cite:p:`hoffman2022tuning` with</span>
+<span class="sd">    K-fold cross-chain adaptation and periodic chain shuffling.</span>
 
-<span class="sd">    The step size parameter is chosen to ensure the stability of the velocity</span>
-<span class="sd">    verlet integrator, the alpha parameter to make the influence of the current</span>
-<span class="sd">    state on future states of the momentum variable to decay exponentially, and</span>
-<span class="sd">    the delta parameter to maximize the acceptance of proposal but with good</span>
-<span class="sd">    mixing properties for the slice variable. These characteristics are targeted</span>
-<span class="sd">    by controlling heuristics based on the maximum eigenvalues of the correlation</span>
-<span class="sd">    and gradient matrices of the cross-chain samples, under simpifyng assumptions.</span>
-
-<span class="sd">    Good tuning is fundamental for the non-reversible Generalized HMC sampling</span>
-<span class="sd">    algorithm to explore the target space efficienty and output uncorrelated, or</span>
-<span class="sd">    as uncorrelated as possible, samples from the target space. Furthermore, the</span>
-<span class="sd">    single integrator step of the algorithm lends itself for fast sampling</span>
-<span class="sd">    on parallel computer architectures.</span>
+<span class="sd">    Chains are divided into ``num_folds`` folds. At adaptation step ``t``,</span>
+<span class="sd">    fold ``t mod K`` is frozen (its chains do not advance, Algorithm 3 line 4).</span>
+<span class="sd">    For each active fold k, the step size is computed from fold ``(k-1) mod K``&#39;s</span>
+<span class="sd">    preconditioned gradients, and the damping is computed from fold k&#39;s own</span>
+<span class="sd">    positions using that step size. Every K steps all chains are reshuffled</span>
+<span class="sd">    randomly across folds to prevent fold-assignment bias.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    logdensity_fn</span>
 <span class="sd">        The log density probability density function from which we wish to sample.</span>
 <span class="sd">    num_chains</span>
-<span class="sd">        Number of chains used for cross-chain warm-up training.</span>
+<span class="sd">        Total number of chains. Must be divisible by ``num_folds``.</span>
+<span class="sd">    num_folds</span>
+<span class="sd">        Number of folds K to split chains into. Default is 4 as in the paper.</span>
+<span class="sd">    step_size_multiplier</span>
+<span class="sd">        Multiplicative factor for the step size heuristic. Default is 0.5 as in</span>
+<span class="sd">        the paper.</span>
+<span class="sd">    damping_slowdown</span>
+<span class="sd">        Slows the damping decay relative to the iteration count. Default is 1.0</span>
+<span class="sd">        as in the paper. Higher values force stronger damping in early iterations.</span>
 <span class="sd">    adaptation_info_fn</span>
 <span class="sd">        Function to select the adaptation info returned. See return_all_adapt_info</span>
-<span class="sd">        and get_filter_adapt_info_fn in blackjax.adaptation.base.  By default all</span>
+<span class="sd">        and get_filter_adapt_info_fn in blackjax.adaptation.base. By default all</span>
 <span class="sd">        information is saved - this can result in excessive memory usage if the</span>
 <span class="sd">        information is unused.</span>
+<span class="sd">    low_rank_rank</span>
+<span class="sd">        MEADS-LRD extension (opt-in, default ``None``). ``None`` adapts a</span>
+<span class="sd">        *diagonal* momentum metric from the fold ensemble -- exactly the</span>
+<span class="sd">        original behavior, bit-for-bit. An ``int`` instead adapts a</span>
+<span class="sd">        rank-``low_rank_rank`` :class:`~blackjax.mcmc.metrics.LowRankInverseMassMatrix`</span>
+<span class="sd">        from the **full population of all ``num_chains`` chains** (requires</span>
+<span class="sd">        :func:`blackjax.mcmc.ghmc`&#39;s dense/low-rank momentum-metric support,</span>
+<span class="sd">        blackjax#950), generalizing MEADS the way MCLMC-LRD generalized</span>
+<span class="sd">        MCLMC. Unlike the diagonal scale (estimated per-fold, from each</span>
+<span class="sd">        fold&#39;s own ``num_chains // num_folds`` chains), the low-rank</span>
+<span class="sd">        eigenbasis is estimated *once per step* from the pooled global</span>
+<span class="sd">        population and then shared across all folds: a single fold&#39;s</span>
+<span class="sd">        ensemble (paper default ``num_folds=4`` gives only 16 chains/fold)</span>
+<span class="sd">        is too small for its top-k eigenvectors to be stable step-to-step,</span>
+<span class="sd">        and the resulting jitter destabilizes ghmc&#39;s persistent momentum</span>
+<span class="sd">        (measured regression: low-rank underperformed diagonal at</span>
+<span class="sd">        ``num_folds=4`` despite beating it at ``num_folds=1``, where the</span>
+<span class="sd">        per-fold estimate happens to already be the global one). The metric</span>
+<span class="sd">        is a shared symmetric preconditioner, not a per-fold statistic like</span>
+<span class="sd">        step size or damping, so pooling all chains to estimate it needs no</span>
+<span class="sd">        special justification -- it is the same practice window adaptation</span>
+<span class="sd">        uses for its diagonal/dense metric. The per-fold step-size and</span>
+<span class="sd">        damping heuristics (Algorithm 3) are otherwise unchanged, except they</span>
+<span class="sd">        now whiten by this shared global metric rather than a per-fold one,</span>
+<span class="sd">        so they stay consistent with the metric ghmc actually samples with.</span>
+<span class="sd">        The rank is clamped to ``min(low_rank_rank, num_chains - 1, d)`` (raises</span>
+<span class="sd">        ``ValueError`` if ``num_chains - 1 &lt; 1``). A rank-``d`` metric equals the</span>
+<span class="sd">        full dense metric, so clamping by ``d`` is lossless and prevents shape</span>
+<span class="sd">        disagreements in the jax.lax.cond branches. The metric *returned* by</span>
+<span class="sd">        ``run()`` is the final state of the same window-accumulated estimator</span>
+<span class="sd">        described under ``low_rank_window_fraction`` below.</span>
+
+<span class="sd">        Two further fixes address a validated high-dimension (``d &gt;&gt;</span>
+<span class="sd">        num_chains``) failure mode where a single-snapshot low-rank metric</span>
+<span class="sd">        made MEADS-LRD *worse* than the diagonal baseline (a p &gt;&gt; n noise-</span>
+<span class="sd">        dominated eigenbasis fed into ghmc&#39;s step-size heuristic collapsed</span>
+<span class="sd">        ``epsilon`` to ~1e-3 and froze the chains):</span>
+
+<span class="sd">        - The step-size heuristic (Algorithm 3, line 8) always whitens its</span>
+<span class="sd">          gradients by the plain per-fold diagonal scale (``grad * sigma``),</span>
+<span class="sd">          never by the low-rank metric, even when ``low_rank_rank`` is set.</span>
+<span class="sd">          Whitening ``epsilon`` by a noisy low-rank eigenbasis couples the</span>
+<span class="sd">          step size to whichever direction the estimate currently</span>
+<span class="sd">          over-weights, which is what caused the collapse above; the</span>
+<span class="sd">          low-rank metric still preconditions the *momentum* (where it</span>
+<span class="sd">          helps), just not the step-size proxy.</span>
+<span class="sd">        - Selected eigenvalues are floored away from 0 (see</span>
+<span class="sd">          ``_floor_lrd_eigenvalues``) so a collinear/rank-deficient initial</span>
+<span class="sd">          ensemble can&#39;t seed a degenerate metric that self-reinforces into</span>
+<span class="sd">          ``rhat = inf``. Collinear / near-collinear initial ensembles</span>
+<span class="sd">          (e.g. all chains on a 1-D offset line) do not crash — two redundant</span>
+<span class="sd">          guards (the step-size decoupling and the eigenvalue floor) prevent</span>
+<span class="sd">          the NaN collapse — but expect severe under-mixing (measured</span>
+<span class="sd">          rhat≈5 on a rank-1 init); use a dispersed, full-rank initialization.</span>
+<span class="sd">    low_rank_window_fraction</span>
+<span class="sd">        Only used when ``low_rank_rank`` is not ``None``. Fraction of</span>
+<span class="sd">        warmup steps, counted from the end, over which the low-rank metric&#39;s</span>
+<span class="sd">        covariance is accumulated (default ``0.5``: the last half of</span>
+<span class="sd">        warmup). A single ``num_chains``-sized ensemble snapshot is</span>
+<span class="sd">        ``p &gt;&gt; n`` noise-dominated once the dimension ``d`` exceeds</span>
+<span class="sd">        ``num_chains`` -- exactly the regime a single fold&#39;s estimate was</span>
+<span class="sd">        already too noisy for (see ``low_rank_rank`` above), just worse,</span>
+<span class="sd">        since now the *whole* population&#39;s snapshot is undersized too, and</span>
+<span class="sd">        (measured directly) even routing through it as a one-off fallback</span>
+<span class="sd">        is enough to destabilize the ensemble. Instead, a running</span>
+<span class="sd">        Chan/Welford covariance accumulator (mirroring the pattern</span>
+<span class="sd">        :func:`~blackjax.adaptation.mass_matrix.welford_algorithm` uses for</span>
+<span class="sd">        the mass matrix, generalized to a whole ensemble per step) is</span>
+<span class="sd">        updated with every chain&#39;s position at every step *inside* the</span>
+<span class="sd">        window, giving an effective sample size of ``num_chains *</span>
+<span class="sd">        window_steps``. Once that effective size exceeds ``2 * d`` (a bare</span>
+<span class="sd">        minimum for the estimate to not be noise-dominated), the low-rank</span>
+<span class="sd">        momentum metric switches on and keeps improving every further</span>
+<span class="sd">        window step; before that point -- either because the step is</span>
+<span class="sd">        before the window (the initial, still-transient fraction of</span>
+<span class="sd">        warmup, mirroring why Stan&#39;s window adaptation excludes its own</span>
+<span class="sd">        initial/final fast windows from mass-matrix estimation), or because</span>
+<span class="sd">        the window hasn&#39;t yet pooled ``2 * d`` samples -- the momentum</span>
+<span class="sd">        metric falls back to a purely diagonal one</span>
+<span class="sd">        (:func:`_lrd_diagonal_fallback`, i.e. no low-rank correction at</span>
+<span class="sd">        all, matching ``low_rank_rank=None``&#39;s momentum exactly), never a</span>
+<span class="sd">        low-rank estimate from too little data.</span>
+<span class="sd">        Must be in ``[0.0, 1.0]``; ``0.0`` accumulates from step 0, ``1.0``</span>
+<span class="sd">        disables accumulation entirely (falls back to the purely diagonal</span>
+<span class="sd">        momentum metric throughout the run).</span>
+
+<span class="sd">        At GPU scale (independent re-validation, num_chains up to 1024 on a</span>
+<span class="sd">        d≈390 hierarchical target): the low-rank metric&#39;s de-biasing reproduces</span>
+<span class="sd">        (num_chains ≥ 256 with adequate warmup — cutting warmup at high</span>
+<span class="sd">        num_chains under-accumulates the metric and re-introduces bias via</span>
+<span class="sd">        step-size collapse) and holds as num_chains grows, but residual mean-error</span>
+<span class="sd">        stabilizes slightly above strict certification thresholds; treat the</span>
+<span class="sd">        low-rank metric as a robust improvement over the diagonal rather than a</span>
+<span class="sd">        guarantee of unbiased means on such targets.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    A function that returns the last cross-chain state, a sampling kernel with the</span>
-<span class="sd">    tuned parameter values, and all the warm-up states for diagnostics.</span>
+<span class="sd">    tuned parameter values (averaged across folds), and all the warm-up states for</span>
+<span class="sd">    diagnostics.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">num_folds</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;num_folds must be &gt;= 1, got </span><span class="si">{</span><span class="n">num_folds</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">num_chains</span> <span class="o">%</span> <span class="n">num_folds</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;num_chains (</span><span class="si">{</span><span class="n">num_chains</span><span class="si">}</span><span class="s2">) must be divisible by num_folds (</span><span class="si">{</span><span class="n">num_folds</span><span class="si">}</span><span class="s2">).&quot;</span>
+        <span class="p">)</span>
+    <span class="n">n_per_fold</span> <span class="o">=</span> <span class="n">num_chains</span> <span class="o">//</span> <span class="n">num_folds</span>
+
+    <span class="n">low_rank_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">low_rank_rank</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mcmc</span><span class="o">.</span><span class="n">ghmc</span><span class="p">,</span> <span class="s2">&quot;_metric_from_momentum_inverse_scale&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;low_rank_rank requires blackjax.mcmc.ghmc&#39;s dense/low-rank &quot;</span>
+                <span class="s2">&quot;momentum-metric support (blackjax#950); the installed ghmc &quot;</span>
+                <span class="s2">&quot;module predates it.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">low_rank_k</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">low_rank_rank</span><span class="p">,</span> <span class="n">num_chains</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">low_rank_k</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;low_rank_rank=</span><span class="si">{</span><span class="n">low_rank_rank</span><span class="si">}</span><span class="s2"> cannot be honored: the &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;low-rank metric is estimated from the full population of &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;num_chains=</span><span class="si">{</span><span class="n">num_chains</span><span class="si">}</span><span class="s2"> chains, and that estimate needs &quot;</span>
+                <span class="s2">&quot;num_chains - 1 &gt;= 1. Increase num_chains.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">low_rank_window_fraction</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;low_rank_window_fraction must be in [0.0, 1.0], got &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">low_rank_window_fraction</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
 
     <span class="n">ghmc_kernel</span> <span class="o">=</span> <span class="n">mcmc</span><span class="o">.</span><span class="n">ghmc</span><span class="o">.</span><span class="n">build_kernel</span><span class="p">()</span>
+    <span class="n">adapt_init</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">base</span><span class="p">(</span><span class="n">num_folds</span><span class="p">,</span> <span class="n">step_size_multiplier</span><span class="p">,</span> <span class="n">damping_slowdown</span><span class="p">)</span>
+    <span class="n">batch_init</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">mcmc</span><span class="o">.</span><span class="n">ghmc</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">logdensity_fn</span><span class="p">,</span> <span class="n">r</span><span class="p">))</span>
 
-    <span class="n">adapt_init</span><span class="p">,</span> <span class="n">adapt_update</span> <span class="o">=</span> <span class="n">base</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">one_step</span><span class="p">(</span><span class="n">carry</span><span class="p">,</span> <span class="n">xs</span><span class="p">):</span>
+        <span class="n">rng_key</span><span class="p">,</span> <span class="n">in_window</span> <span class="o">=</span> <span class="n">xs</span>
+        <span class="n">states</span><span class="p">,</span> <span class="n">adaptation_state</span><span class="p">,</span> <span class="n">lrd_accum</span> <span class="o">=</span> <span class="n">carry</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">adaptation_state</span><span class="o">.</span><span class="n">current_iteration</span>
 
-    <span class="n">batch_init</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">mcmc</span><span class="o">.</span><span class="n">ghmc</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">logdensity_fn</span><span class="p">))</span>
+        <span class="c1"># Fold to freeze this step (Algorithm 3, line 4: &quot;excluding k = t mod K&quot;)</span>
+        <span class="n">fold_to_skip</span> <span class="o">=</span> <span class="n">t</span> <span class="o">%</span> <span class="n">num_folds</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">one_step</span><span class="p">(</span><span class="n">carry</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">):</span>
-        <span class="n">states</span><span class="p">,</span> <span class="n">adaptation_state</span> <span class="o">=</span> <span class="n">carry</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">num_chains</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">chain_keys</span><span class="p">,</span> <span class="n">shuffle_key</span> <span class="o">=</span> <span class="n">keys</span><span class="p">[:</span><span class="n">num_chains</span><span class="p">],</span> <span class="n">keys</span><span class="p">[</span><span class="n">num_chains</span><span class="p">]</span>
 
-        <span class="n">keys</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">num_chains</span><span class="p">)</span>
-        <span class="n">new_states</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span>
-            <span class="n">ghmc_kernel</span><span class="p">,</span> <span class="n">in_axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="p">)(</span>
-            <span class="n">keys</span><span class="p">,</span>
+        <span class="c1"># Reshape chain arrays to [num_folds, n_per_fold, *dims] for per-fold ops</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">to_folds</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">num_folds</span><span class="p">,</span> <span class="n">n_per_fold</span><span class="p">)</span> <span class="o">+</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+
+        <span class="n">folded_pos</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">to_folds</span><span class="p">,</span> <span class="n">states</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+        <span class="n">folded_grads</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">to_folds</span><span class="p">,</span> <span class="n">states</span><span class="o">.</span><span class="n">logdensity_grad</span><span class="p">)</span>
+
+        <span class="c1"># Per-fold scale (std across chains within each fold)</span>
+        <span class="c1"># Result: PyTree with leaves [num_folds, *dims]</span>
+        <span class="n">folded_scales</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">folded_pos</span><span class="p">)</span>
+
+        <span class="c1"># Preconditioned grads: grads_k * scale_k  (Algorithm 3, line 7)</span>
+        <span class="n">precond_grads</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">g</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="n">g</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">folded_grads</span><span class="p">,</span>
+            <span class="n">folded_scales</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># MEADS-LRD: estimate ONE rank-`low_rank_k` correlation eigenbasis</span>
+        <span class="c1"># (sigma, U, lam) per step from the FULL population of all</span>
+        <span class="c1"># num_chains chains -- NOT from each fold&#39;s own noisy n_per_fold</span>
+        <span class="c1"># snapshot. A fold&#39;s ensemble is too small (paper default</span>
+        <span class="c1"># n_per_fold=16) for its top-k eigenvectors to be stable</span>
+        <span class="c1"># step-to-step; the resulting eigenvector jitter destabilizes ghmc&#39;s</span>
+        <span class="c1"># persistent momentum. The metric is a shared symmetric</span>
+        <span class="c1"># preconditioner (unlike step-size/damping, which stay genuinely</span>
+        <span class="c1"># per-fold below), so pooling all chains to estimate it needs no</span>
+        <span class="c1"># per-fold isolation -- the same practice window adaptation uses for</span>
+        <span class="c1"># its diagonal/dense metric. This low-rank metric then preconditions</span>
+        <span class="c1"># the damping heuristic below (via `_low_rank_precondition_pos`), so</span>
+        <span class="c1"># alpha/delta stay consistent with the metric actually handed to</span>
+        <span class="c1"># ghmc for sampling this step. It does NOT precondition the</span>
+        <span class="c1"># step-size heuristic (see the ε-decouple fix just below).</span>
+        <span class="c1">#</span>
+        <span class="c1"># FIX (high-d, p &gt;&gt; n): a single num_chains-sized snapshot is noise-</span>
+        <span class="c1"># dominated once d exceeds num_chains, so `lrd_accum` -- a running</span>
+        <span class="c1"># Chan/Welford covariance pooled over every chain at every step</span>
+        <span class="c1"># *inside* the accumulation window (see `low_rank_window_fraction`&#39;s</span>
+        <span class="c1"># docstring) -- is used instead once its effective sample count</span>
+        <span class="c1"># exceeds 2*d (a bare minimum for a covariance estimate to not be</span>
+        <span class="c1"># noise-dominated). Before that (outside the window, or too early</span>
+        <span class="c1"># inside it), fall back to a purely diagonal metric</span>
+        <span class="c1"># (`_lrd_diagonal_fallback`) rather than ever attempting a low-rank</span>
+        <span class="c1"># estimate from too little data -- see that function&#39;s docstring for</span>
+        <span class="c1"># why a single-snapshot estimate is unsafe even as a fallback.</span>
+        <span class="k">if</span> <span class="n">low_rank_rank</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">flat_all_pos</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">ravel_pytree</span><span class="p">(</span><span class="n">p</span><span class="p">)[</span><span class="mi">0</span><span class="p">])(</span><span class="n">states</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">flat_all_pos</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">flat_folded_pos</span> <span class="o">=</span> <span class="n">flat_all_pos</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">num_folds</span><span class="p">,</span> <span class="n">n_per_fold</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
+
+            <span class="n">updated_lrd_accum</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">cond</span><span class="p">(</span>
+                <span class="n">in_window</span><span class="p">,</span>
+                <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">cgl_update_batch</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">flat_all_pos</span><span class="p">),</span>
+                <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span><span class="p">,</span>
+                <span class="n">lrd_accum</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">enough_accumulated</span> <span class="o">=</span> <span class="n">updated_lrd_accum</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">d</span>
+            <span class="n">use_accumulated</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">in_window</span><span class="p">,</span> <span class="n">enough_accumulated</span><span class="p">)</span>
+            <span class="n">global_sigma</span><span class="p">,</span> <span class="n">global_U</span><span class="p">,</span> <span class="n">global_lam</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">cond</span><span class="p">(</span>
+                <span class="n">use_accumulated</span><span class="p">,</span>
+                <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">_lrd_from_accumulated_covariance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">low_rank_k</span><span class="p">),</span>
+                <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">_lrd_diagonal_fallback</span><span class="p">(</span><span class="n">flat_all_pos</span><span class="p">,</span> <span class="n">low_rank_k</span><span class="p">),</span>
+                <span class="n">updated_lrd_accum</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">global_lam</span> <span class="o">=</span> <span class="n">_floor_lrd_eigenvalues</span><span class="p">(</span><span class="n">global_lam</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">updated_lrd_accum</span> <span class="o">=</span> <span class="n">lrd_accum</span>
+
+        <span class="c1"># ε-decouple: the step-size heuristic (Algorithm 3, line 8) always</span>
+        <span class="c1"># whitens by the plain per-fold diagonal scale, never by the</span>
+        <span class="c1"># low-rank metric -- whitening it by a noisy low-rank eigenbasis</span>
+        <span class="c1"># couples epsilon to whichever direction the estimate currently</span>
+        <span class="c1"># over-weights (measured: collapsed epsilon ~20x at d=390), and the</span>
+        <span class="c1"># low-rank metric&#39;s benefit is in the momentum, not the step size.</span>
+        <span class="n">precond_grads_for_step_size</span> <span class="o">=</span> <span class="n">precond_grads</span>
+
+        <span class="c1"># Per-fold step size from each fold&#39;s own preconditioned grads.</span>
+        <span class="c1"># Then roll by 1 so fold k gets the step size from fold k-1.</span>
+        <span class="c1"># (Algorithm 3, line 8 + cross-fold roll)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">fold_step_size</span><span class="p">(</span><span class="n">grads_k</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span>
+                <span class="n">step_size_multiplier</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">maximum_eigenvalue</span><span class="p">(</span><span class="n">grads_k</span><span class="p">)),</span>
+                <span class="mf">1.0</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">step_size_own</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">fold_step_size</span><span class="p">)(</span>
+            <span class="n">precond_grads_for_step_size</span>
+        <span class="p">)</span>  <span class="c1"># [num_folds]</span>
+        <span class="c1"># fold k uses step_size from fold k-1</span>
+        <span class="n">step_size_rolled</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">step_size_own</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># [num_folds]</span>
+        <span class="c1"># fold k uses the momentum scale (std) from fold k-1</span>
+        <span class="n">scales_rolled</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>  <span class="c1"># [num_folds, *dims]</span>
+            <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">folded_scales</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Per-fold damping from each fold&#39;s OWN (centered, scaled) positions</span>
+        <span class="c1"># and the rolled step size from the left-neighbor fold.</span>
+        <span class="c1"># Algorithm 3, lines 9-10 (paper parameterization):</span>
+        <span class="c1">#   γ_k = max(1/sqrt(λ_max(θ̄_k)), damping_slowdown/(t·ε_k))</span>
+        <span class="c1">#   α_k = 1 - exp(-2·ε_k·γ_k)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">fold_damping</span><span class="p">(</span><span class="n">pos_k</span><span class="p">,</span> <span class="n">eps_k</span><span class="p">):</span>
+            <span class="c1"># Center within the fold before eigenvalue estimation</span>
+            <span class="n">pos_k_centered</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">pos_k</span><span class="p">)</span>
+            <span class="n">gamma</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span>
+                <span class="mf">1.0</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">maximum_eigenvalue</span><span class="p">(</span><span class="n">pos_k_centered</span><span class="p">)),</span>
+                <span class="n">damping_slowdown</span> <span class="o">/</span> <span class="p">((</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">eps_k</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">eps_k</span> <span class="o">*</span> <span class="n">gamma</span><span class="p">)</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="k">return</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">delta</span>
+
+        <span class="c1"># Divide each fold&#39;s positions by its own scale (centering done inside)</span>
+        <span class="n">precond_pos</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">p</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="n">p</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">folded_pos</span><span class="p">,</span>
+            <span class="n">folded_scales</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">low_rank_rank</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Same shared global (sigma, U, lam) as the step-size block above</span>
+            <span class="c1"># -- broadcast across folds (in_axes=None), not rolled: unlike</span>
+            <span class="c1"># the per-fold diagonal scale, there is only one metric this</span>
+            <span class="c1"># step, so every fold whitens by (and every chain samples with)</span>
+            <span class="c1"># the same eigenbasis.</span>
+            <span class="n">precond_pos_for_damping</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span>
+                <span class="n">_low_rank_precondition_pos</span><span class="p">,</span> <span class="n">in_axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="p">)(</span><span class="n">flat_folded_pos</span><span class="p">,</span> <span class="n">global_sigma</span><span class="p">,</span> <span class="n">global_U</span><span class="p">,</span> <span class="n">global_lam</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">precond_pos_for_damping</span> <span class="o">=</span> <span class="n">precond_pos</span>
+        <span class="n">alphas</span><span class="p">,</span> <span class="n">deltas</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">fold_damping</span><span class="p">)(</span>
+            <span class="n">precond_pos_for_damping</span><span class="p">,</span> <span class="n">step_size_rolled</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Broadcast per-fold parameters to per-chain arrays</span>
+        <span class="n">chain_step_sizes</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">step_size_rolled</span><span class="p">,</span> <span class="n">n_per_fold</span><span class="p">)</span>
+        <span class="n">chain_scales</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">n_per_fold</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">scales_rolled</span>
+        <span class="p">)</span>
+        <span class="n">chain_alphas</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">alphas</span><span class="p">,</span> <span class="n">n_per_fold</span><span class="p">)</span>
+        <span class="n">chain_deltas</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">deltas</span><span class="p">,</span> <span class="n">n_per_fold</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">low_rank_rank</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Feed ghmc the SAME global LowRankInverseMassMatrix for every</span>
+            <span class="c1"># chain (no per-fold rolling -- there is only one metric this</span>
+            <span class="c1"># step); blackjax#950 lets ghmc&#39;s momentum_inverse_scale accept</span>
+            <span class="c1"># this directly (no elementwise squaring, unlike the legacy</span>
+            <span class="c1"># diagonal path).</span>
+            <span class="n">chain_momentum_inverse_scale</span> <span class="o">=</span> <span class="n">LowRankInverseMassMatrix</span><span class="p">(</span>
+                <span class="n">sigma</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">global_sigma</span><span class="p">[</span><span class="kc">None</span><span class="p">],</span> <span class="n">num_chains</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">U</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">global_U</span><span class="p">[</span><span class="kc">None</span><span class="p">],</span> <span class="n">num_chains</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">lam</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">global_lam</span><span class="p">[</span><span class="kc">None</span><span class="p">],</span> <span class="n">num_chains</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">chain_momentum_inverse_scale</span> <span class="o">=</span> <span class="n">chain_scales</span>
+
+        <span class="c1"># Step all chains with their fold&#39;s parameters</span>
+        <span class="n">new_states</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">ghmc_kernel</span><span class="p">,</span> <span class="n">in_axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))(</span>
+            <span class="n">chain_keys</span><span class="p">,</span>
             <span class="n">states</span><span class="p">,</span>
             <span class="n">logdensity_fn</span><span class="p">,</span>
-            <span class="n">adaptation_state</span><span class="o">.</span><span class="n">step_size</span><span class="p">,</span>
-            <span class="n">adaptation_state</span><span class="o">.</span><span class="n">position_sigma</span><span class="p">,</span>
-            <span class="n">adaptation_state</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span>
-            <span class="n">adaptation_state</span><span class="o">.</span><span class="n">delta</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">new_adaptation_state</span> <span class="o">=</span> <span class="n">adapt_update</span><span class="p">(</span>
-            <span class="n">adaptation_state</span><span class="p">,</span> <span class="n">new_states</span><span class="o">.</span><span class="n">position</span><span class="p">,</span> <span class="n">new_states</span><span class="o">.</span><span class="n">logdensity_grad</span>
+            <span class="n">chain_step_sizes</span><span class="p">,</span>
+            <span class="n">chain_momentum_inverse_scale</span><span class="p">,</span>
+            <span class="n">chain_alphas</span><span class="p">,</span>
+            <span class="n">chain_deltas</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="k">return</span> <span class="p">(</span><span class="n">new_states</span><span class="p">,</span> <span class="n">new_adaptation_state</span><span class="p">),</span> <span class="n">adaptation_info_fn</span><span class="p">(</span>
-            <span class="n">new_states</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">new_adaptation_state</span>
+        <span class="c1"># Restore fold_to_skip&#39;s chains: they do not advance this step</span>
+        <span class="c1"># (Algorithm 3, line 4: &quot;excluding k = t mod K&quot;).</span>
+        <span class="c1"># When num_folds==1 there is no meaningful cross-fold split, so all</span>
+        <span class="c1"># chains advance (no fold is frozen).</span>
+        <span class="k">if</span> <span class="n">num_folds</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">fold_is_skipped</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_folds</span><span class="p">)</span> <span class="o">==</span> <span class="n">fold_to_skip</span>  <span class="c1"># [num_folds]</span>
+            <span class="n">chain_is_skipped</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">fold_is_skipped</span><span class="p">,</span> <span class="n">n_per_fold</span><span class="p">)</span>  <span class="c1"># [num_chains]</span>
+
+            <span class="k">def</span><span class="w"> </span><span class="nf">restore_skipped</span><span class="p">(</span><span class="n">new_val</span><span class="p">,</span> <span class="n">old_val</span><span class="p">):</span>
+                <span class="n">mask</span> <span class="o">=</span> <span class="n">chain_is_skipped</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                    <span class="n">chain_is_skipped</span><span class="o">.</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="o">*</span> <span class="p">(</span><span class="n">new_val</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">old_val</span><span class="p">,</span> <span class="n">new_val</span><span class="p">)</span>
+
+            <span class="n">new_states</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">restore_skipped</span><span class="p">,</span> <span class="n">new_states</span><span class="p">,</span> <span class="n">states</span><span class="p">)</span>
+
+        <span class="n">new_adaptation_state</span> <span class="o">=</span> <span class="n">MEADSAdaptationState</span><span class="p">(</span>
+            <span class="n">current_iteration</span><span class="o">=</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">step_size</span><span class="o">=</span><span class="n">step_size_rolled</span><span class="p">,</span>
+            <span class="n">position_sigma</span><span class="o">=</span><span class="n">scales_rolled</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="n">alphas</span><span class="p">,</span>
+            <span class="n">delta</span><span class="o">=</span><span class="n">deltas</span><span class="p">,</span>
         <span class="p">)</span>
+
+        <span class="c1"># Every num_folds steps: reshuffle chains across folds.</span>
+        <span class="c1"># Skipped for num_folds==1 (single fold; shuffle would be a no-op).</span>
+        <span class="k">if</span> <span class="n">num_folds</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">perm</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">shuffle_key</span><span class="p">,</span> <span class="n">num_chains</span><span class="p">)</span>
+            <span class="n">new_states</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">cond</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">num_folds</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="n">perm</span><span class="p">],</span> <span class="n">s</span><span class="p">),</span>
+                <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="p">,</span>
+                <span class="n">new_states</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">new_states</span><span class="p">,</span>
+            <span class="n">new_adaptation_state</span><span class="p">,</span>
+            <span class="n">updated_lrd_accum</span><span class="p">,</span>
+        <span class="p">),</span> <span class="n">adaptation_info_fn</span><span class="p">(</span><span class="n">new_states</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">new_adaptation_state</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">rng_key</span><span class="p">:</span> <span class="n">PRNGKey</span><span class="p">,</span> <span class="n">positions</span><span class="p">:</span> <span class="n">ArrayLikeTree</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">):</span>
         <span class="n">key_init</span><span class="p">,</span> <span class="n">key_adapt</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rng_key</span><span class="p">)</span>
@@ -645,16 +1153,72 @@ document.write(`
         <span class="n">init_states</span> <span class="o">=</span> <span class="n">batch_init</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">rng_keys</span><span class="p">)</span>
         <span class="n">init_adaptation_state</span> <span class="o">=</span> <span class="n">adapt_init</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">init_states</span><span class="o">.</span><span class="n">logdensity_grad</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">low_rank_rank</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Accumulate the covariance over the LAST `low_rank_window_fraction`</span>
+            <span class="c1"># of warmup steps only (skip the still-transient early fraction),</span>
+            <span class="c1"># mirroring how Stan&#39;s window adaptation delimits its own windows.</span>
+            <span class="c1"># `window_start`/`in_window_flags` are plain Python/concrete-shape</span>
+            <span class="c1"># values -- num_steps is always a concrete int here, never traced.</span>
+            <span class="n">window_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">low_rank_window_fraction</span> <span class="o">*</span> <span class="n">num_steps</span><span class="p">)</span>
+            <span class="n">flat_init_pos</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">ravel_pytree</span><span class="p">(</span><span class="n">p</span><span class="p">)[</span><span class="mi">0</span><span class="p">])(</span><span class="n">init_states</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">flat_init_pos</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="c1"># Clamp the rank to the flattened dimension as well: rank &gt; d makes the</span>
+            <span class="c1"># two jax.lax.cond branches disagree on output shapes. A rank-d metric</span>
+            <span class="c1"># equals the full dense metric, so this clamp is lossless.</span>
+            <span class="k">nonlocal</span> <span class="n">low_rank_k</span>
+            <span class="n">low_rank_k</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">low_rank_k</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+            <span class="n">init_lrd_accum</span> <span class="o">=</span> <span class="n">MomentBlock</span><span class="p">(</span>
+                <span class="n">count</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(()),</span> <span class="n">mean</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">d</span><span class="p">,)),</span> <span class="n">m2</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">d</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">window_start</span> <span class="o">=</span> <span class="n">num_steps</span>
+            <span class="n">init_lrd_accum</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">in_window_flags</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_steps</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">window_start</span>
+
         <span class="n">keys</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key_adapt</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">)</span>
-        <span class="p">(</span><span class="n">last_states</span><span class="p">,</span> <span class="n">last_adaptation_state</span><span class="p">),</span> <span class="n">info</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span>
-            <span class="n">one_step</span><span class="p">,</span> <span class="p">(</span><span class="n">init_states</span><span class="p">,</span> <span class="n">init_adaptation_state</span><span class="p">),</span> <span class="n">keys</span>
+        <span class="p">(</span><span class="n">last_states</span><span class="p">,</span> <span class="n">last_adaptation_state</span><span class="p">,</span> <span class="n">last_lrd_accum</span><span class="p">),</span> <span class="n">info</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span>
+            <span class="n">one_step</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">init_states</span><span class="p">,</span> <span class="n">init_adaptation_state</span><span class="p">,</span> <span class="n">init_lrd_accum</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">in_window_flags</span><span class="p">),</span>
         <span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">low_rank_rank</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># The metric returned to the caller is the FINAL state of the</span>
+            <span class="c1"># same window-accumulated estimator `one_step` uses per-step</span>
+            <span class="c1"># (effective n = num_chains * window_steps), falling back to the</span>
+            <span class="c1"># diagonal-only estimate only if the window never accumulated</span>
+            <span class="c1"># enough samples (e.g. num_steps too small). See</span>
+            <span class="c1"># `low_rank_window_fraction`&#39;s docstring. `low_rank_k` (==</span>
+            <span class="c1"># min(low_rank_rank, num_chains - 1)) is reused unchanged.</span>
+            <span class="n">flat_final_pos</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">ravel_pytree</span><span class="p">(</span><span class="n">p</span><span class="p">)[</span><span class="mi">0</span><span class="p">])(</span>
+                <span class="n">last_states</span><span class="o">.</span><span class="n">position</span>
+            <span class="p">)</span>
+            <span class="c1"># low_rank_k is set to a non-None int whenever low_rank_rank is</span>
+            <span class="c1"># not None (validated above); assert narrows it for mypy.</span>
+            <span class="k">assert</span> <span class="n">low_rank_k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">d_final</span> <span class="o">=</span> <span class="n">flat_final_pos</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">use_accumulated_final</span> <span class="o">=</span> <span class="n">last_lrd_accum</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">d_final</span>
+            <span class="n">final_sigma</span><span class="p">,</span> <span class="n">final_U</span><span class="p">,</span> <span class="n">final_lam</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">cond</span><span class="p">(</span>
+                <span class="n">use_accumulated_final</span><span class="p">,</span>
+                <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">_lrd_from_accumulated_covariance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">low_rank_k</span><span class="p">),</span>
+                <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">_lrd_diagonal_fallback</span><span class="p">(</span><span class="n">flat_final_pos</span><span class="p">,</span> <span class="n">low_rank_k</span><span class="p">),</span>
+                <span class="n">last_lrd_accum</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">final_lam</span> <span class="o">=</span> <span class="n">_floor_lrd_eigenvalues</span><span class="p">(</span><span class="n">final_lam</span><span class="p">)</span>
+            <span class="n">momentum_inverse_scale</span> <span class="o">=</span> <span class="n">LowRankInverseMassMatrix</span><span class="p">(</span>
+                <span class="n">sigma</span><span class="o">=</span><span class="n">final_sigma</span><span class="p">,</span> <span class="n">U</span><span class="o">=</span><span class="n">final_U</span><span class="p">,</span> <span class="n">lam</span><span class="o">=</span><span class="n">final_lam</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">momentum_inverse_scale</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">last_adaptation_state</span><span class="o">.</span><span class="n">position_sigma</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Return mean parameters across folds for use with a single ghmc kernel</span>
         <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;step_size&quot;</span><span class="p">:</span> <span class="n">last_adaptation_state</span><span class="o">.</span><span class="n">step_size</span><span class="p">,</span>
-            <span class="s2">&quot;momentum_inverse_scale&quot;</span><span class="p">:</span> <span class="n">last_adaptation_state</span><span class="o">.</span><span class="n">position_sigma</span><span class="p">,</span>
-            <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="n">last_adaptation_state</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span>
-            <span class="s2">&quot;delta&quot;</span><span class="p">:</span> <span class="n">last_adaptation_state</span><span class="o">.</span><span class="n">delta</span><span class="p">,</span>
+            <span class="s2">&quot;step_size&quot;</span><span class="p">:</span> <span class="n">last_adaptation_state</span><span class="o">.</span><span class="n">step_size</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+            <span class="s2">&quot;momentum_inverse_scale&quot;</span><span class="p">:</span> <span class="n">momentum_inverse_scale</span><span class="p">,</span>
+            <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="n">last_adaptation_state</span><span class="o">.</span><span class="n">alpha</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+            <span class="s2">&quot;delta&quot;</span><span class="p">:</span> <span class="n">last_adaptation_state</span><span class="o">.</span><span class="n">delta</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
         <span class="p">}</span>
 
         <span class="k">return</span> <span class="n">AdaptationResults</span><span class="p">(</span><span class="n">last_states</span><span class="p">,</span> <span class="n">parameters</span><span class="p">),</span> <span class="n">info</span>
@@ -732,7 +1296,7 @@ By The Blackjax developers
 
   <p class="copyright">
     
-      © Copyright 2025, The Blackjax developers.
+      © Copyright 2026, The Blackjax developers.
       <br/>
     
   </p>
@@ -756,8 +1320,8 @@ By The Blackjax developers
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
   </footer>

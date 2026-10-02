@@ -16,43 +16,47 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=e37d73aa" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="../../../_static/documentation_options.js?v=9eb32ce0"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'autoapi/blackjax/diagnostics/index';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="blackjax.mcmc" href="../mcmc/index.html" />
+    <link rel="next" title="blackjax.eca" href="../eca/index.html" />
     <link rel="prev" title="blackjax.adaptation.window_adaptation" href="../adaptation/window_adaptation/index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.1.dev1+g351bb9a14" />
   </head>
   
   
@@ -68,19 +72,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../../../search.html"
       method="get">
@@ -88,7 +81,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search..."
          aria-label="Search..."
          autocomplete="off"
@@ -96,8 +88,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -113,7 +105,8 @@
       
       
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -143,30 +136,29 @@
     
     
     <img src="../../../_static/blackjax.png" class="logo__image only-light" alt=" - Home"/>
-    <script>document.write(`<img src="../../../_static/blackjax.png" class="logo__image only-dark" alt=" - Home"/>`);</script>
+    <img src="../../../_static/blackjax.png" class="logo__image only-dark pst-js-only" alt=" - Home"/>
   
   
 </a></div>
         <div class="sidebar-primary-item">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script></div>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/diagnostics.html">MCMC Diagnostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/speed_up_guide.html">Speed-up Guide</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">PPL INTEGRATION</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_aesara.html">Aesara</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_pytensor.html">PyTensor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_numpyro.html">Numpyro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_funsor.html">Funsor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_oryx.html">Oryx</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_pymc.html">PyMC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_use_tfp.html">Tensorflow-Probability</a></li>
@@ -174,9 +166,11 @@
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">HOW TO</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_sample_multiple_chains.html">Sample with multiple chains?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_progress_bar.html">Show progress during sampling?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_custom_gradients.html">Use custom gradients?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_other_frameworks.html">Use non-JAX log-prob functions?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_metropolis_within_gibbs.html">Build a Metropolis-Within-Gibbs sampler?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_laplace_hmc.html">Use Laplace-preconditioned HMC?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/howto_reproduce_the_blackjax_image.html">Sample from the word BlackJAX using BlackJAX?</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">LEARN BY EXAMPLE</span></p>
@@ -190,25 +184,52 @@
 <li class="toctree-l3"><a class="reference internal" href="../adaptation/adjusted_mclmc_adaptation/index.html">blackjax.adaptation.adjusted_mclmc_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../adaptation/base/index.html">blackjax.adaptation.base</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../adaptation/chees_adaptation/index.html">blackjax.adaptation.chees_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../adaptation/laps/index.html">blackjax.adaptation.laps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../adaptation/laps_burn_in/index.html">blackjax.adaptation.laps_burn_in</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../adaptation/low_rank_adaptation/index.html">blackjax.adaptation.low_rank_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../adaptation/mass_matrix/index.html">blackjax.adaptation.mass_matrix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../adaptation/mclmc_adaptation/index.html">blackjax.adaptation.mclmc_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../adaptation/mclmc_lrd_adaptation/index.html">blackjax.adaptation.mclmc_lrd_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../adaptation/meads_adaptation/index.html">blackjax.adaptation.meads_adaptation</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../adaptation/meta/index.html">blackjax.adaptation.meta</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../adaptation/meta/builders/index.html">blackjax.adaptation.meta.builders</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../adaptation/meta/verdict/index.html">blackjax.adaptation.meta.verdict</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../adaptation/meta_adaptation/index.html">blackjax.adaptation.meta_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../adaptation/metric_buffers/index.html">blackjax.adaptation.metric_buffers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../adaptation/metric_estimators/index.html">blackjax.adaptation.metric_estimators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../adaptation/metric_recipes/index.html">blackjax.adaptation.metric_recipes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../adaptation/pathfinder_adaptation/index.html">blackjax.adaptation.pathfinder_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../adaptation/staged_adaptation/index.html">blackjax.adaptation.staged_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../adaptation/step_size/index.html">blackjax.adaptation.step_size</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../adaptation/window_adaptation/index.html">blackjax.adaptation.window_adaptation</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">blackjax.diagnostics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../eca/index.html">blackjax.eca</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../mcmc/index.html">blackjax.mcmc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../mcmc/adjusted_mclmc/index.html">blackjax.mcmc.adjusted_mclmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../mcmc/adjusted_mclmc_dynamic/index.html">blackjax.mcmc.adjusted_mclmc_dynamic</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../mcmc/barker/index.html">blackjax.mcmc.barker</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../mcmc/composed/index.html">blackjax.mcmc.composed</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mcmc/composed/step_size/index.html">blackjax.mcmc.composed.step_size</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mcmc/composed/trajectory_length/index.html">blackjax.mcmc.composed.trajectory_length</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../mcmc/coupled_hmc/index.html">blackjax.mcmc.coupled_hmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../mcmc/diffusions/index.html">blackjax.mcmc.diffusions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../mcmc/dynamic_hmc/index.html">blackjax.mcmc.dynamic_hmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../mcmc/elliptical_slice/index.html">blackjax.mcmc.elliptical_slice</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../mcmc/ghmc/index.html">blackjax.mcmc.ghmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mcmc/gist/index.html">blackjax.mcmc.gist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mcmc/gist_step_size/index.html">blackjax.mcmc.gist_step_size</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mcmc/gist_trajectory_length/index.html">blackjax.mcmc.gist_trajectory_length</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../mcmc/hmc/index.html">blackjax.mcmc.hmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../mcmc/integrators/index.html">blackjax.mcmc.integrators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mcmc/laplace_dynamic_hmc/index.html">blackjax.mcmc.laplace_dynamic_hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mcmc/laplace_hmc/index.html">blackjax.mcmc.laplace_hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mcmc/laplace_marginal/index.html">blackjax.mcmc.laplace_marginal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../mcmc/mala/index.html">blackjax.mcmc.mala</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../mcmc/marginal_latent_gaussian/index.html">blackjax.mcmc.marginal_latent_gaussian</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../mcmc/mclmc/index.html">blackjax.mcmc.mclmc</a></li>
@@ -218,10 +239,21 @@
 <li class="toctree-l3"><a class="reference internal" href="../mcmc/proposal/index.html">blackjax.mcmc.proposal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../mcmc/random_walk/index.html">blackjax.mcmc.random_walk</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../mcmc/rmhmc/index.html">blackjax.mcmc.rmhmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mcmc/slice/index.html">blackjax.mcmc.slice</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../mcmc/termination/index.html">blackjax.mcmc.termination</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../mcmc/trajectory/index.html">blackjax.mcmc.trajectory</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../ns/index.html">blackjax.ns</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../ns/adaptive/index.html">blackjax.ns.adaptive</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ns/base/index.html">blackjax.ns.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ns/from_mcmc/index.html">blackjax.ns.from_mcmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ns/integrator/index.html">blackjax.ns.integrator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ns/nss/index.html">blackjax.ns.nss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ns/utils/index.html">blackjax.ns.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../progress_reader/index.html">blackjax.progress_reader</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../sgmcmc/index.html">blackjax.sgmcmc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../sgmcmc/csgld/index.html">blackjax.sgmcmc.csgld</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../sgmcmc/diffusions/index.html">blackjax.sgmcmc.diffusions</a></li>
@@ -232,12 +264,14 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../smc/index.html">blackjax.smc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../smc/adaptive_persistent_sampling/index.html">blackjax.smc.adaptive_persistent_sampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../smc/adaptive_tempered/index.html">blackjax.smc.adaptive_tempered</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../smc/base/index.html">blackjax.smc.base</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../smc/ess/index.html">blackjax.smc.ess</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../smc/from_mcmc/index.html">blackjax.smc.from_mcmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../smc/inner_kernel_tuning/index.html">blackjax.smc.inner_kernel_tuning</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../smc/partial_posteriors_path/index.html">blackjax.smc.partial_posteriors_path</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../smc/persistent_sampling/index.html">blackjax.smc.persistent_sampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../smc/pretuning/index.html">blackjax.smc.pretuning</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../smc/resampling/index.html">blackjax.smc.resampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../smc/solver/index.html">blackjax.smc.solver</a></li>
@@ -251,7 +285,9 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../vi/index.html">blackjax.vi</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../vi/fullrank_vi/index.html">blackjax.vi.fullrank_vi</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../vi/meanfield_vi/index.html">blackjax.vi.meanfield_vi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../vi/multipathfinder/index.html">blackjax.vi.multipathfinder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../vi/pathfinder/index.html">blackjax.vi.pathfinder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../vi/schrodinger_follmer/index.html">blackjax.vi.schrodinger_follmer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../vi/svgd/index.html">blackjax.vi.svgd</a></li>
@@ -261,6 +297,11 @@
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../bib.html">Bibliography</a></li>
 </ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">DEVELOPER DOCUMENTATION</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../developer/design_principles.html">Design Principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer/new_algorithm_guide.html">Contributing a New Algorithm</a></li>
+</ul>
 
     </div>
 </nav></div>
@@ -268,9 +309,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -320,7 +366,7 @@
 
 
 <button onclick="toggleFullScreen()"
-  class="btn btn-sm btn-fullscreen-button"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
   title="Fullscreen mode"
   data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
@@ -334,25 +380,17 @@
 
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-  </button>
-`);
-</script>
-<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
 </button>
 </div></div>
@@ -375,10 +413,42 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classes">Classes</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module Contents</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.potential_scale_reduction"><code class="docutils literal notranslate"><span class="pre">potential_scale_reduction()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.rhat"><code class="docutils literal notranslate"><span class="pre">rhat()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.effective_sample_size"><code class="docutils literal notranslate"><span class="pre">effective_sample_size()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.ess_bulk"><code class="docutils literal notranslate"><span class="pre">ess_bulk()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.ess_tail"><code class="docutils literal notranslate"><span class="pre">ess_tail()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.pareto_khat"><code class="docutils literal notranslate"><span class="pre">pareto_khat()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.psis_weights"><code class="docutils literal notranslate"><span class="pre">psis_weights()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.warn"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.warn</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.flagged"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.flagged</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.num_flagged"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.num_flagged</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.rates"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.rates</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.median_other_rate"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.median_other_rate</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.total_divergences"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.total_divergences</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.num_chains"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.num_chains</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.rate_threshold"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.rate_threshold</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.multinomial_p_value"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.multinomial_p_value</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.warn</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id5"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.flagged</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id6"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.num_flagged</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id7"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.rates</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.early_rate"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.early_rate</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.late_rate"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.late_rate</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id8"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.median_other_rate</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id9"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.total_divergences</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id10"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.num_chains</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id11"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.rate_threshold</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id12"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.multinomial_p_value</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.divergence_concentration"><code class="docutils literal notranslate"><span class="pre">divergence_concentration()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.divergence_concentration_from_counts"><code class="docutils literal notranslate"><span class="pre">divergence_concentration_from_counts()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.format_divergence_warning"><code class="docutils literal notranslate"><span class="pre">format_divergence_warning()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -395,6 +465,17 @@ document.write(`
   <section id="module-blackjax.diagnostics">
 <span id="blackjax-diagnostics"></span><h1>blackjax.diagnostics<a class="headerlink" href="#module-blackjax.diagnostics" title="Link to this heading">#</a></h1>
 <p>MCMC diagnostics.</p>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.diagnostics.DivergenceConcentrationReport" title="blackjax.diagnostics.DivergenceConcentrationReport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DivergenceConcentrationReport</span></code></a></p></td>
+<td><p>Per-run divergence-concentration diagnostic report.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
 <section id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
@@ -402,8 +483,32 @@ document.write(`
 <tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.diagnostics.potential_scale_reduction" title="blackjax.diagnostics.potential_scale_reduction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">potential_scale_reduction</span></code></a>(→ blackjax.types.Array)</p></td>
 <td><p>Gelman and Rubin (1992)'s potential scale reduction for computing multiple MCMC chain convergence.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#blackjax.diagnostics.effective_sample_size" title="blackjax.diagnostics.effective_sample_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">effective_sample_size</span></code></a>(→ blackjax.types.Array)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#blackjax.diagnostics.rhat" title="blackjax.diagnostics.rhat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rhat</span></code></a>(→ blackjax.types.Array)</p></td>
+<td><p>Rank-normalized split-R̂ (Vehtari et al. 2021).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.diagnostics.effective_sample_size" title="blackjax.diagnostics.effective_sample_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">effective_sample_size</span></code></a>(→ blackjax.types.Array)</p></td>
 <td><p>Compute estimate of the effective sample size (ess).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#blackjax.diagnostics.ess_bulk" title="blackjax.diagnostics.ess_bulk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ess_bulk</span></code></a>(→ blackjax.types.Array)</p></td>
+<td><p>Bulk effective sample size (rank-normalized split-chain ESS).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.diagnostics.ess_tail" title="blackjax.diagnostics.ess_tail"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ess_tail</span></code></a>(→ blackjax.types.Array)</p></td>
+<td><p>Tail effective sample size.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#blackjax.diagnostics.pareto_khat" title="blackjax.diagnostics.pareto_khat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pareto_khat</span></code></a>(→ blackjax.types.Array)</p></td>
+<td><p>Pareto shape parameter k̂ for tail diagnosis.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.diagnostics.psis_weights" title="blackjax.diagnostics.psis_weights"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psis_weights</span></code></a>(→ tuple[blackjax.types.Array, ...)</p></td>
+<td><p>Pareto Smoothed Importance Sampling (PSIS) log weights.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#blackjax.diagnostics.divergence_concentration" title="blackjax.diagnostics.divergence_concentration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">divergence_concentration</span></code></a>(→ DivergenceConcentrationReport)</p></td>
+<td><p>Flag a run where sampling-phase divergences concentrate on a minority of chains.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.diagnostics.divergence_concentration_from_counts" title="blackjax.diagnostics.divergence_concentration_from_counts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">divergence_concentration_from_counts</span></code></a>(...)</p></td>
+<td><p>Same as <a class="reference internal" href="#blackjax.diagnostics.divergence_concentration" title="blackjax.diagnostics.divergence_concentration"><code class="xref py py-func docutils literal notranslate"><span class="pre">divergence_concentration()</span></code></a>, from precomputed per-chain counts.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#blackjax.diagnostics.format_divergence_warning" title="blackjax.diagnostics.format_divergence_warning"><code class="xref py py-obj docutils literal notranslate"><span class="pre">format_divergence_warning</span></code></a>(→ str)</p></td>
+<td><p>Render a <a class="reference internal" href="#blackjax.diagnostics.DivergenceConcentrationReport" title="blackjax.diagnostics.DivergenceConcentrationReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">DivergenceConcentrationReport</span></code></a> as a human-readable message.</p></td>
 </tr>
 </tbody>
 </table>
@@ -413,7 +518,7 @@ document.write(`
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="blackjax.diagnostics.potential_scale_reduction">
-<span class="sig-name descname"><span class="pre">potential_scale_reduction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">blackjax.types.ArrayLike</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain_axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">blackjax.types.Array</span></span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#potential_scale_reduction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.potential_scale_reduction" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">potential_scale_reduction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">blackjax.types.ArrayLike</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain_axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">blackjax.types.Array</span></span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#potential_scale_reduction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.potential_scale_reduction" title="Link to this definition">#</a></dt>
 <dd><p>Gelman and Rubin (1992)’s potential scale reduction for computing multiple MCMC chain convergence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -431,16 +536,70 @@ contains a chain dimension and a sample dimension.</p></li>
 <p class="rubric">Notes</p>
 <p>The diagnostic is computed by:</p>
 <div class="math notranslate nohighlight">
-\[\hat{R} = \frac{\hat{V}}{W}\]</div>
+\[\hat{R} = \sqrt{\frac{\hat{V}}{W}}\]</div>
 <p>where <span class="math notranslate nohighlight">\(W\)</span> is the within-chain variance and <span class="math notranslate nohighlight">\(\hat{V}\)</span> is the posterior variance
 estimate for the pooled traces. This is the potential scale reduction factor, which
 converges to unity when each of the traces is a sample from the target posterior. Values
-greater than one indicate that one or more chains have not yet converged <span id="id1">[<a class="reference internal" href="../../../bib.html#id3" title="Potential scale reduction, stan manual. URL: https://mc-stan.org/docs/2_27/reference-manual/notation-for-samples-chains-and-draws.html#potential-scale-reduction.">stac</a>, <a class="reference internal" href="../../../bib.html#id2" title="Andrew Gelman and Donald B Rubin. Inference from iterative simulation using multiple sequences. Statistical science, pages 457–472, 1992.">GR92</a>]</span>.</p>
+greater than one indicate that one or more chains have not yet converged <span id="id1">[<a class="reference internal" href="../../../bib.html#id6" title="Potential scale reduction, stan manual. URL: https://mc-stan.org/docs/2_27/reference-manual/notation-for-samples-chains-and-draws.html#potential-scale-reduction.">stac</a>, <a class="reference internal" href="../../../bib.html#id5" title="Andrew Gelman and Donald B Rubin. Inference from iterative simulation using multiple sequences. Statistical science, pages 457–472, 1992.">GR92</a>]</span>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.diagnostics.rhat">
+<span class="sig-name descname"><span class="pre">rhat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">blackjax.types.ArrayLike</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain_axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">blackjax.types.Array</span></span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#rhat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.rhat" title="Link to this definition">#</a></dt>
+<dd><p>Rank-normalized split-R̂ (Vehtari et al. 2021).</p>
+<p>The modern improved R̂ diagnostic.  Combines two split-chain R̂ values —
+one on rank-normalized draws and one on rank-normalized <em>folded</em> draws —
+and returns the maximum.  The folded component catches scale/variance
+non-convergence that the bulk component can miss.</p>
+<p>This matches the default <code class="docutils literal notranslate"><span class="pre">az.rhat(method=&quot;rank&quot;)</span></code> convention in ArviZ.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_array</strong> – An array representing multiple chains of MCMC samples. The array must
+contain a chain dimension and a sample dimension.  At least 2 chains
+and at least 4 draws per chain are required.</p></li>
+<li><p><strong>chain_axis</strong> – The axis indicating the multiple chains. Default 0.</p></li>
+<li><p><strong>sample_axis</strong> – The axis indicating a single chain of MCMC samples. Default 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>NDArray of the resulting R̂ values, with chain and sample dimensions</em></p></li>
+<li><p><em>squeezed.  Values close to 1.0 indicate convergence; values above 1.01</em></p></li>
+<li><p><em>suggest chains have not converged.</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Algorithm (Vehtari et al. 2021, § 4):</p>
+<ol class="arabic simple">
+<li><p>Split each chain in half → 2× chains.</p></li>
+<li><p>Rank-normalize with the Blom plotting position
+<span class="math notranslate nohighlight">\(z_r = \Phi^{-1}((r - 3/8) / (n + 1/4))\)</span> over the joint pool.</p></li>
+<li><p>Compute the standard split-R̂ on the rank-normalized draws (<strong>bulk</strong>).</p></li>
+<li><p>Compute the folded draws <span class="math notranslate nohighlight">\(|x - \mathrm{median}(x)|\)</span>, rank-normalize
+them, and compute split-R̂ again (<strong>tail</strong>).</p></li>
+<li><p>Return <span class="math notranslate nohighlight">\(\max(\hat{R}_{\text{bulk}}, \hat{R}_{\text{tail}})\)</span>.</p></li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="docutils literal notranslate"><span class="pre">NaN</span></code> from this function does <strong>not</strong> uniquely mean “the draws
+contained a missing observation”.  The folded component subtracts the
+pooled median, so when at least half of a component’s pooled draws are
+<code class="docutils literal notranslate"><span class="pre">+inf</span></code> (or <code class="docutils literal notranslate"><span class="pre">-inf</span></code>) the median is infinite and the fold evaluates
+<code class="docutils literal notranslate"><span class="pre">inf</span> <span class="pre">-</span> <span class="pre">inf</span></code>, which is <code class="docutils literal notranslate"><span class="pre">NaN</span></code>.  Such a component returns <code class="docutils literal notranslate"><span class="pre">NaN</span></code> from
+<a class="reference internal" href="#blackjax.diagnostics.rhat" title="blackjax.diagnostics.rhat"><code class="xref py py-func docutils literal notranslate"><span class="pre">rhat()</span></code></a> while containing no <code class="docutils literal notranslate"><span class="pre">NaN</span></code> at all — and while
+<a class="reference internal" href="#blackjax.diagnostics.ess_bulk" title="blackjax.diagnostics.ess_bulk"><code class="xref py py-func docutils literal notranslate"><span class="pre">ess_bulk()</span></code></a> and <a class="reference internal" href="#blackjax.diagnostics.ess_tail" title="blackjax.diagnostics.ess_tail"><code class="xref py py-func docutils literal notranslate"><span class="pre">ess_tail()</span></code></a> still return finite values for it.
+Infinity handling is a separate open question from the missing-data
+contract; this is documented, not yet decided.</p>
+</div>
+<p class="rubric">References</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="blackjax.diagnostics.effective_sample_size">
-<span class="sig-name descname"><span class="pre">effective_sample_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">blackjax.types.ArrayLike</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain_axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">blackjax.types.Array</span></span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#effective_sample_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.effective_sample_size" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">effective_sample_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">blackjax.types.ArrayLike</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain_axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">blackjax.types.Array</span></span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#effective_sample_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.effective_sample_size" title="Link to this definition">#</a></dt>
 <dd><p>Compute estimate of the effective sample size (ess).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -451,8 +610,16 @@ contains a chain dimension and a sample dimension.</p></li>
 <li><p><strong>sample_axis</strong> – The axis indicating a single chain of MCMC samples. Default to 1.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>NDArray of the resulting statistics (ess), with the chain and sample dimensions squeezed.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>NDArray of the resulting statistics (ess), with the chain and sample dimensions squeezed.</em></p></li>
+<li><p><em>Variables whose within-chain variance is numerically zero have an effective</em></p></li>
+<li><p>sample size of zero.  Variables containing a <code class="docutils literal notranslate"><span class="pre">NaN</span></code> draw are undefined and</p></li>
+<li><p>report <code class="docutils literal notranslate"><span class="pre">NaN</span></code>; the reduction is per variable, so an independent finite</p></li>
+<li><p><em>variable is unaffected.  Infinities are ordered values and are not treated</em></p></li>
+<li><p><em>as missing.</em></p></li>
+</ul>
+</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -464,9 +631,379 @@ contains a chain dimension and a sample dimension.</p></li>
 <p>where <span class="math notranslate nohighlight">\(M\)</span> is the number of chains, <span class="math notranslate nohighlight">\(N\)</span> the number of draws,
 <span class="math notranslate nohighlight">\(\hat{\rho}_t\)</span> is the estimated _autocorrelation at lag <span class="math notranslate nohighlight">\(t\)</span>, and
 <span class="math notranslate nohighlight">\(K\)</span> is the last integer for which <span class="math notranslate nohighlight">\(\hat{P}_{K} = \hat{\rho}_{2K} +
-\hat{\rho}_{2K+1}\)</span> is still positive <span id="id2">[<a class="reference internal" href="../../../bib.html#id4" title="Effective sample size, stan manual. URL: https://mc-stan.org/docs/2_27/reference-manual/effective-sample-size-section.html.">staa</a>, <a class="reference internal" href="../../../bib.html#id9" title="Andrew Gelman, John B Carlin, Hal S Stern, and Donald B Rubin. Bayesian data analysis. Chapman and Hall/CRC, 1995.">GCSR95</a>]</span>.</p>
+\hat{\rho}_{2K+1}\)</span> is still positive <span id="id2">[<a class="reference internal" href="../../../bib.html#id7" title="Effective sample size, stan manual. URL: https://mc-stan.org/docs/2_27/reference-manual/effective-sample-size-section.html.">staa</a>, <a class="reference internal" href="../../../bib.html#id11" title="Andrew Gelman, John B Carlin, Hal S Stern, and Donald B Rubin. Bayesian data analysis. Chapman and Hall/CRC, 1995.">GCSR95</a>]</span>.</p>
 <p>The current implementation is similar to Stan, which uses Geyer’s initial monotone sequence
-criterion <span id="id3">[<a class="reference internal" href="../../../bib.html#id10" title="Charles J Geyer. Practical markov chain monte carlo. Statistical science, pages 473–483, 1992.">Gey92</a>, <a class="reference internal" href="../../../bib.html#id11" title="Charles J Geyer. Introduction to markov chain monte carlo. Handbook of Markov Chain Monte Carlo, 20116022:45, 2011.">Gey11</a>]</span>.</p>
+criterion <span id="id3">[<a class="reference internal" href="../../../bib.html#id12" title="Charles J Geyer. Practical markov chain monte carlo. Statistical science, pages 473–483, 1992.">Gey92</a>, <a class="reference internal" href="../../../bib.html#id13" title="Charles J Geyer. Introduction to markov chain monte carlo. Handbook of Markov Chain Monte Carlo, 20116022:45, 2011.">Gey11</a>]</span>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.diagnostics.ess_bulk">
+<span class="sig-name descname"><span class="pre">ess_bulk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">blackjax.types.ArrayLike</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain_axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">blackjax.types.Array</span></span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#ess_bulk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.ess_bulk" title="Link to this definition">#</a></dt>
+<dd><p>Bulk effective sample size (rank-normalized split-chain ESS).</p>
+<p>Computes the bulk ESS from Vehtari et al. (2021): rank-normalizes draws
+after splitting each chain in half, then applies the standard
+autocorrelation-based <a class="reference internal" href="#blackjax.diagnostics.effective_sample_size" title="blackjax.diagnostics.effective_sample_size"><code class="xref py py-func docutils literal notranslate"><span class="pre">effective_sample_size()</span></code></a> estimator.  This
+diagnostic is robust to non-stationarity and multimodality.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_array</strong> – An array representing multiple chains of MCMC samples. The array must
+contain a chain dimension and a sample dimension.</p></li>
+<li><p><strong>chain_axis</strong> – The axis indicating the multiple chains. Default 0.</p></li>
+<li><p><strong>sample_axis</strong> – The axis indicating a single chain of MCMC samples. Default 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>NDArray of the resulting bulk-ESS, with chain and sample dimensions squeezed.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Algorithm:</p>
+<ol class="arabic simple">
+<li><p>Split each chain in half → 2× chains.</p></li>
+<li><p>Pool all draws and rank-normalize with <span class="math notranslate nohighlight">\(z_r = \Phi^{-1}((r-3/8)/(n+1/4))\)</span>.</p></li>
+<li><p>Apply <a class="reference internal" href="#blackjax.diagnostics.effective_sample_size" title="blackjax.diagnostics.effective_sample_size"><code class="xref py py-func docutils literal notranslate"><span class="pre">effective_sample_size()</span></code></a> to the rank-normalized draws.</p></li>
+</ol>
+<p class="rubric">References</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.diagnostics.ess_tail">
+<span class="sig-name descname"><span class="pre">ess_tail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">blackjax.types.ArrayLike</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain_axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.9</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">blackjax.types.Array</span></span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#ess_tail"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.ess_tail" title="Link to this definition">#</a></dt>
+<dd><p>Tail effective sample size.</p>
+<p>Computes the tail ESS from Vehtari et al. (2021) as the minimum of the
+ESS of the lower- and upper-tail indicator functions applied to split-chain
+draws.</p>
+<p>The tail quantiles are determined by <code class="docutils literal notranslate"><span class="pre">prob</span></code>: the lower tail uses the
+<code class="docutils literal notranslate"><span class="pre">(1</span> <span class="pre">-</span> <span class="pre">prob)</span> <span class="pre">/</span> <span class="pre">2</span></code> quantile and the upper tail uses the
+<code class="docutils literal notranslate"><span class="pre">(1</span> <span class="pre">+</span> <span class="pre">prob)</span> <span class="pre">/</span> <span class="pre">2</span></code> quantile.  The default <code class="docutils literal notranslate"><span class="pre">prob=0.90</span></code> corresponds to
+the 5th/95th percentiles, matching ArviZ’s default <code class="docutils literal notranslate"><span class="pre">prob=(0.05,</span> <span class="pre">0.95)</span></code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The agreement with <code class="docutils literal notranslate"><span class="pre">az.ess(method=&quot;tail&quot;)</span></code> holds for <strong>continuous</strong>
+draws only.  The upper-tail indicator here is
+<span class="math notranslate nohighlight">\(\mathbf{1}(x \ge q_{\text{high}})\)</span>, whereas Vehtari et al.
+and ArviZ use <span class="math notranslate nohighlight">\(\mathbf{1}(x \le q)\)</span> for both tails.  On
+continuous draws the two are exact complements and the ESS is
+identical, but on tied draws they are not: for iid Bernoulli(0.1),
+<span class="math notranslate nohighlight">\(P(x \ge q_{95})\)</span> is 0.097 rather than 0.05, and for a 5-level
+grid it is 0.21.  This is a separate known defect in the tail
+estimator’s tie handling, tracked independently of the
+rank-normalization fix; note that simply switching to <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code> does not
+resolve it, since that indicator is identically 1 on such draws and
+would be reported as degenerate.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_array</strong> – An array representing multiple chains of MCMC samples. The array must
+contain a chain dimension and a sample dimension.</p></li>
+<li><p><strong>chain_axis</strong> – The axis indicating the multiple chains. Default 0.</p></li>
+<li><p><strong>sample_axis</strong> – The axis indicating a single chain of MCMC samples. Default 1.</p></li>
+<li><p><strong>prob</strong> – Central-interval probability that determines the tail quantiles.
+Lower quantile: <code class="docutils literal notranslate"><span class="pre">(1</span> <span class="pre">-</span> <span class="pre">prob)</span> <span class="pre">/</span> <span class="pre">2</span></code>; upper quantile:
+<code class="docutils literal notranslate"><span class="pre">(1</span> <span class="pre">+</span> <span class="pre">prob)</span> <span class="pre">/</span> <span class="pre">2</span></code>.  Default <code class="docutils literal notranslate"><span class="pre">0.90</span></code> gives the 5th/95th-percentile
+tail, matching <code class="docutils literal notranslate"><span class="pre">az.ess(method=&quot;tail&quot;)</span></code> (ArviZ default).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>NDArray of the resulting tail-ESS, with chain and sample dimensions squeezed.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Algorithm:</p>
+<ol class="arabic simple">
+<li><p>Split each chain in half → 2× chains.</p></li>
+<li><p>Compute pooled lower/upper quantiles (at <code class="docutils literal notranslate"><span class="pre">(1-prob)/2</span></code> and
+<code class="docutils literal notranslate"><span class="pre">(1+prob)/2</span></code>) across all split chains and draws.</p></li>
+<li><p>Form indicator series <span class="math notranslate nohighlight">\(\mathbf{1}(x \le q_{\text{low}})\)</span> and
+<span class="math notranslate nohighlight">\(\mathbf{1}(x \ge q_{\text{high}})\)</span>.</p></li>
+<li><p>Compute <a class="reference internal" href="#blackjax.diagnostics.effective_sample_size" title="blackjax.diagnostics.effective_sample_size"><code class="xref py py-func docutils literal notranslate"><span class="pre">effective_sample_size()</span></code></a> for each indicator.</p></li>
+<li><p>Return <span class="math notranslate nohighlight">\(\min(\text{ESS}_\text{lower}, \text{ESS}_\text{upper})\)</span>.</p></li>
+</ol>
+<p class="rubric">References</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.diagnostics.pareto_khat">
+<span class="sig-name descname"><span class="pre">pareto_khat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">blackjax.types.ArrayLike</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tail</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'both'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tail_frac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">blackjax.types.Array</span></span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#pareto_khat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.pareto_khat" title="Link to this definition">#</a></dt>
+<dd><p>Pareto shape parameter k̂ for tail diagnosis.</p>
+<p>Fits a Generalised Pareto Distribution (GPD) to the upper and/or lower
+tail of a 1-D sample and returns the estimated shape parameter k̂.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – 1-D array of draws (or any array; it is ravelled before use).</p></li>
+<li><p><strong>tail</strong> – Which tail to fit: <code class="docutils literal notranslate"><span class="pre">&quot;upper&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;lower&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;both&quot;</span></code> (default).
+When <code class="docutils literal notranslate"><span class="pre">&quot;both&quot;</span></code>, returns the maximum of the two k̂ estimates.</p></li>
+<li><p><strong>tail_frac</strong> – Fraction of samples used as the tail. Default 0.10 (10 %).
+A minimum of 5 tail samples is always enforced.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>Scalar Array</strong> (<em>the Pareto shape estimate k̂.  Values below 0.5 indicate</em>)</p></li>
+<li><p><em>reliable tail estimates; 0.5–0.7 are moderate; above 0.7 may be</em></p></li>
+<li><p><em>unreliable.</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Uses the Zhang &amp; Stephens (2009) empirical-Bayes estimator implemented
+in the internal <code class="xref py py-func docutils literal notranslate"><span class="pre">_gpdfit()</span></code>.  The upper tail is modelled directly;
+the lower tail is reflected and modelled as an upper tail.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.diagnostics.psis_weights">
+<span class="sig-name descname"><span class="pre">psis_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_ratios</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">blackjax.types.Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_eff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">blackjax.types.Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#psis_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.psis_weights" title="Link to this definition">#</a></dt>
+<dd><p>Pareto Smoothed Importance Sampling (PSIS) log weights.</p>
+<p>Implements the PSIS smoothing step from <span id="id4">[<a class="reference internal" href="../../../bib.html#id4" title="Aki Vehtari, Andrew Gelman, and Jonah Gabry. Practical bayesian model evaluation using leave-one-out cross-validation and WAIC. Statistics and Computing, 27(5):1413–1432, 2017.">VGG17</a>]</span>:
+the <code class="docutils literal notranslate"><span class="pre">M</span></code> largest importance ratios (in ratio space) are replaced by sorted
+Generalised Pareto quantiles fitted by the empirical Bayes estimator of
+Zhang &amp; Stephens (2009), then all weights are normalised.</p>
+<p>This is a pure-JAX, JIT-compatible implementation faithful to Algorithm 1
+of Vehtari, Gelman &amp; Gabry (2017).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>log_ratios</strong> – Log importance ratios <code class="docutils literal notranslate"><span class="pre">log</span> <span class="pre">p(θ)</span> <span class="pre">−</span> <span class="pre">log</span> <span class="pre">q(θ)</span></code>, shape <code class="docutils literal notranslate"><span class="pre">(n,)</span></code>.
+Need not be normalised.</p></li>
+<li><p><strong>r_eff</strong> – Relative effective sample size of the proposal, <code class="docutils literal notranslate"><span class="pre">S_eff</span> <span class="pre">/</span> <span class="pre">n</span></code>.
+Use the default of <code class="docutils literal notranslate"><span class="pre">1.0</span></code> for i.i.d. draws (e.g. Pathfinder);
+set to the actual ESS ratio for correlated MCMC chains.  Values
+below 1 increase the tail size <code class="docutils literal notranslate"><span class="pre">M</span></code> to compensate for correlation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>log_weights</em> – Normalised log importance weights, shape <code class="docutils literal notranslate"><span class="pre">(n,)</span></code>.
+<code class="docutils literal notranslate"><span class="pre">jnp.exp(log_weights).sum()</span> <span class="pre">==</span> <span class="pre">1</span></code> up to floating-point precision.</p></li>
+<li><p><em>pareto_k</em> – Pareto shape parameter estimate (scalar <code class="docutils literal notranslate"><span class="pre">Array</span></code>).  Values below 0.5
+indicate reliable estimates; 0.5–0.7 are moderate; above 0.7 may give
+unreliable estimates.  <code class="docutils literal notranslate"><span class="pre">jnp.inf</span></code> means the tail was too small to fit
+(fewer than 5 samples).</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Tail size: <code class="docutils literal notranslate"><span class="pre">M</span> <span class="pre">=</span> <span class="pre">min(floor(3*sqrt(n/r_eff)),</span> <span class="pre">n//5)</span></code>, matching the paper.
+The GPD is only applied when <code class="docutils literal notranslate"><span class="pre">k</span> <span class="pre">&gt;=</span> <span class="pre">1/3</span></code>; lighter tails are left
+unsmoothed (only normalised).  Fitting uses empirical Bayes in
+importance-ratio space, the same approach as ArviZ.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="blackjax.diagnostics.DivergenceConcentrationReport">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">DivergenceConcentrationReport</span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#DivergenceConcentrationReport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.DivergenceConcentrationReport" title="Link to this definition">#</a></dt>
+<dd><p>Per-run divergence-concentration diagnostic report.</p>
+<p>All fields are plain JAX numerics — no strings — so the statistic
+itself stays JIT-compilable.  Pass the report to
+<a class="reference internal" href="#blackjax.diagnostics.format_divergence_warning" title="blackjax.diagnostics.format_divergence_warning"><code class="xref py py-func docutils literal notranslate"><span class="pre">format_divergence_warning()</span></code></a> to render a human-readable message
+from concrete (non-traced) values.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.diagnostics.DivergenceConcentrationReport.warn">
+<span class="sig-name descname"><span class="pre">warn</span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#DivergenceConcentrationReport.warn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.DivergenceConcentrationReport.warn" title="Link to this definition">#</a></dt>
+<dd><p>Bool. Whether a minority of chains (see the module notes on
+<a class="reference internal" href="#blackjax.diagnostics.divergence_concentration" title="blackjax.diagnostics.divergence_concentration"><code class="xref py py-func docutils literal notranslate"><span class="pre">divergence_concentration()</span></code></a>) crossed <code class="docutils literal notranslate"><span class="pre">rate_threshold</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.diagnostics.DivergenceConcentrationReport.flagged">
+<span class="sig-name descname"><span class="pre">flagged</span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#DivergenceConcentrationReport.flagged"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.DivergenceConcentrationReport.flagged" title="Link to this definition">#</a></dt>
+<dd><p>Bool array, shape <code class="docutils literal notranslate"><span class="pre">(n_chains,)</span></code>. Which chains crossed
+<code class="docutils literal notranslate"><span class="pre">rate_threshold</span></code>, independent of whether <code class="docutils literal notranslate"><span class="pre">warn</span></code> ends up true.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.diagnostics.DivergenceConcentrationReport.num_flagged">
+<span class="sig-name descname"><span class="pre">num_flagged</span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#DivergenceConcentrationReport.num_flagged"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.DivergenceConcentrationReport.num_flagged" title="Link to this definition">#</a></dt>
+<dd><p>Number of flagged chains, <code class="docutils literal notranslate"><span class="pre">flagged.sum()</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.diagnostics.DivergenceConcentrationReport.rates">
+<span class="sig-name descname"><span class="pre">rates</span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#DivergenceConcentrationReport.rates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.DivergenceConcentrationReport.rates" title="Link to this definition">#</a></dt>
+<dd><p>Per-chain sampling-phase divergence rate, shape <code class="docutils literal notranslate"><span class="pre">(n_chains,)</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">early_rate,</span> <span class="pre">late_rate</span></span></dt>
+<dd><p>Per-chain divergence rate in the first and last quarter of the
+sampling draws, shape <code class="docutils literal notranslate"><span class="pre">(n_chains,)</span></code>. <code class="docutils literal notranslate"><span class="pre">NaN</span></code> when computed from
+<a class="reference internal" href="#blackjax.diagnostics.divergence_concentration_from_counts" title="blackjax.diagnostics.divergence_concentration_from_counts"><code class="xref py py-func docutils literal notranslate"><span class="pre">divergence_concentration_from_counts()</span></code></a> (no per-draw
+resolution available).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.diagnostics.DivergenceConcentrationReport.median_other_rate">
+<span class="sig-name descname"><span class="pre">median_other_rate</span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#DivergenceConcentrationReport.median_other_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.DivergenceConcentrationReport.median_other_rate" title="Link to this definition">#</a></dt>
+<dd><p>For each chain, the median <code class="docutils literal notranslate"><span class="pre">rates</span></code> value across the <em>other</em>
+<code class="docutils literal notranslate"><span class="pre">n_chains</span> <span class="pre">-</span> <span class="pre">1</span></code> chains, shape <code class="docutils literal notranslate"><span class="pre">(n_chains,)</span></code>. <code class="docutils literal notranslate"><span class="pre">NaN</span></code> when
+<code class="docutils literal notranslate"><span class="pre">n_chains</span> <span class="pre">&lt;=</span> <span class="pre">1</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.diagnostics.DivergenceConcentrationReport.total_divergences">
+<span class="sig-name descname"><span class="pre">total_divergences</span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#DivergenceConcentrationReport.total_divergences"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.DivergenceConcentrationReport.total_divergences" title="Link to this definition">#</a></dt>
+<dd><p>Total divergence count <code class="docutils literal notranslate"><span class="pre">D</span></code> summed over all chains.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.diagnostics.DivergenceConcentrationReport.num_chains">
+<span class="sig-name descname"><span class="pre">num_chains</span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#DivergenceConcentrationReport.num_chains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.DivergenceConcentrationReport.num_chains" title="Link to this definition">#</a></dt>
+<dd><p>Number of chains <code class="docutils literal notranslate"><span class="pre">M</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.diagnostics.DivergenceConcentrationReport.rate_threshold">
+<span class="sig-name descname"><span class="pre">rate_threshold</span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#DivergenceConcentrationReport.rate_threshold"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.DivergenceConcentrationReport.rate_threshold" title="Link to this definition">#</a></dt>
+<dd><p>The threshold that was applied (echoed back for the message /
+for callers that only keep the report).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.diagnostics.DivergenceConcentrationReport.multinomial_p_value">
+<span class="sig-name descname"><span class="pre">multinomial_p_value</span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#DivergenceConcentrationReport.multinomial_p_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.DivergenceConcentrationReport.multinomial_p_value" title="Link to this definition">#</a></dt>
+<dd><p>Bonferroni-corrected exchangeable-null tail probability for the
+single worst chain, <code class="docutils literal notranslate"><span class="pre">min(1,</span> <span class="pre">M</span> <span class="pre">*</span> <span class="pre">P(Binomial(D,</span> <span class="pre">1/M)</span> <span class="pre">&gt;=</span> <span class="pre">d_max))</span></code>.
+Context only; never drives <code class="docutils literal notranslate"><span class="pre">warn</span></code>. <code class="docutils literal notranslate"><span class="pre">NaN</span></code> when <code class="docutils literal notranslate"><span class="pre">D=0</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">warn</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#DivergenceConcentrationReport.warn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">flagged</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#DivergenceConcentrationReport.flagged"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id5" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id6">
+<span class="sig-name descname"><span class="pre">num_flagged</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#DivergenceConcentrationReport.num_flagged"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id6" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id7">
+<span class="sig-name descname"><span class="pre">rates</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#DivergenceConcentrationReport.rates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id7" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.diagnostics.DivergenceConcentrationReport.early_rate">
+<span class="sig-name descname"><span class="pre">early_rate</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#DivergenceConcentrationReport.early_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.DivergenceConcentrationReport.early_rate" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.diagnostics.DivergenceConcentrationReport.late_rate">
+<span class="sig-name descname"><span class="pre">late_rate</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#DivergenceConcentrationReport.late_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.DivergenceConcentrationReport.late_rate" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id8">
+<span class="sig-name descname"><span class="pre">median_other_rate</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#DivergenceConcentrationReport.median_other_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id8" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id9">
+<span class="sig-name descname"><span class="pre">total_divergences</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#DivergenceConcentrationReport.total_divergences"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id9" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id10">
+<span class="sig-name descname"><span class="pre">num_chains</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#DivergenceConcentrationReport.num_chains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id10" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id11">
+<span class="sig-name descname"><span class="pre">rate_threshold</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#DivergenceConcentrationReport.rate_threshold"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id11" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id12">
+<span class="sig-name descname"><span class="pre">multinomial_p_value</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#DivergenceConcentrationReport.multinomial_p_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id12" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.diagnostics.divergence_concentration">
+<span class="sig-name descname"><span class="pre">divergence_concentration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">is_divergent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">blackjax.types.ArrayLike</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.02</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#blackjax.diagnostics.DivergenceConcentrationReport" title="blackjax.diagnostics.DivergenceConcentrationReport"><span class="pre">DivergenceConcentrationReport</span></a></span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#divergence_concentration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.divergence_concentration" title="Link to this definition">#</a></dt>
+<dd><p>Flag a run where sampling-phase divergences concentrate on a minority of chains.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>is_divergent</strong> – Per-draw divergence flags (bool or 0/1) for the sampling
+(post-warmup) phase only, shape <code class="docutils literal notranslate"><span class="pre">(n_chains,</span> <span class="pre">n_draws)</span></code>.</p></li>
+<li><p><strong>rate_threshold</strong> – Minimum per-chain divergence rate for chain <code class="docutils literal notranslate"><span class="pre">k</span></code> to count as
+flagged. Default <code class="docutils literal notranslate"><span class="pre">0.02</span></code> (2%).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><a class="reference internal" href="#blackjax.diagnostics.DivergenceConcentrationReport" title="blackjax.diagnostics.DivergenceConcentrationReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">DivergenceConcentrationReport</span></code></a>. <code class="docutils literal notranslate"><span class="pre">warn</span></code> is true iff between</p></li>
+<li><p>1 and <code class="docutils literal notranslate"><span class="pre">max(1,</span> <span class="pre">n_chains</span> <span class="pre">//</span> <span class="pre">4)</span></code> chains are flagged – a</p></li>
+<li><p><em>minority-outlier trigger; an ensemble where most/all chains cross the</em></p></li>
+<li><p><em>threshold returns populated fields but no warning.</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Counting is sampling-phase only; warmup divergences are out of scope.</p></li>
+<li><p>Concatenating warmup draws in front of sampling draws dilutes a real
+signal below threshold rather than raising a false alarm – slice to
+sampling draws only before calling this.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">multinomial_p_value</span></code> is context only; it never decides <code class="docutils literal notranslate"><span class="pre">warn</span></code>.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.diagnostics.divergence_concentration_from_counts">
+<span class="sig-name descname"><span class="pre">divergence_concentration_from_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chain_divergence_counts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">blackjax.types.ArrayLike</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_draws</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.02</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#blackjax.diagnostics.DivergenceConcentrationReport" title="blackjax.diagnostics.DivergenceConcentrationReport"><span class="pre">DivergenceConcentrationReport</span></a></span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#divergence_concentration_from_counts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.divergence_concentration_from_counts" title="Link to this definition">#</a></dt>
+<dd><p>Same as <a class="reference internal" href="#blackjax.diagnostics.divergence_concentration" title="blackjax.diagnostics.divergence_concentration"><code class="xref py py-func docutils literal notranslate"><span class="pre">divergence_concentration()</span></code></a>, from precomputed per-chain counts.</p>
+<p>Use when per-draw flags are not retained but per-chain totals are.
+<code class="docutils literal notranslate"><span class="pre">early_rate</span></code> / <code class="docutils literal notranslate"><span class="pre">late_rate</span></code> are <code class="docutils literal notranslate"><span class="pre">NaN</span></code> (no per-draw resolution for
+a quarter profile); <a class="reference internal" href="#blackjax.diagnostics.format_divergence_warning" title="blackjax.diagnostics.format_divergence_warning"><code class="xref py py-func docutils literal notranslate"><span class="pre">format_divergence_warning()</span></code></a> omits that part
+of the message rather than printing “nan%”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chain_divergence_counts</strong> – Per-chain divergence counts for the sampling phase, shape
+<code class="docutils literal notranslate"><span class="pre">(n_chains,)</span></code>.</p></li>
+<li><p><strong>n_draws</strong> – Number of sampling draws per chain.</p></li>
+<li><p><strong>rate_threshold</strong> – See <a class="reference internal" href="#blackjax.diagnostics.divergence_concentration" title="blackjax.diagnostics.divergence_concentration"><code class="xref py py-func docutils literal notranslate"><span class="pre">divergence_concentration()</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#blackjax.diagnostics.DivergenceConcentrationReport" title="blackjax.diagnostics.DivergenceConcentrationReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">DivergenceConcentrationReport</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.diagnostics.format_divergence_warning">
+<span class="sig-name descname"><span class="pre">format_divergence_warning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#blackjax.diagnostics.DivergenceConcentrationReport" title="blackjax.diagnostics.DivergenceConcentrationReport"><span class="pre">DivergenceConcentrationReport</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../../../_modules/blackjax/diagnostics.html#format_divergence_warning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.diagnostics.format_divergence_warning" title="Link to this definition">#</a></dt>
+<dd><p>Render a <a class="reference internal" href="#blackjax.diagnostics.DivergenceConcentrationReport" title="blackjax.diagnostics.DivergenceConcentrationReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">DivergenceConcentrationReport</span></code></a> as a human-readable message.</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code> when <code class="docutils literal notranslate"><span class="pre">report.warn</span></code> is false. Otherwise returns one
+sentence per flagged chain (newline-separated when more than one
+chain is flagged). Not JIT-compatible by design — call it on concrete
+report values (e.g. after a sampling run has completed), not inside
+traced code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>report</strong> – A report produced by <a class="reference internal" href="#blackjax.diagnostics.divergence_concentration" title="blackjax.diagnostics.divergence_concentration"><code class="xref py py-func docutils literal notranslate"><span class="pre">divergence_concentration()</span></code></a> or
+<a class="reference internal" href="#blackjax.diagnostics.divergence_concentration_from_counts" title="blackjax.diagnostics.divergence_concentration_from_counts"><code class="xref py py-func docutils literal notranslate"><span class="pre">divergence_concentration_from_counts()</span></code></a>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">str</span></code>, empty when there is nothing to warn about.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -493,11 +1030,11 @@ criterion <span id="id3">[<a class="reference internal" href="../../../bib.html#
       </div>
     </a>
     <a class="right-next"
-       href="../mcmc/index.html"
+       href="../eca/index.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">blackjax.mcmc</p>
+        <p class="prev-next-title">blackjax.eca</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -508,19 +1045,53 @@ criterion <span id="id3">[<a class="reference internal" href="../../../bib.html#
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> Contents
   </div>
-  <nav class="bd-toc-nav page-toc">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classes">Classes</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module Contents</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.potential_scale_reduction"><code class="docutils literal notranslate"><span class="pre">potential_scale_reduction()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.rhat"><code class="docutils literal notranslate"><span class="pre">rhat()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.effective_sample_size"><code class="docutils literal notranslate"><span class="pre">effective_sample_size()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.ess_bulk"><code class="docutils literal notranslate"><span class="pre">ess_bulk()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.ess_tail"><code class="docutils literal notranslate"><span class="pre">ess_tail()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.pareto_khat"><code class="docutils literal notranslate"><span class="pre">pareto_khat()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.psis_weights"><code class="docutils literal notranslate"><span class="pre">psis_weights()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.warn"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.warn</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.flagged"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.flagged</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.num_flagged"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.num_flagged</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.rates"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.rates</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.median_other_rate"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.median_other_rate</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.total_divergences"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.total_divergences</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.num_chains"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.num_chains</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.rate_threshold"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.rate_threshold</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.multinomial_p_value"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.multinomial_p_value</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.warn</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id5"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.flagged</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id6"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.num_flagged</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id7"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.rates</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.early_rate"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.early_rate</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.DivergenceConcentrationReport.late_rate"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.late_rate</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id8"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.median_other_rate</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id9"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.total_divergences</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id10"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.num_chains</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id11"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.rate_threshold</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id12"><code class="docutils literal notranslate"><span class="pre">DivergenceConcentrationReport.multinomial_p_value</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.divergence_concentration"><code class="docutils literal notranslate"><span class="pre">divergence_concentration()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.divergence_concentration_from_counts"><code class="docutils literal notranslate"><span class="pre">divergence_concentration_from_counts()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.diagnostics.format_divergence_warning"><code class="docutils literal notranslate"><span class="pre">format_divergence_warning()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -547,7 +1118,7 @@ By The Blackjax developers
 
   <p class="copyright">
     
-      © Copyright 2025, The Blackjax developers.
+      © Copyright 2026, The Blackjax developers.
       <br/>
     
   </p>
@@ -571,8 +1142,8 @@ By The Blackjax developers
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
   </footer>

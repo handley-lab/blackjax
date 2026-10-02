@@ -9,13 +9,29 @@ blackjax.diagnostics
 
 
 
+Classes
+-------
+
+.. autoapisummary::
+
+   blackjax.diagnostics.DivergenceConcentrationReport
+
+
 Functions
 ---------
 
 .. autoapisummary::
 
    blackjax.diagnostics.potential_scale_reduction
+   blackjax.diagnostics.rhat
    blackjax.diagnostics.effective_sample_size
+   blackjax.diagnostics.ess_bulk
+   blackjax.diagnostics.ess_tail
+   blackjax.diagnostics.pareto_khat
+   blackjax.diagnostics.psis_weights
+   blackjax.diagnostics.divergence_concentration
+   blackjax.diagnostics.divergence_concentration_from_counts
+   blackjax.diagnostics.format_divergence_warning
 
 
 Module Contents
@@ -36,12 +52,62 @@ Module Contents
 
    The diagnostic is computed by:
 
-   .. math:: \hat{R} = \frac{\hat{V}}{W}
+   .. math:: \hat{R} = \sqrt{\frac{\hat{V}}{W}}
 
    where :math:`W` is the within-chain variance and :math:`\hat{V}` is the posterior variance
    estimate for the pooled traces. This is the potential scale reduction factor, which
    converges to unity when each of the traces is a sample from the target posterior. Values
    greater than one indicate that one or more chains have not yet converged :cite:p:`stan_rhat,gelman1992inference`.
+
+
+.. py:function:: rhat(input_array: blackjax.types.ArrayLike, chain_axis: int = 0, sample_axis: int = 1) -> blackjax.types.Array
+
+   Rank-normalized split-R̂ (Vehtari et al. 2021).
+
+   The modern improved R̂ diagnostic.  Combines two split-chain R̂ values —
+   one on rank-normalized draws and one on rank-normalized *folded* draws —
+   and returns the maximum.  The folded component catches scale/variance
+   non-convergence that the bulk component can miss.
+
+   This matches the default ``az.rhat(method="rank")`` convention in ArviZ.
+
+   :param input_array: An array representing multiple chains of MCMC samples. The array must
+                       contain a chain dimension and a sample dimension.  At least 2 chains
+                       and at least 4 draws per chain are required.
+   :param chain_axis: The axis indicating the multiple chains. Default 0.
+   :param sample_axis: The axis indicating a single chain of MCMC samples. Default 1.
+
+   :returns: * *NDArray of the resulting R̂ values, with chain and sample dimensions*
+             * *squeezed.  Values close to 1.0 indicate convergence; values above 1.01*
+             * *suggest chains have not converged.*
+
+   .. rubric:: Notes
+
+   Algorithm (Vehtari et al. 2021, § 4):
+
+   1. Split each chain in half → 2× chains.
+   2. Rank-normalize with the Blom plotting position
+      :math:`z_r = \Phi^{-1}((r - 3/8) / (n + 1/4))` over the joint pool.
+   3. Compute the standard split-R̂ on the rank-normalized draws (**bulk**).
+   4. Compute the folded draws :math:`|x - \mathrm{median}(x)|`, rank-normalize
+      them, and compute split-R̂ again (**tail**).
+   5. Return :math:`\max(\hat{R}_{\text{bulk}}, \hat{R}_{\text{tail}})`.
+
+   .. warning::
+
+      ``NaN`` from this function does **not** uniquely mean "the draws
+      contained a missing observation".  The folded component subtracts the
+      pooled median, so when at least half of a component's pooled draws are
+      ``+inf`` (or ``-inf``) the median is infinite and the fold evaluates
+      ``inf - inf``, which is ``NaN``.  Such a component returns ``NaN`` from
+      :func:`rhat` while containing no ``NaN`` at all — and while
+      :func:`ess_bulk` and :func:`ess_tail` still return finite values for it.
+      Infinity handling is a separate open question from the missing-data
+      contract; this is documented, not yet decided.
+
+   .. rubric:: References
+
+   .. cite:p:`vehtari2021rank`
 
 
 .. py:function:: effective_sample_size(input_array: blackjax.types.ArrayLike, chain_axis: int = 0, sample_axis: int = 1) -> blackjax.types.Array
@@ -53,7 +119,12 @@ Module Contents
    :param chain_axis: The axis indicating the multiple chains. Default to 0.
    :param sample_axis: The axis indicating a single chain of MCMC samples. Default to 1.
 
-   :rtype: NDArray of the resulting statistics (ess), with the chain and sample dimensions squeezed.
+   :returns: * *NDArray of the resulting statistics (ess), with the chain and sample dimensions squeezed.*
+             * *Variables whose within-chain variance is numerically zero have an effective*
+             * sample size of zero.  Variables containing a ``NaN`` draw are undefined and
+             * report ``NaN``; the reduction is per variable, so an independent finite
+             * *variable is unaffected.  Infinities are ordered values and are not treated*
+             * *as missing.*
 
    .. rubric:: Notes
 
@@ -70,5 +141,310 @@ Module Contents
 
    The current implementation is similar to Stan, which uses Geyer's initial monotone sequence
    criterion :cite:p:`geyer1992practical,geyer2011introduction`.
+
+
+.. py:function:: ess_bulk(input_array: blackjax.types.ArrayLike, chain_axis: int = 0, sample_axis: int = 1) -> blackjax.types.Array
+
+   Bulk effective sample size (rank-normalized split-chain ESS).
+
+   Computes the bulk ESS from Vehtari et al. (2021): rank-normalizes draws
+   after splitting each chain in half, then applies the standard
+   autocorrelation-based :func:`effective_sample_size` estimator.  This
+   diagnostic is robust to non-stationarity and multimodality.
+
+   :param input_array: An array representing multiple chains of MCMC samples. The array must
+                       contain a chain dimension and a sample dimension.
+   :param chain_axis: The axis indicating the multiple chains. Default 0.
+   :param sample_axis: The axis indicating a single chain of MCMC samples. Default 1.
+
+   :rtype: NDArray of the resulting bulk-ESS, with chain and sample dimensions squeezed.
+
+   .. rubric:: Notes
+
+   Algorithm:
+
+   1. Split each chain in half → 2× chains.
+   2. Pool all draws and rank-normalize with :math:`z_r = \Phi^{-1}((r-3/8)/(n+1/4))`.
+   3. Apply :func:`effective_sample_size` to the rank-normalized draws.
+
+   .. rubric:: References
+
+   .. cite:p:`vehtari2021rank`
+
+
+.. py:function:: ess_tail(input_array: blackjax.types.ArrayLike, chain_axis: int = 0, sample_axis: int = 1, prob: float = 0.9) -> blackjax.types.Array
+
+   Tail effective sample size.
+
+   Computes the tail ESS from Vehtari et al. (2021) as the minimum of the
+   ESS of the lower- and upper-tail indicator functions applied to split-chain
+   draws.
+
+   The tail quantiles are determined by ``prob``: the lower tail uses the
+   ``(1 - prob) / 2`` quantile and the upper tail uses the
+   ``(1 + prob) / 2`` quantile.  The default ``prob=0.90`` corresponds to
+   the 5th/95th percentiles, matching ArviZ's default ``prob=(0.05, 0.95)``.
+
+   .. warning::
+
+      The agreement with ``az.ess(method="tail")`` holds for **continuous**
+      draws only.  The upper-tail indicator here is
+      :math:`\mathbf{1}(x \ge q_{\text{high}})`, whereas Vehtari et al.
+      and ArviZ use :math:`\mathbf{1}(x \le q)` for both tails.  On
+      continuous draws the two are exact complements and the ESS is
+      identical, but on tied draws they are not: for iid Bernoulli(0.1),
+      :math:`P(x \ge q_{95})` is 0.097 rather than 0.05, and for a 5-level
+      grid it is 0.21.  This is a separate known defect in the tail
+      estimator's tie handling, tracked independently of the
+      rank-normalization fix; note that simply switching to ``<=`` does not
+      resolve it, since that indicator is identically 1 on such draws and
+      would be reported as degenerate.
+
+   :param input_array: An array representing multiple chains of MCMC samples. The array must
+                       contain a chain dimension and a sample dimension.
+   :param chain_axis: The axis indicating the multiple chains. Default 0.
+   :param sample_axis: The axis indicating a single chain of MCMC samples. Default 1.
+   :param prob: Central-interval probability that determines the tail quantiles.
+                Lower quantile: ``(1 - prob) / 2``; upper quantile:
+                ``(1 + prob) / 2``.  Default ``0.90`` gives the 5th/95th-percentile
+                tail, matching ``az.ess(method="tail")`` (ArviZ default).
+
+   :rtype: NDArray of the resulting tail-ESS, with chain and sample dimensions squeezed.
+
+   .. rubric:: Notes
+
+   Algorithm:
+
+   1. Split each chain in half → 2× chains.
+   2. Compute pooled lower/upper quantiles (at ``(1-prob)/2`` and
+      ``(1+prob)/2``) across all split chains and draws.
+   3. Form indicator series :math:`\mathbf{1}(x \le q_{\text{low}})` and
+      :math:`\mathbf{1}(x \ge q_{\text{high}})`.
+   4. Compute :func:`effective_sample_size` for each indicator.
+   5. Return :math:`\min(\text{ESS}_\text{lower}, \text{ESS}_\text{upper})`.
+
+   .. rubric:: References
+
+   .. cite:p:`vehtari2021rank`
+
+
+.. py:function:: pareto_khat(x: blackjax.types.ArrayLike, tail: str = 'both', tail_frac: float = 0.1) -> blackjax.types.Array
+
+   Pareto shape parameter k̂ for tail diagnosis.
+
+   Fits a Generalised Pareto Distribution (GPD) to the upper and/or lower
+   tail of a 1-D sample and returns the estimated shape parameter k̂.
+
+   :param x: 1-D array of draws (or any array; it is ravelled before use).
+   :param tail: Which tail to fit: ``"upper"``, ``"lower"``, or ``"both"`` (default).
+                When ``"both"``, returns the maximum of the two k̂ estimates.
+   :param tail_frac: Fraction of samples used as the tail. Default 0.10 (10 %).
+                     A minimum of 5 tail samples is always enforced.
+
+   :returns: * **Scalar Array** (*the Pareto shape estimate k̂.  Values below 0.5 indicate*)
+             * *reliable tail estimates; 0.5–0.7 are moderate; above 0.7 may be*
+             * *unreliable.*
+
+   .. rubric:: Notes
+
+   Uses the Zhang & Stephens (2009) empirical-Bayes estimator implemented
+   in the internal :func:`_gpdfit`.  The upper tail is modelled directly;
+   the lower tail is reflected and modelled as an upper tail.
+
+
+.. py:function:: psis_weights(log_ratios: blackjax.types.Array, r_eff: float = 1.0) -> tuple[blackjax.types.Array, blackjax.types.Array]
+
+   Pareto Smoothed Importance Sampling (PSIS) log weights.
+
+   Implements the PSIS smoothing step from :cite:p:`vehtari2017practical`:
+   the ``M`` largest importance ratios (in ratio space) are replaced by sorted
+   Generalised Pareto quantiles fitted by the empirical Bayes estimator of
+   Zhang & Stephens (2009), then all weights are normalised.
+
+   This is a pure-JAX, JIT-compatible implementation faithful to Algorithm 1
+   of Vehtari, Gelman & Gabry (2017).
+
+   :param log_ratios: Log importance ratios ``log p(θ) − log q(θ)``, shape ``(n,)``.
+                      Need not be normalised.
+   :param r_eff: Relative effective sample size of the proposal, ``S_eff / n``.
+                 Use the default of ``1.0`` for i.i.d. draws (e.g. Pathfinder);
+                 set to the actual ESS ratio for correlated MCMC chains.  Values
+                 below 1 increase the tail size ``M`` to compensate for correlation.
+
+   :returns: * *log_weights* -- Normalised log importance weights, shape ``(n,)``.
+               ``jnp.exp(log_weights).sum() == 1`` up to floating-point precision.
+             * *pareto_k* -- Pareto shape parameter estimate (scalar ``Array``).  Values below 0.5
+               indicate reliable estimates; 0.5–0.7 are moderate; above 0.7 may give
+               unreliable estimates.  ``jnp.inf`` means the tail was too small to fit
+               (fewer than 5 samples).
+
+   .. rubric:: Notes
+
+   Tail size: ``M = min(floor(3*sqrt(n/r_eff)), n//5)``, matching the paper.
+   The GPD is only applied when ``k >= 1/3``; lighter tails are left
+   unsmoothed (only normalised).  Fitting uses empirical Bayes in
+   importance-ratio space, the same approach as ArviZ.
+
+
+.. py:class:: DivergenceConcentrationReport
+
+
+
+   Per-run divergence-concentration diagnostic report.
+
+   All fields are plain JAX numerics — no strings — so the statistic
+   itself stays JIT-compilable.  Pass the report to
+   :func:`format_divergence_warning` to render a human-readable message
+   from concrete (non-traced) values.
+
+   .. attribute:: warn
+
+      Bool. Whether a minority of chains (see the module notes on
+      :func:`divergence_concentration`) crossed ``rate_threshold``.
+
+   .. attribute:: flagged
+
+      Bool array, shape ``(n_chains,)``. Which chains crossed
+      ``rate_threshold``, independent of whether ``warn`` ends up true.
+
+   .. attribute:: num_flagged
+
+      Number of flagged chains, ``flagged.sum()``.
+
+   .. attribute:: rates
+
+      Per-chain sampling-phase divergence rate, shape ``(n_chains,)``.
+
+   .. attribute:: early_rate, late_rate
+
+      Per-chain divergence rate in the first and last quarter of the
+      sampling draws, shape ``(n_chains,)``. ``NaN`` when computed from
+      :func:`divergence_concentration_from_counts` (no per-draw
+      resolution available).
+
+   .. attribute:: median_other_rate
+
+      For each chain, the median ``rates`` value across the *other*
+      ``n_chains - 1`` chains, shape ``(n_chains,)``. ``NaN`` when
+      ``n_chains <= 1``.
+
+   .. attribute:: total_divergences
+
+      Total divergence count ``D`` summed over all chains.
+
+   .. attribute:: num_chains
+
+      Number of chains ``M``.
+
+   .. attribute:: rate_threshold
+
+      The threshold that was applied (echoed back for the message /
+      for callers that only keep the report).
+
+   .. attribute:: multinomial_p_value
+
+      Bonferroni-corrected exchangeable-null tail probability for the
+      single worst chain, ``min(1, M * P(Binomial(D, 1/M) >= d_max))``.
+      Context only; never drives ``warn``. ``NaN`` when ``D=0``.
+
+
+   .. py:attribute:: warn
+      :type:  blackjax.types.Array
+
+
+   .. py:attribute:: flagged
+      :type:  blackjax.types.Array
+
+
+   .. py:attribute:: num_flagged
+      :type:  blackjax.types.Array
+
+
+   .. py:attribute:: rates
+      :type:  blackjax.types.Array
+
+
+   .. py:attribute:: early_rate
+      :type:  blackjax.types.Array
+
+
+   .. py:attribute:: late_rate
+      :type:  blackjax.types.Array
+
+
+   .. py:attribute:: median_other_rate
+      :type:  blackjax.types.Array
+
+
+   .. py:attribute:: total_divergences
+      :type:  blackjax.types.Array
+
+
+   .. py:attribute:: num_chains
+      :type:  blackjax.types.Array
+
+
+   .. py:attribute:: rate_threshold
+      :type:  blackjax.types.Array
+
+
+   .. py:attribute:: multinomial_p_value
+      :type:  blackjax.types.Array
+
+
+.. py:function:: divergence_concentration(is_divergent: blackjax.types.ArrayLike, *, rate_threshold: float = 0.02) -> DivergenceConcentrationReport
+
+   Flag a run where sampling-phase divergences concentrate on a minority of chains.
+
+   :param is_divergent: Per-draw divergence flags (bool or 0/1) for the sampling
+                        (post-warmup) phase only, shape ``(n_chains, n_draws)``.
+   :param rate_threshold: Minimum per-chain divergence rate for chain ``k`` to count as
+                          flagged. Default ``0.02`` (2%).
+
+   :returns: * :class:`DivergenceConcentrationReport`. ``warn`` is true iff between
+             * 1 and ``max(1, n_chains // 4)`` chains are flagged -- a
+             * *minority-outlier trigger; an ensemble where most/all chains cross the*
+             * *threshold returns populated fields but no warning.*
+
+   .. rubric:: Notes
+
+   - Counting is sampling-phase only; warmup divergences are out of scope.
+   - Concatenating warmup draws in front of sampling draws dilutes a real
+     signal below threshold rather than raising a false alarm -- slice to
+     sampling draws only before calling this.
+   - ``multinomial_p_value`` is context only; it never decides ``warn``.
+
+
+.. py:function:: divergence_concentration_from_counts(chain_divergence_counts: blackjax.types.ArrayLike, n_draws: int, *, rate_threshold: float = 0.02) -> DivergenceConcentrationReport
+
+   Same as :func:`divergence_concentration`, from precomputed per-chain counts.
+
+   Use when per-draw flags are not retained but per-chain totals are.
+   ``early_rate`` / ``late_rate`` are ``NaN`` (no per-draw resolution for
+   a quarter profile); :func:`format_divergence_warning` omits that part
+   of the message rather than printing "nan%".
+
+   :param chain_divergence_counts: Per-chain divergence counts for the sampling phase, shape
+                                   ``(n_chains,)``.
+   :param n_draws: Number of sampling draws per chain.
+   :param rate_threshold: See :func:`divergence_concentration`.
+
+   :rtype: :class:`DivergenceConcentrationReport`
+
+
+.. py:function:: format_divergence_warning(report: DivergenceConcentrationReport) -> str
+
+   Render a :class:`DivergenceConcentrationReport` as a human-readable message.
+
+   Returns ``""`` when ``report.warn`` is false. Otherwise returns one
+   sentence per flagged chain (newline-separated when more than one
+   chain is flagged). Not JIT-compatible by design — call it on concrete
+   report values (e.g. after a sampling run has completed), not inside
+   traced code.
+
+   :param report: A report produced by :func:`divergence_concentration` or
+                  :func:`divergence_concentration_from_counts`.
+
+   :rtype: ``str``, empty when there is nothing to warn about.
 
 

@@ -47,4 +47,10 @@ Module Contents
 
    Numpyro style dynamic U-Turn criterion.
 
+   :param is_turning: A function that checks whether a trajectory is turning back on itself,
+                      given the left momentum, right momentum, and summed momentum.
+
+   :returns: * A tuple of ``(new_state, update_criterion_state, is_iterative_turning)``
+             * *functions that together implement the iterative U-turn criterion.*
+
 

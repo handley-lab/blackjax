@@ -24,36 +24,49 @@ Functions
 Module Contents
 ---------------
 
-.. py:function:: init(position: blackjax.types.ArrayLikeTree, logdensity_fn: Callable)
+.. py:function:: init(position: blackjax.types.ArrayLikeTree, logdensity_fn: Callable) -> blackjax.mcmc.hmc.HMCState
 
-.. py:function:: build_kernel(logdensity_fn: Callable, integrator: Callable = integrators.isokinetic_mclachlan, divergence_threshold: float = 1000, inverse_mass_matrix=1.0)
+   Create an initial state for the MHMCHMC kernel.
 
-   Build an MHMCHMC kernel where the number of integration steps is chosen randomly.
+   :param position: Initial position of the chain.
+   :param logdensity_fn: Log-density function of the target distribution.
 
-   :param integrator: The integrator to use to integrate the Hamiltonian dynamics.
-   :param divergence_threshold: Value of the difference in energy above which we consider that the transition is divergent.
-   :param next_random_arg_fn: Function that generates the next `random_generator_arg` from its previous value.
-   :param integration_steps_fn: Function that generates the next pseudo or quasi-random number of integration steps in the
-                                sequence, given the current `random_generator_arg`. Needs to return an `int`.
+   :rtype: The initial HMCState.
+
+
+.. py:function:: build_kernel(integrator: Callable = integrators.isokinetic_mclachlan, divergence_threshold: float = 1000)
+
+   Build an MHMCHMC kernel.
+
+   :param integrator: The symplectic integrator to use to integrate the Hamiltonian dynamics.
+   :param divergence_threshold: Value of the difference in energy above which we consider that the
+                                transition is divergent.
 
    :returns: * *A kernel that takes a rng_key and a Pytree that contains the current state*
              * *of the chain and that returns a new state of the chain along with*
              * *information about the transition.*
 
 
-.. py:function:: as_top_level_api(logdensity_fn: Callable, step_size: float, L_proposal_factor: float = jnp.inf, inverse_mass_matrix=1.0, *, divergence_threshold: int = 1000, integrator: Callable = integrators.isokinetic_mclachlan, num_integration_steps) -> blackjax.base.SamplingAlgorithm
+.. py:function:: as_top_level_api(logdensity_fn: Callable, step_size: float, L_proposal_factor: float = jnp.inf, inverse_mass_matrix=1.0, *, divergence_threshold: int = 1000, integrator: Callable = integrators.isokinetic_mclachlan, num_integration_steps=None, integration_steps_params: tuple | None = None) -> blackjax.base.SamplingAlgorithm
 
    Implements the (basic) user interface for the MHMCHMC kernel.
 
    :param logdensity_fn: The log-density function we wish to draw samples from.
    :param step_size: The value to use for the step size in the symplectic integrator.
+   :param L_proposal_factor: Factor controlling partial momentum refreshment. ``jnp.inf`` disables
+                             refreshment (standard HMC-like behavior).
+   :param inverse_mass_matrix: Inverse mass matrix for the isokinetic integrator. Scalar or array.
    :param divergence_threshold: The absolute value of the difference in energy between two states above
-                                which we say that the transition is divergent. The default value is
-                                commonly found in other libraries, and yet is arbitrary.
-   :param integrator: (algorithm parameter) The symplectic integrator to use to integrate the trajectory.
-   :param next_random_arg_fn: Function that generates the next `random_generator_arg` from its previous value.
-   :param integration_steps_fn: Function that generates the next pseudo or quasi-random number of integration steps in the
-                                sequence, given the current `random_generator_arg`.
+                                which we say that the transition is divergent.
+   :param integrator: The symplectic integrator to use to integrate the trajectory.
+   :param num_integration_steps: Number of integration steps per transition.  Deprecated in favour of
+                                 ``integration_steps_params=(num_integration_steps,)``.  Providing both
+                                 raises a :class:`DeprecationWarning` and ``integration_steps_params``
+                                 takes precedence.
+   :param integration_steps_params: Tuple of parameters unpacked into the kernel's ``integration_steps_params``
+                                    argument.  For the static kernel this must be a 1-tuple
+                                    ``(num_steps,)``.  Defaults to ``(num_integration_steps,)`` when only
+                                    ``num_integration_steps`` is provided.
 
    :rtype: A ``SamplingAlgorithm``.
 

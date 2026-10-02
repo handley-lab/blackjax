@@ -16,36 +16,39 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=e37d73aa" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="../../../../_static/documentation_options.js?v=9eb32ce0"></script>
-    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'autoapi/blackjax/mcmc/metrics/index';</script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -53,6 +56,7 @@
     <link rel="prev" title="blackjax.mcmc.mclmc" href="../mclmc/index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.1.dev1+g351bb9a14" />
   </head>
   
   
@@ -68,19 +72,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../../../../search.html"
       method="get">
@@ -88,7 +81,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search..."
          aria-label="Search..."
          autocomplete="off"
@@ -96,8 +88,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -113,7 +105,8 @@
       
       
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -143,30 +136,29 @@
     
     
     <img src="../../../../_static/blackjax.png" class="logo__image only-light" alt=" - Home"/>
-    <script>document.write(`<img src="../../../../_static/blackjax.png" class="logo__image only-dark" alt=" - Home"/>`);</script>
+    <img src="../../../../_static/blackjax.png" class="logo__image only-dark pst-js-only" alt=" - Home"/>
   
   
 </a></div>
         <div class="sidebar-primary-item">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script></div>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/diagnostics.html">MCMC Diagnostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/speed_up_guide.html">Speed-up Guide</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">PPL INTEGRATION</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_aesara.html">Aesara</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_pytensor.html">PyTensor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_numpyro.html">Numpyro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_funsor.html">Funsor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_oryx.html">Oryx</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_pymc.html">PyMC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_use_tfp.html">Tensorflow-Probability</a></li>
@@ -174,9 +166,11 @@
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">HOW TO</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_sample_multiple_chains.html">Sample with multiple chains?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_progress_bar.html">Show progress during sampling?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_custom_gradients.html">Use custom gradients?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_other_frameworks.html">Use non-JAX log-prob functions?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_metropolis_within_gibbs.html">Build a Metropolis-Within-Gibbs sampler?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_laplace_hmc.html">Use Laplace-preconditioned HMC?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/howto_reproduce_the_blackjax_image.html">Sample from the word BlackJAX using BlackJAX?</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">LEARN BY EXAMPLE</span></p>
@@ -190,25 +184,52 @@
 <li class="toctree-l3"><a class="reference internal" href="../../adaptation/adjusted_mclmc_adaptation/index.html">blackjax.adaptation.adjusted_mclmc_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../adaptation/base/index.html">blackjax.adaptation.base</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../adaptation/chees_adaptation/index.html">blackjax.adaptation.chees_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/laps/index.html">blackjax.adaptation.laps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/laps_burn_in/index.html">blackjax.adaptation.laps_burn_in</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/low_rank_adaptation/index.html">blackjax.adaptation.low_rank_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../adaptation/mass_matrix/index.html">blackjax.adaptation.mass_matrix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../adaptation/mclmc_adaptation/index.html">blackjax.adaptation.mclmc_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/mclmc_lrd_adaptation/index.html">blackjax.adaptation.mclmc_lrd_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../adaptation/meads_adaptation/index.html">blackjax.adaptation.meads_adaptation</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../adaptation/meta/index.html">blackjax.adaptation.meta</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../adaptation/meta/builders/index.html">blackjax.adaptation.meta.builders</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../adaptation/meta/verdict/index.html">blackjax.adaptation.meta.verdict</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/meta_adaptation/index.html">blackjax.adaptation.meta_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/metric_buffers/index.html">blackjax.adaptation.metric_buffers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/metric_estimators/index.html">blackjax.adaptation.metric_estimators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/metric_recipes/index.html">blackjax.adaptation.metric_recipes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../adaptation/pathfinder_adaptation/index.html">blackjax.adaptation.pathfinder_adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../adaptation/staged_adaptation/index.html">blackjax.adaptation.staged_adaptation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../adaptation/step_size/index.html">blackjax.adaptation.step_size</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../adaptation/window_adaptation/index.html">blackjax.adaptation.window_adaptation</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../../diagnostics/index.html">blackjax.diagnostics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../eca/index.html">blackjax.eca</a></li>
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="../index.html">blackjax.mcmc</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../adjusted_mclmc/index.html">blackjax.mcmc.adjusted_mclmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../adjusted_mclmc_dynamic/index.html">blackjax.mcmc.adjusted_mclmc_dynamic</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../barker/index.html">blackjax.mcmc.barker</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../composed/index.html">blackjax.mcmc.composed</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../composed/step_size/index.html">blackjax.mcmc.composed.step_size</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../composed/trajectory_length/index.html">blackjax.mcmc.composed.trajectory_length</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../coupled_hmc/index.html">blackjax.mcmc.coupled_hmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../diffusions/index.html">blackjax.mcmc.diffusions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../dynamic_hmc/index.html">blackjax.mcmc.dynamic_hmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../elliptical_slice/index.html">blackjax.mcmc.elliptical_slice</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ghmc/index.html">blackjax.mcmc.ghmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gist/index.html">blackjax.mcmc.gist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gist_step_size/index.html">blackjax.mcmc.gist_step_size</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gist_trajectory_length/index.html">blackjax.mcmc.gist_trajectory_length</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../hmc/index.html">blackjax.mcmc.hmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../integrators/index.html">blackjax.mcmc.integrators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../laplace_dynamic_hmc/index.html">blackjax.mcmc.laplace_dynamic_hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../laplace_hmc/index.html">blackjax.mcmc.laplace_hmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../laplace_marginal/index.html">blackjax.mcmc.laplace_marginal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../mala/index.html">blackjax.mcmc.mala</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../marginal_latent_gaussian/index.html">blackjax.mcmc.marginal_latent_gaussian</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../mclmc/index.html">blackjax.mcmc.mclmc</a></li>
@@ -218,10 +239,21 @@
 <li class="toctree-l3"><a class="reference internal" href="../proposal/index.html">blackjax.mcmc.proposal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../random_walk/index.html">blackjax.mcmc.random_walk</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../rmhmc/index.html">blackjax.mcmc.rmhmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../slice/index.html">blackjax.mcmc.slice</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../termination/index.html">blackjax.mcmc.termination</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../trajectory/index.html">blackjax.mcmc.trajectory</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../ns/index.html">blackjax.ns</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../ns/adaptive/index.html">blackjax.ns.adaptive</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ns/base/index.html">blackjax.ns.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ns/from_mcmc/index.html">blackjax.ns.from_mcmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ns/integrator/index.html">blackjax.ns.integrator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ns/nss/index.html">blackjax.ns.nss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ns/utils/index.html">blackjax.ns.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../progress_reader/index.html">blackjax.progress_reader</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../sgmcmc/index.html">blackjax.sgmcmc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../sgmcmc/csgld/index.html">blackjax.sgmcmc.csgld</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../sgmcmc/diffusions/index.html">blackjax.sgmcmc.diffusions</a></li>
@@ -232,12 +264,14 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../smc/index.html">blackjax.smc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/adaptive_persistent_sampling/index.html">blackjax.smc.adaptive_persistent_sampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../smc/adaptive_tempered/index.html">blackjax.smc.adaptive_tempered</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../smc/base/index.html">blackjax.smc.base</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../smc/ess/index.html">blackjax.smc.ess</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../smc/from_mcmc/index.html">blackjax.smc.from_mcmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../smc/inner_kernel_tuning/index.html">blackjax.smc.inner_kernel_tuning</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../smc/partial_posteriors_path/index.html">blackjax.smc.partial_posteriors_path</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../smc/persistent_sampling/index.html">blackjax.smc.persistent_sampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../smc/pretuning/index.html">blackjax.smc.pretuning</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../smc/resampling/index.html">blackjax.smc.resampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../smc/solver/index.html">blackjax.smc.solver</a></li>
@@ -251,7 +285,9 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../vi/index.html">blackjax.vi</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../vi/fullrank_vi/index.html">blackjax.vi.fullrank_vi</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../vi/meanfield_vi/index.html">blackjax.vi.meanfield_vi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../vi/multipathfinder/index.html">blackjax.vi.multipathfinder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../vi/pathfinder/index.html">blackjax.vi.pathfinder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../vi/schrodinger_follmer/index.html">blackjax.vi.schrodinger_follmer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../vi/svgd/index.html">blackjax.vi.svgd</a></li>
@@ -261,6 +297,11 @@
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../bib.html">Bibliography</a></li>
 </ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">DEVELOPER DOCUMENTATION</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../developer/design_principles.html">Design Principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developer/new_algorithm_guide.html">Contributing a New Algorithm</a></li>
+</ul>
 
     </div>
 </nav></div>
@@ -268,9 +309,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -320,7 +366,7 @@
 
 
 <button onclick="toggleFullScreen()"
-  class="btn btn-sm btn-fullscreen-button"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
   title="Fullscreen mode"
   data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
@@ -334,25 +380,17 @@
 
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-  </button>
-`);
-</script>
-<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
 </button>
 </div></div>
@@ -375,11 +413,23 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classes">Classes</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module Contents</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.metrics.LowRankInverseMassMatrix"><code class="docutils literal notranslate"><span class="pre">LowRankInverseMassMatrix</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.metrics.LowRankInverseMassMatrix.sigma"><code class="docutils literal notranslate"><span class="pre">LowRankInverseMassMatrix.sigma</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.metrics.LowRankInverseMassMatrix.U"><code class="docutils literal notranslate"><span class="pre">LowRankInverseMassMatrix.U</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.metrics.LowRankInverseMassMatrix.lam"><code class="docutils literal notranslate"><span class="pre">LowRankInverseMassMatrix.lam</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">LowRankInverseMassMatrix.sigma</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id4"><code class="docutils literal notranslate"><span class="pre">LowRankInverseMassMatrix.U</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id5"><code class="docutils literal notranslate"><span class="pre">LowRankInverseMassMatrix.lam</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.metrics.default_metric"><code class="docutils literal notranslate"><span class="pre">default_metric()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.metrics.gaussian_euclidean"><code class="docutils literal notranslate"><span class="pre">gaussian_euclidean()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.metrics.gaussian_euclidean_low_rank"><code class="docutils literal notranslate"><span class="pre">gaussian_euclidean_low_rank()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.metrics.gaussian_riemannian"><code class="docutils literal notranslate"><span class="pre">gaussian_riemannian()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.metrics.lbfgs_inverse_hessian_to_low_rank_metric"><code class="docutils literal notranslate"><span class="pre">lbfgs_inverse_hessian_to_low_rank_metric()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -400,23 +450,40 @@ document.write(`
 position space in the Euclidean metric. It is defined by a definite positive
 matrix <span class="math notranslate nohighlight">\(M\)</span> with fixed value so that the kinetic energy of the hamiltonian
 dynamic is independent of the position and only depends on the momentum
-<span class="math notranslate nohighlight">\(p\)</span> <span id="id1">[<a class="reference internal" href="../../../../bib.html#id23" title="Michael Betancourt, Simon Byrne, Sam Livingstone, and Mark Girolami. The geometric foundations of hamiltonian monte carlo. arXiv preprint arXiv:arXiv:1410.5110, 2017.">BBLG17</a>]</span>.</p>
+<span class="math notranslate nohighlight">\(p\)</span> <span id="id1">[<a class="reference internal" href="../../../../bib.html#id25" title="Michael Betancourt, Simon Byrne, Sam Livingstone, and Mark Girolami. The geometric foundations of hamiltonian monte carlo. arXiv preprint arXiv:arXiv:1410.5110, 2017.">BBLG17</a>]</span>.</p>
 <p>For a Newtonian hamiltonian dynamic the kinetic energy is given by:</p>
 <div class="math notranslate nohighlight">
 \[K(p) = \frac{1}{2} p^T M^{-1} p\]</div>
-<p>We can also generate a relativistic dynamic <span id="id2">[<a class="reference internal" href="../../../../bib.html#id24" title="Xiaoyu Lu, Valerio Perrone, Leonard Hasenclever, Yee Whye Teh, and Sebastian Vollmer. Relativistic monte carlo. In Artificial Intelligence and Statistics, 1236–1245. PMLR, 2017.">LPH+17</a>]</span>.</p>
+<p>We can also generate a relativistic dynamic <span id="id2">[<a class="reference internal" href="../../../../bib.html#id26" title="Xiaoyu Lu, Valerio Perrone, Leonard Hasenclever, Yee Whye Teh, and Sebastian Vollmer. Relativistic monte carlo. In Artificial Intelligence and Statistics, 1236–1245. PMLR, 2017.">LPH+17</a>]</span>.</p>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.mcmc.metrics.LowRankInverseMassMatrix" title="blackjax.mcmc.metrics.LowRankInverseMassMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LowRankInverseMassMatrix</span></code></a></p></td>
+<td><p>Pure-array description of a low-rank inverse mass matrix.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
 <section id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.mcmc.metrics.default_metric" title="blackjax.mcmc.metrics.default_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">default_metric</span></code></a>(→ Metric)</p></td>
-<td><p>Convert an input metric into a <code class="docutils literal notranslate"><span class="pre">Metric</span></code> object following sensible default rules</p></td>
+<td><p>Convert an input metric into a <code class="docutils literal notranslate"><span class="pre">Metric</span></code> object following sensible default rules.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#blackjax.mcmc.metrics.gaussian_euclidean" title="blackjax.mcmc.metrics.gaussian_euclidean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gaussian_euclidean</span></code></a>(→ Metric)</p></td>
 <td><p>Hamiltonian dynamic on euclidean manifold with normally-distributed momentum</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.mcmc.metrics.gaussian_riemannian" title="blackjax.mcmc.metrics.gaussian_riemannian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gaussian_riemannian</span></code></a>(→ Metric)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.mcmc.metrics.gaussian_euclidean_low_rank" title="blackjax.mcmc.metrics.gaussian_euclidean_low_rank"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gaussian_euclidean_low_rank</span></code></a>(→ Metric)</p></td>
+<td><p>Euclidean metric with low-rank-modified mass matrix <span id="id3">[<a class="reference internal" href="../../../../bib.html#id3" title="Adrian Seyboldt, Eliot L. Carlson, and Bob Carpenter. Preconditioning hamiltonian monte carlo by minimizing fisher divergence. arXiv preprint arXiv:2603.18845, 2026.">SCC26</a>]</span>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#blackjax.mcmc.metrics.gaussian_riemannian" title="blackjax.mcmc.metrics.gaussian_riemannian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gaussian_riemannian</span></code></a>(→ Metric)</p></td>
+<td><p>Hamiltonian dynamic on Riemannian manifold with normally-distributed momentum.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#blackjax.mcmc.metrics.lbfgs_inverse_hessian_to_low_rank_metric" title="blackjax.mcmc.metrics.lbfgs_inverse_hessian_to_low_rank_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lbfgs_inverse_hessian_to_low_rank_metric</span></code></a>(...)</p></td>
+<td><p>Convert an L-BFGS factored inverse-Hessian to a <a class="reference internal" href="#blackjax.mcmc.metrics.LowRankInverseMassMatrix" title="blackjax.mcmc.metrics.LowRankInverseMassMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">LowRankInverseMassMatrix</span></code></a>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -424,25 +491,92 @@ dynamic is independent of the position and only depends on the momentum
 </section>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="blackjax.mcmc.metrics.LowRankInverseMassMatrix">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LowRankInverseMassMatrix</span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/metrics.html#LowRankInverseMassMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.metrics.LowRankInverseMassMatrix" title="Link to this definition">#</a></dt>
+<dd><p>Pure-array description of a low-rank inverse mass matrix.</p>
+<p>The inverse mass matrix has the form</p>
+<div class="math notranslate nohighlight">
+\[M^{-1} = \operatorname{diag}(\sigma)
+         \bigl(I + U(\Lambda - I)U^\top\bigr)
+         \operatorname{diag}(\sigma)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\sigma \in \mathbb{R}^d_{&gt;0}\)</span>, <span class="math notranslate nohighlight">\(U \in \mathbb{R}^{d \times k}\)</span>
+has orthonormal columns and <span class="math notranslate nohighlight">\(\Lambda = \operatorname{diag}(\lambda)\)</span>.</p>
+<p>This is the array-only payload produced by
+<a class="reference internal" href="../../adaptation/low_rank_adaptation/index.html#blackjax.adaptation.low_rank_adaptation.window_adaptation_low_rank" title="blackjax.adaptation.low_rank_adaptation.window_adaptation_low_rank"><code class="xref py py-func docutils literal notranslate"><span class="pre">window_adaptation_low_rank()</span></code></a>.
+Unlike a fully-constructed <code class="xref py py-class docutils literal notranslate"><span class="pre">Metric</span></code> (whose fields are Python closures
+that capture these arrays), this NamedTuple is a pure JAX pytree and can be
+safely transported across <code class="docutils literal notranslate"><span class="pre">jax.vmap</span></code> / <code class="docutils literal notranslate"><span class="pre">jax.pmap</span></code> boundaries.</p>
+<p><a class="reference internal" href="#blackjax.mcmc.metrics.default_metric" title="blackjax.mcmc.metrics.default_metric"><code class="xref py py-func docutils literal notranslate"><span class="pre">default_metric()</span></code></a> expands this into a <code class="xref py py-class docutils literal notranslate"><span class="pre">Metric</span></code> at the kernel
+call site via <a class="reference internal" href="#blackjax.mcmc.metrics.gaussian_euclidean_low_rank" title="blackjax.mcmc.metrics.gaussian_euclidean_low_rank"><code class="xref py py-func docutils literal notranslate"><span class="pre">gaussian_euclidean_low_rank()</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.mcmc.metrics.LowRankInverseMassMatrix.sigma">
+<span class="sig-name descname"><span class="pre">sigma</span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/metrics.html#LowRankInverseMassMatrix.sigma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.metrics.LowRankInverseMassMatrix.sigma" title="Link to this definition">#</a></dt>
+<dd><p>Shape <code class="docutils literal notranslate"><span class="pre">(d,)</span></code>. Positive diagonal scaling.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.mcmc.metrics.LowRankInverseMassMatrix.U">
+<span class="sig-name descname"><span class="pre">U</span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/metrics.html#LowRankInverseMassMatrix.U"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.metrics.LowRankInverseMassMatrix.U" title="Link to this definition">#</a></dt>
+<dd><p>Shape <code class="docutils literal notranslate"><span class="pre">(d,</span> <span class="pre">k)</span></code>. Matrix with orthonormal columns.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="blackjax.mcmc.metrics.LowRankInverseMassMatrix.lam">
+<span class="sig-name descname"><span class="pre">lam</span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/metrics.html#LowRankInverseMassMatrix.lam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.metrics.LowRankInverseMassMatrix.lam" title="Link to this definition">#</a></dt>
+<dd><p>Shape <code class="docutils literal notranslate"><span class="pre">(k,)</span></code>. Positive eigenvalues.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">sigma</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/metrics.html#LowRankInverseMassMatrix.sigma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">U</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/metrics.html#LowRankInverseMassMatrix.U"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id4" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">lam</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">blackjax.types.Array</span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/metrics.html#LowRankInverseMassMatrix.lam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id5" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="blackjax.mcmc.metrics.default_metric">
 <span class="sig-name descname"><span class="pre">default_metric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MetricTypes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Metric</span></span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/metrics.html#default_metric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.metrics.default_metric" title="Link to this definition">#</a></dt>
-<dd><p>Convert an input metric into a <code class="docutils literal notranslate"><span class="pre">Metric</span></code> object following sensible default rules</p>
-<p>The metric can be specified in three different ways:</p>
+<dd><p>Convert an input metric into a <code class="docutils literal notranslate"><span class="pre">Metric</span></code> object following sensible default rules.</p>
+<p>The metric can be specified in four different ways:</p>
 <ul class="simple">
 <li><p>A <code class="docutils literal notranslate"><span class="pre">Metric</span></code> object that implements the full interface</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">LowRankInverseMassMatrix</span></code> NamedTuple holding <code class="docutils literal notranslate"><span class="pre">(sigma,</span> <span class="pre">U,</span> <span class="pre">lam)</span></code>,
+which is expanded to a full <code class="xref py py-class docutils literal notranslate"><span class="pre">Metric</span></code> via
+<a class="reference internal" href="#blackjax.mcmc.metrics.gaussian_euclidean_low_rank" title="blackjax.mcmc.metrics.gaussian_euclidean_low_rank"><code class="xref py py-func docutils literal notranslate"><span class="pre">gaussian_euclidean_low_rank()</span></code></a>. This is the form returned by
+<a class="reference internal" href="../../adaptation/low_rank_adaptation/index.html#blackjax.adaptation.low_rank_adaptation.window_adaptation_low_rank" title="blackjax.adaptation.low_rank_adaptation.window_adaptation_low_rank"><code class="xref py py-func docutils literal notranslate"><span class="pre">window_adaptation_low_rank()</span></code></a>
+and is safe to transport across <code class="docutils literal notranslate"><span class="pre">jax.vmap</span></code> boundaries.</p></li>
 <li><p>An <code class="docutils literal notranslate"><span class="pre">Array</span></code> which is assumed to specify the inverse mass matrix of a static
 metric</p></li>
 <li><p>A function that takes a coordinate position and returns the mass matrix at that
 location</p></li>
 </ul>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>A <code class="docutils literal notranslate"><span class="pre">Metric</span></code> object with <code class="docutils literal notranslate"><span class="pre">sample_momentum</span></code>, <code class="docutils literal notranslate"><span class="pre">kinetic_energy</span></code>,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">check_turning</span></code>, and <code class="docutils literal notranslate"><span class="pre">scale</span></code> fields.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="blackjax.mcmc.metrics.gaussian_euclidean">
 <span class="sig-name descname"><span class="pre">gaussian_euclidean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inverse_mass_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">blackjax.types.Array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Metric</span></span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/metrics.html#gaussian_euclidean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.metrics.gaussian_euclidean" title="Link to this definition">#</a></dt>
 <dd><p>Hamiltonian dynamic on euclidean manifold with normally-distributed momentum
-<span id="id3">[<a class="reference internal" href="../../../../bib.html#id34" title="Michael Betancourt. A general metric for riemannian manifold hamiltonian monte carlo. In Geometric Science of Information: First International Conference, GSI 2013, Paris, France, August 28-30, 2013. Proceedings, 327–334. Springer, 2013.">Bet13</a>]</span>.</p>
+<span id="id6">[<a class="reference internal" href="../../../../bib.html#id36" title="Michael Betancourt. A general metric for riemannian manifold hamiltonian monte carlo. In Geometric Science of Information: First International Conference, GSI 2013, Paris, France, August 28-30, 2013. Proceedings, 327–334. Springer, 2013.">Bet13</a>]</span>.</p>
 <p>The gaussian euclidean metric is a euclidean metric further characterized
 by setting the conditional probability density <span class="math notranslate nohighlight">\(\pi(momentum|position)\)</span>
 to follow a standard gaussian distribution. A Newtonian hamiltonian
@@ -472,9 +606,141 @@ itself given the values of the momentum along the trajectory.</p></li>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="blackjax.mcmc.metrics.gaussian_euclidean_low_rank">
+<span class="sig-name descname"><span class="pre">gaussian_euclidean_low_rank</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">blackjax.types.Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">blackjax.types.Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">blackjax.types.Array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Metric</span></span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/metrics.html#gaussian_euclidean_low_rank"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.metrics.gaussian_euclidean_low_rank" title="Link to this definition">#</a></dt>
+<dd><p>Euclidean metric with low-rank-modified mass matrix <span id="id7">[<a class="reference internal" href="../../../../bib.html#id3" title="Adrian Seyboldt, Eliot L. Carlson, and Bob Carpenter. Preconditioning hamiltonian monte carlo by minimizing fisher divergence. arXiv preprint arXiv:2603.18845, 2026.">SCC26</a>]</span>.</p>
+<p>The inverse mass matrix has the form</p>
+<div class="math notranslate nohighlight">
+\[M^{-1} = \operatorname{diag}(\sigma)
+         \bigl(I + U(\Lambda - I)U^\top\bigr)
+         \operatorname{diag}(\sigma)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\sigma \in \mathbb{R}^d_{&gt;0}\)</span> is a diagonal scaling,
+<span class="math notranslate nohighlight">\(U \in \mathbb{R}^{d \times k}\)</span> has orthonormal columns, and
+<span class="math notranslate nohighlight">\(\Lambda = \operatorname{diag}(\lambda)\)</span> with <span class="math notranslate nohighlight">\(\lambda &gt; 0\)</span>.
+When <span class="math notranslate nohighlight">\(\lambda = \mathbf{1}\)</span> the metric reduces to a diagonal metric
+with scale <span class="math notranslate nohighlight">\(\sigma\)</span>.  All HMC operations are <span class="math notranslate nohighlight">\(O(dk)\)</span>, making
+this efficient when <span class="math notranslate nohighlight">\(k \ll d\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sigma</strong> – Shape <code class="docutils literal notranslate"><span class="pre">(d,)</span></code>.  Positive diagonal scaling; plays the role of marginal
+standard deviations.</p></li>
+<li><p><strong>U</strong> – Shape <code class="docutils literal notranslate"><span class="pre">(d,</span> <span class="pre">k)</span></code>.  Matrix with orthonormal columns spanning the
+low-rank correction subspace.</p></li>
+<li><p><strong>lam</strong> – Shape <code class="docutils literal notranslate"><span class="pre">(k,)</span></code>.  Positive eigenvalues for the low-rank correction.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <code class="docutils literal notranslate"><span class="pre">Metric</span></code> object whose operations all run in <span class="math notranslate nohighlight">\(O(dk)\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="blackjax.mcmc.metrics.gaussian_riemannian">
 <span class="sig-name descname"><span class="pre">gaussian_riemannian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mass_matrix_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Metric</span></span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/metrics.html#gaussian_riemannian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.metrics.gaussian_riemannian" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Hamiltonian dynamic on Riemannian manifold with normally-distributed momentum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mass_matrix_fn</strong> – A callable that takes a position and returns the mass matrix at that
+location (positive definite, one or two-dimensional array).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>A <code class="docutils literal notranslate"><span class="pre">Metric</span></code> object with <code class="docutils literal notranslate"><span class="pre">sample_momentum</span></code>, <code class="docutils literal notranslate"><span class="pre">kinetic_energy</span></code>,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">check_turning</span></code>, and <code class="docutils literal notranslate"><span class="pre">scale</span></code> fields.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blackjax.mcmc.metrics.lbfgs_inverse_hessian_to_low_rank_metric">
+<span class="sig-name descname"><span class="pre">lbfgs_inverse_hessian_to_low_rank_metric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">blackjax.types.Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">blackjax.types.Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">blackjax.types.Array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#blackjax.mcmc.metrics.LowRankInverseMassMatrix" title="blackjax.mcmc.metrics.LowRankInverseMassMatrix"><span class="pre">LowRankInverseMassMatrix</span></a></span></span><a class="reference internal" href="../../../../_modules/blackjax/mcmc/metrics.html#lbfgs_inverse_hessian_to_low_rank_metric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blackjax.mcmc.metrics.lbfgs_inverse_hessian_to_low_rank_metric" title="Link to this definition">#</a></dt>
+<dd><p>Convert an L-BFGS factored inverse-Hessian to a <a class="reference internal" href="#blackjax.mcmc.metrics.LowRankInverseMassMatrix" title="blackjax.mcmc.metrics.LowRankInverseMassMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">LowRankInverseMassMatrix</span></code></a>.</p>
+<p>The L-BFGS inverse Hessian is stored in the factored form</p>
+<div class="math notranslate nohighlight">
+\[H^{-1} = \operatorname{diag}(\alpha) + \beta \Gamma \beta^\top\]</div>
+<p>(formula II.1 / II.3 of <span id="id8">[<a class="reference internal" href="../../../../bib.html#id38" title="Lu Zhang, Bob Carpenter, Andrew Gelman, and Aki Vehtari. Pathfinder: parallel quasi-newton variational inference. Journal of Machine Learning Research, 23(306):1–49, 2022.">ZCGV22</a>]</span>).  This adapter
+rewrites it as a <a class="reference internal" href="#blackjax.mcmc.metrics.LowRankInverseMassMatrix" title="blackjax.mcmc.metrics.LowRankInverseMassMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">LowRankInverseMassMatrix</span></code></a> with</p>
+<div class="math notranslate nohighlight">
+\[M^{-1} = \operatorname{diag}(\sigma)
+         \bigl(I + U(\Lambda - I)U^\top\bigr)
+         \operatorname{diag}(\sigma),
+\quad \sigma = \sqrt{\alpha}\]</div>
+<p>via a compact <span class="math notranslate nohighlight">\(O((2m)^3)\)</span> inner eigendecomposition that avoids the
+<span class="math notranslate nohighlight">\(O(d^3)\)</span> full eigenproblem:</p>
+<ol class="arabic simple">
+<li><p>Set <span class="math notranslate nohighlight">\(D = \operatorname{diag}(\sigma)\)</span> and factor out to obtain
+<span class="math notranslate nohighlight">\(H^{-1} = D(I + \tilde B \Gamma \tilde B^\top)D\)</span> with
+<span class="math notranslate nohighlight">\(\tilde B = D^{-1}\beta \in \mathbb{R}^{d \times 2m}\)</span>.</p></li>
+<li><p>QR-decompose <span class="math notranslate nohighlight">\(\tilde B = Q R\)</span> (thin QR, <span class="math notranslate nohighlight">\(Q\)</span> orthonormal
+<span class="math notranslate nohighlight">\(d \times r\)</span>, <span class="math notranslate nohighlight">\(r = \min(d, 2m)\)</span>).</p></li>
+<li><p>The inner correction satisfies
+<span class="math notranslate nohighlight">\(\tilde B \Gamma \tilde B^\top = Q (R \Gamma R^\top) Q^\top\)</span>,
+so its eigenvalues are those of the <span class="math notranslate nohighlight">\(r \times r\)</span> matrix
+<span class="math notranslate nohighlight">\(R \Gamma R^\top\)</span>.</p></li>
+<li><p>Eigendecompose <span class="math notranslate nohighlight">\(R \Gamma R^\top = V \Lambda_c V^\top\)</span> (eigh,
+<span class="math notranslate nohighlight">\(r \times r\)</span> only).</p></li>
+<li><p>Return <span class="math notranslate nohighlight">\(U = QV\)</span> (orthonormal eigenvectors, shape <span class="math notranslate nohighlight">\(d \times r\)</span>)
+and <span class="math notranslate nohighlight">\(\lambda = 1 + \Lambda_c\)</span> (eigenvalues of <span class="math notranslate nohighlight">\(I + \tilde B
+\Gamma \tilde B^\top\)</span>).</p></li>
+</ol>
+<p><strong>When to use this.</strong>  Pass the <code class="docutils literal notranslate"><span class="pre">(alpha,</span> <span class="pre">beta,</span> <span class="pre">gamma)</span></code> triple produced by
+<code class="xref py py-func docutils literal notranslate"><span class="pre">lbfgs_inverse_hessian_factors()</span></code> to obtain a
+JAX-pytree-safe <a class="reference internal" href="#blackjax.mcmc.metrics.LowRankInverseMassMatrix" title="blackjax.mcmc.metrics.LowRankInverseMassMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">LowRankInverseMassMatrix</span></code></a> that can cross
+<code class="docutils literal notranslate"><span class="pre">jax.vmap</span></code> boundaries and feed any consumer that accepts the unified
+representation (HMC, MCLMC, etc.).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is a <strong>pure adapter</strong> — it does not alter Pathfinder’s
+internal sampling path.  Wiring this adapter into Pathfinder’s own
+sampling path is deliberate follow-up work; for now it ships as an
+adapter with parity tests only.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>Positive-definiteness precondition.</strong>  The triple <code class="docutils literal notranslate"><span class="pre">(alpha,</span> <span class="pre">beta,</span> <span class="pre">gamma)</span></code>
+must yield a positive-definite dense form <code class="docutils literal notranslate"><span class="pre">diag(alpha)</span> <span class="pre">+</span> <span class="pre">beta</span> <span class="pre">&#64;</span> <span class="pre">gamma</span> <span class="pre">&#64;</span>
+<span class="pre">beta.T</span></code>; this is guaranteed when the triple comes from
+<code class="xref py py-func docutils literal notranslate"><span class="pre">lbfgs_inverse_hessian_factors()</span></code> under a
+Wolfe-condition line search.  Non-positive-definite inputs produce <code class="docutils literal notranslate"><span class="pre">lam</span> <span class="pre">&lt;=</span>
+<span class="pre">0</span></code> <em>silently</em> here and surface as NaN at momentum sampling.  Additionally,
+at float32 near-singular metrics (condition number ≳ 1e7) can resolve the
+smallest eigenvalue with unreliable sign; for such inputs prefer float64
+factors.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alpha</strong> – Shape <code class="docutils literal notranslate"><span class="pre">(d,)</span></code>.  Positive diagonal of the inverse Hessian approximation.</p></li>
+<li><p><strong>beta</strong> – Shape <code class="docutils literal notranslate"><span class="pre">(d,</span> <span class="pre">2m)</span></code>.  Left factor of the low-rank correction.  When
+<code class="docutils literal notranslate"><span class="pre">m</span> <span class="pre">=</span> <span class="pre">0</span></code> (empty L-BFGS history) <code class="docutils literal notranslate"><span class="pre">beta</span></code> has shape <code class="docutils literal notranslate"><span class="pre">(d,</span> <span class="pre">0)</span></code> and the
+adapter returns a pure diagonal metric.</p></li>
+<li><p><strong>gamma</strong> – Shape <code class="docutils literal notranslate"><span class="pre">(2m,</span> <span class="pre">2m)</span></code>.  Symmetric inner factor of the low-rank correction.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>With <code class="docutils literal notranslate"><span class="pre">sigma</span> <span class="pre">=</span> <span class="pre">sqrt(alpha)</span></code>, <code class="docutils literal notranslate"><span class="pre">U</span></code> the <code class="docutils literal notranslate"><span class="pre">(d,</span> <span class="pre">r)</span></code> orthonormal
+eigenvector matrix, and <code class="docutils literal notranslate"><span class="pre">lam</span> <span class="pre">=</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">eigenvalues(R</span> <span class="pre">Γ</span> <span class="pre">Rᵀ)</span></code>.
+Empty-history edge: <code class="docutils literal notranslate"><span class="pre">U</span></code> has shape <code class="docutils literal notranslate"><span class="pre">(d,</span> <span class="pre">0)</span></code> and <code class="docutils literal notranslate"><span class="pre">lam</span></code> shape <code class="docutils literal notranslate"><span class="pre">(0,)</span></code>,
+representing a pure diagonal metric with scale <code class="docutils literal notranslate"><span class="pre">sigma</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#blackjax.mcmc.metrics.LowRankInverseMassMatrix" title="blackjax.mcmc.metrics.LowRankInverseMassMatrix">LowRankInverseMassMatrix</a></p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#blackjax.mcmc.metrics.LowRankInverseMassMatrix" title="blackjax.mcmc.metrics.LowRankInverseMassMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LowRankInverseMassMatrix</span></code></a></dt><dd><p>Target representation consumed by <a class="reference internal" href="#blackjax.mcmc.metrics.gaussian_euclidean_low_rank" title="blackjax.mcmc.metrics.gaussian_euclidean_low_rank"><code class="xref py py-func docutils literal notranslate"><span class="pre">gaussian_euclidean_low_rank()</span></code></a>.</p>
+</dd>
+<dt><a class="reference internal" href="#blackjax.mcmc.metrics.gaussian_euclidean_low_rank" title="blackjax.mcmc.metrics.gaussian_euclidean_low_rank"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gaussian_euclidean_low_rank</span></code></a></dt><dd><p>Full metric protocol built from the representation.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
 
 </section>
 </section>
@@ -515,20 +781,34 @@ itself given the values of the momentum along the trajectory.</p></li>
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> Contents
   </div>
-  <nav class="bd-toc-nav page-toc">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classes">Classes</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module Contents</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.metrics.LowRankInverseMassMatrix"><code class="docutils literal notranslate"><span class="pre">LowRankInverseMassMatrix</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.metrics.LowRankInverseMassMatrix.sigma"><code class="docutils literal notranslate"><span class="pre">LowRankInverseMassMatrix.sigma</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.metrics.LowRankInverseMassMatrix.U"><code class="docutils literal notranslate"><span class="pre">LowRankInverseMassMatrix.U</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.metrics.LowRankInverseMassMatrix.lam"><code class="docutils literal notranslate"><span class="pre">LowRankInverseMassMatrix.lam</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">LowRankInverseMassMatrix.sigma</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id4"><code class="docutils literal notranslate"><span class="pre">LowRankInverseMassMatrix.U</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id5"><code class="docutils literal notranslate"><span class="pre">LowRankInverseMassMatrix.lam</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.metrics.default_metric"><code class="docutils literal notranslate"><span class="pre">default_metric()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.metrics.gaussian_euclidean"><code class="docutils literal notranslate"><span class="pre">gaussian_euclidean()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.metrics.gaussian_euclidean_low_rank"><code class="docutils literal notranslate"><span class="pre">gaussian_euclidean_low_rank()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.metrics.gaussian_riemannian"><code class="docutils literal notranslate"><span class="pre">gaussian_riemannian()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blackjax.mcmc.metrics.lbfgs_inverse_hessian_to_low_rank_metric"><code class="docutils literal notranslate"><span class="pre">lbfgs_inverse_hessian_to_low_rank_metric()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -555,7 +835,7 @@ By The Blackjax developers
 
   <p class="copyright">
     
-      © Copyright 2025, The Blackjax developers.
+      © Copyright 2026, The Blackjax developers.
       <br/>
     
   </p>
@@ -579,8 +859,8 @@ By The Blackjax developers
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
   </footer>
