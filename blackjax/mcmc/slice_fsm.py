@@ -15,12 +15,13 @@
 
 A scalar kernel advances through interval construction, shrinkage, acceptance
 checks and successive moves in one loop. Under vmap, chains need not wait for
-one another between these stages. The evaluator has one shared call site.
+one another between these stages. The slice function has one shared call site.
 
 Interval strategies implement Neal (2003), Figures 3--6. The proposal defines
-the path independently of the interval strategy and target evaluation.
+the slice independently of the interval strategy.
 """
 
+from collections import namedtuple
 from typing import Any, NamedTuple
 
 import jax
@@ -39,24 +40,72 @@ class SliceInfo(NamedTuple):
     num_shrink: Array
 
 
-class _SliceState(NamedTuple):
-    rng_key: PRNGKey
-    phase: Array
-    left: Array
-    right: Array
-    t: Array
-    level: Array
-    trial: Any
-    num_expansions: Array
-    num_shrink: Array
+class SliceState(NamedTuple):
+    position: Any
+    logdensity: Array
+    rng_key: PRNGKey = None
+    proposal: Any = ()
+    index: Array = 0
+    phase: Array = _LEFT
+    left: Array = 0.0
+    right: Array = 0.0
+    t: Array = 0.0
+    level: Array = 0.0
+    num_evaluations: Array = 0
+    num_expansions: Array = 0
+    num_shrink: Array = 0
 
 
-def _init_slice(rng_key, state, width):
+SteppingOutState = namedtuple(
+    "SteppingOutState",
+    (*SliceState._fields, "left_steps", "right_steps"),
+    defaults=(*SliceState._field_defaults.values(), 0, 0),
+)
+
+DoublingState = namedtuple(
+    "DoublingState",
+    (
+        *SliceState._fields,
+        "remaining",
+        "side",
+        "left_inside",
+        "right_inside",
+        "expanded_left",
+        "expanded_right",
+        "check_left",
+        "check_right",
+        "separated",
+        "trial_t",
+    ),
+    defaults=(
+        *SliceState._field_defaults.values(),
+        0,
+        False,
+        False,
+        False,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        False,
+        0.0,
+    ),
+)
+
+
+def init(rng_key, state, width):
     rng_key, level_key, bracket_key = random.split(rng_key, 3)
     dtype = state.logdensity.dtype
     left = -width * random.uniform(bracket_key, dtype=dtype)
     level = state.logdensity + jnp.log(random.uniform(level_key, dtype=dtype))
-    return _SliceState(rng_key, _LEFT, left, left + width, left, level, state, 0, 0)
+    return state._replace(
+        rng_key=rng_key,
+        phase=_LEFT,
+        left=left,
+        right=left + width,
+        t=left,
+        level=level,
+    )
 
 
 def _draw(s):
@@ -78,22 +127,22 @@ def stepping_out(width, max_expansions):
     no expansion. Shrinkage is not truncated.
     """
 
-    def init(rng_key, state):
+    def init_fn(rng_key, state):
         rng_key, budget_key = random.split(rng_key)
-        s = _init_slice(rng_key, state, width)
+        s = init(rng_key, state, width)
         j = jnp.floor(max_expansions * random.uniform(budget_key)).astype(int)
         k = max_expansions - 1 - j
-        return request(s, (j, k))
+        return request(s._replace(left_steps=j, right_steps=k))
 
-    def request(s, budget):
-        j, k = budget
+    def request(s):
+        j, k = s.left_steps, s.right_steps
         phase = jnp.where((s.phase == _LEFT) & (j <= 0), _RIGHT, s.phase)
         phase = jnp.where((phase == _RIGHT) & (k <= 0), _SHRINK, phase)
         s = s._replace(phase=phase, t=jnp.where(phase == _LEFT, s.left, s.right))
-        return lax.cond(phase == _SHRINK, _draw, lambda s: s, s), budget
+        return lax.cond(phase == _SHRINK, _draw, lambda s: s, s)
 
-    def update(s, budget, candidate, inside):
-        j, k = budget
+    def update(s, candidate, inside):
+        j, k = s.left_steps, s.right_steps
 
         def left(_):
             expand = inside & (j > 0)
@@ -102,7 +151,7 @@ def stepping_out(width, max_expansions):
                 phase=jnp.where(expand, _LEFT, _RIGHT),
                 num_expansions=s.num_expansions + expand,
             )
-            return request(next_s, (jnp.where(inside, j - 1, 0), k))
+            return request(next_s._replace(left_steps=jnp.where(inside, j - 1, 0)))
 
         def right(_):
             expand = inside & (k > 0)
@@ -111,34 +160,21 @@ def stepping_out(width, max_expansions):
                 phase=jnp.where(expand, _RIGHT, _SHRINK),
                 num_expansions=s.num_expansions + expand,
             )
-            return request(next_s, (j, jnp.where(inside, k - 1, 0)))
+            return request(next_s._replace(right_steps=jnp.where(inside, k - 1, 0)))
 
         def shrink(_):
             next_s = s._replace(num_shrink=s.num_shrink + 1)
             next_s = lax.cond(
                 inside,
-                lambda s: s._replace(phase=_DONE, trial=candidate),
+                lambda s: s._replace(phase=_DONE, **candidate._asdict()),
                 lambda s: _reject(s, s.t),
                 next_s,
             )
-            return next_s, budget
+            return next_s
 
         return lax.switch(s.phase, (left, right, shrink), None)
 
-    return init, update
-
-
-class _DoublingState(NamedTuple):
-    remaining: Array
-    side: Array
-    left_inside: Array
-    right_inside: Array
-    left: Array
-    right: Array
-    check_left: Array
-    check_right: Array
-    separated: Array
-    trial_t: Array
+    return init_fn, update
 
 
 def doubling(width, max_expansions):
@@ -148,25 +184,24 @@ def doubling(width, max_expansions):
     a newly doubled endpoint, and 4/5 evaluate reverse-construction endpoints.
     """
 
-    def init(rng_key, state):
-        s = _init_slice(rng_key, state, width)
-        d = _DoublingState(
-            max_expansions,
-            False,
-            False,
-            False,
-            s.left,
-            s.right,
-            s.left,
-            s.right,
-            False,
-            s.t,
+    def init_fn(rng_key, state):
+        s = init(rng_key, state, width)
+        s = s._replace(
+            remaining=max_expansions,
+            side=False,
+            left_inside=False,
+            right_inside=False,
+            expanded_left=s.left,
+            expanded_right=s.right,
+            check_left=s.left,
+            check_right=s.right,
+            separated=False,
+            trial_t=s.t,
         )
-        return lax.cond(max_expansions > 0, lambda s: s, _draw, s), d
+        return lax.cond(max_expansions > 0, lambda s: s, _draw, s)
 
-    def expand(s, d):
-        def extend(pair):
-            s, d = pair
+    def expand(s):
+        def extend(s):
             rng_key, subkey = random.split(s.rng_key)
             side = random.bernoulli(subkey)
             span = s.right - s.left
@@ -179,77 +214,75 @@ def doubling(width, max_expansions):
                 right=right,
                 t=jnp.where(side, left, right),
                 num_expansions=s.num_expansions + 1,
+                remaining=s.remaining - 1,
+                side=side,
+                expanded_left=left,
+                expanded_right=right,
             )
-            d = d._replace(remaining=d.remaining - 1, side=side, left=left, right=right)
-            return s, d
+            return s
 
-        expanding = (d.remaining > 0) & (d.left_inside | d.right_inside)
-        return lax.cond(
-            expanding, extend, lambda pair: (_draw(pair[0]), pair[1]), (s, d)
-        )
+        expanding = (s.remaining > 0) & (s.left_inside | s.right_inside)
+        return lax.cond(expanding, extend, _draw, s)
 
-    def bisect(s, d):
-        def body(d):
-            mid = (d.check_left + d.check_right) / 2
-            separated = d.separated | ((0 < mid) != (d.trial_t < mid))
-            return d._replace(
-                check_left=jnp.where(d.trial_t >= mid, mid, d.check_left),
-                check_right=jnp.where(d.trial_t < mid, mid, d.check_right),
+    def bisect(s):
+        def body(s):
+            mid = (s.check_left + s.check_right) / 2
+            separated = s.separated | ((0 < mid) != (s.trial_t < mid))
+            return s._replace(
+                check_left=jnp.where(s.trial_t >= mid, mid, s.check_left),
+                check_right=jnp.where(s.trial_t < mid, mid, s.check_right),
                 separated=separated,
             )
 
-        wide = lambda d: d.check_right - d.check_left > 1.1 * width
-        needs_check = wide(d)
-        d = lax.cond(needs_check, body, lambda d: d, d)
-        d = lax.while_loop(lambda d: wide(d) & ~d.separated, body, d)
-        check = needs_check & d.separated
-        return s._replace(phase=jnp.where(check, _CHECK_LEFT, _DONE), t=d.check_left), d
+        wide = lambda s: s.check_right - s.check_left > 1.1 * width
+        needs_check = wide(s)
+        s = lax.cond(needs_check, body, lambda s: s, s)
+        s = lax.while_loop(lambda s: wide(s) & ~s.separated, body, s)
+        check = needs_check & s.separated
+        return s._replace(phase=jnp.where(check, _CHECK_LEFT, _DONE), t=s.check_left)
 
-    def update(s, d, candidate, inside):
+    def update(s, candidate, inside):
         def first_left(_):
-            return s._replace(phase=_RIGHT, t=s.right), d._replace(left_inside=inside)
+            return s._replace(phase=_RIGHT, t=s.right, left_inside=inside)
 
         def first_right(_):
-            return expand(s, d._replace(right_inside=inside))
+            return expand(s._replace(right_inside=inside))
 
         def shrink(_):
             next_s = s._replace(num_shrink=s.num_shrink + 1)
 
-            def check(pair):
-                s, d = pair
-                d = d._replace(
-                    check_left=d.left,
-                    check_right=d.right,
+            def check(s):
+                s = s._replace(
+                    check_left=s.expanded_left,
+                    check_right=s.expanded_right,
                     separated=False,
                     trial_t=s.t,
                 )
-                return bisect(s._replace(trial=candidate), d)
+                return bisect(s._replace(**candidate._asdict()))
 
             return lax.cond(
                 inside,
                 check,
-                lambda pair: (_reject(pair[0], pair[0].t), pair[1]),
-                (next_s, d),
+                lambda s: _reject(s, s.t),
+                next_s,
             )
 
         def endpoint(_):
-            next_d = d._replace(
-                left_inside=jnp.where(d.side, inside, d.left_inside),
-                right_inside=jnp.where(d.side, d.right_inside, inside),
+            s_next = s._replace(
+                left_inside=jnp.where(s.side, inside, s.left_inside),
+                right_inside=jnp.where(s.side, s.right_inside, inside),
             )
-            return expand(s, next_d)
+            return expand(s_next)
 
         def check_left(_):
-            return s._replace(phase=_CHECK_RIGHT, t=d.check_right), d._replace(
-                left_inside=inside
-            )
+            return s._replace(phase=_CHECK_RIGHT, t=s.check_right, left_inside=inside)
 
         def check_right(_):
             return lax.cond(
-                jnp.logical_not(d.left_inside | inside),
-                lambda pair: (_reject(pair[0], pair[1].trial_t), pair[1]),
-                lambda pair: bisect(*pair),
-                (s, d),
+                jnp.logical_not(s.left_inside | inside),
+                lambda s: _reject(s, s.trial_t),
+                bisect,
+                s,
             )
 
         return lax.switch(
@@ -258,23 +291,11 @@ def doubling(width, max_expansions):
             None,
         )
 
-    return init, update
-
-
-class _ChainState(NamedTuple):
-    rng_key: PRNGKey
-    index: Array
-    state: Any
-    direction: Any
-    slice: _SliceState
-    interval: Any
-    info: SliceInfo
+    return init_fn, update
 
 
 def build_kernel(
-    proposal_fn,
-    direction_generator,
-    position_update_fn,
+    proposal_generator,
     interval=stepping_out,
     *,
     width=1.0,
@@ -282,12 +303,8 @@ def build_kernel(
 ):
     """Build a scalar, vmappable kernel returning ``(state, SliceInfo)``.
 
-    ``proposal_fn(position) -> (state, is_valid)`` supplies a state with position
-    and logdensity fields, optionally containing other evaluated quantities.
-    ``direction_generator(rng_key, position, move_index) -> direction`` draws
-    fixed-shape proposal data. ``position_update_fn(position, direction, t)``
-    constructs the position along that path. Each path must preserve the target's
-    base measure and support the reverse move with the same probability.
+    ``proposal_generator(rng_key, position, move_index) -> slice_fn`` constructs
+    ``slice_fn(t) -> (state, is_valid)``. The state contains position and logdensity.
 
     ``kernel(rng_key, state, num_steps)`` completes every prescribed move. Per-chain
     keys are independent of other chains' progress. Shrinkage continues until an
@@ -296,48 +313,41 @@ def build_kernel(
     init, update = interval(width, max_expansions)
 
     def kernel(rng_key, state, num_steps=1):
-        def init_move(rng_key, state, index, info):
-            rng_key, direction_key, slice_key = random.split(rng_key, 3)
-            direction = direction_generator(direction_key, state.position, index)
-            slice_state, interval_state = init(slice_key, state)
-            return _ChainState(
-                rng_key, index, state, direction, slice_state, interval_state, info
+        def init_move(rng_key, state):
+            rng_key, proposal_key = random.split(rng_key)
+            state = init(rng_key, state)
+            slice_fn = proposal_generator(proposal_key, state.position, state.index)
+            graph, shape = jax.make_jaxpr(slice_fn, return_shape=True)(state.t)
+            return (
+                state._replace(proposal=graph.consts),
+                graph.jaxpr,
+                jax.tree.structure(shape),
             )
 
-        def body(carry):
-            position = position_update_fn(
-                carry.state.position, carry.direction, carry.slice.t
-            )
-            proposed_state, is_valid = proposal_fn(position)
-            inside = is_valid & (proposed_state.logdensity >= carry.slice.level)
-            slice_state, interval_state = update(
-                carry.slice, carry.interval, proposed_state, inside
-            )
-            done = slice_state.phase == _DONE
-            info = SliceInfo(
-                carry.info.num_evaluations + 1,
-                carry.info.num_expansions
-                + jnp.where(done, slice_state.num_expansions, 0),
-                carry.info.num_shrink + jnp.where(done, slice_state.num_shrink, 0),
-            )
-            carry = carry._replace(
-                slice=slice_state, interval=interval_state, info=info
-            )
+        def body(state):
+            result = jax.core.eval_jaxpr(graph, state.proposal, state.t)
+            proposed_state, is_valid = jax.tree.unflatten(out_tree, result)
+            inside = is_valid & (proposed_state.logdensity >= state.level)
+            state = update(state, proposed_state, inside)
+            state = state._replace(num_evaluations=state.num_evaluations + 1)
 
-            def finish_move(carry):
-                index = carry.index + 1
-                carry = carry._replace(index=index, state=slice_state.trial)
+            def finish_move(state):
+                state = state._replace(index=state.index + 1)
                 return lax.cond(
-                    index < num_steps,
-                    lambda c: init_move(c.rng_key, c.state, c.index, c.info),
-                    lambda c: c,
-                    carry,
+                    state.index < num_steps,
+                    lambda s: init_move(s.rng_key, s)[0],
+                    lambda s: s,
+                    state,
                 )
 
-            return lax.cond(done, finish_move, lambda c: c, carry)
+            return lax.cond(state.phase == _DONE, finish_move, lambda s: s, state)
 
-        carry = init_move(rng_key, state, 0, SliceInfo(0, 0, 0))
-        carry = lax.while_loop(lambda c: c.index < num_steps, body, carry)
-        return carry.state, carry.info
+        state = state._replace(
+            index=0, num_evaluations=0, num_expansions=0, num_shrink=0
+        )
+        state, graph, out_tree = init_move(rng_key, state)
+        state = lax.while_loop(lambda s: s.index < num_steps, body, state)
+        info = SliceInfo(state.num_evaluations, state.num_expansions, state.num_shrink)
+        return state, info
 
     return kernel

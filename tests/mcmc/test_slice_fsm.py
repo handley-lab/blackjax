@@ -1,5 +1,6 @@
 """Independent scalar references and batching tests for asynchronous slices."""
 
+from collections import namedtuple
 from typing import NamedTuple
 
 import jax
@@ -24,7 +25,18 @@ def evaluate(logdensity):
     return lambda x: (SliceState(x, logdensity(x)), jnp.asarray(True))
 
 
-line = (lambda key, x, index: jnp.ones_like(x), lambda x, v, t: x + v * t)
+def line(evaluate):
+    def proposal_generator(key, x, index):
+        return lambda t: evaluate(x + t)
+
+    return proposal_generator
+
+
+def state_type(strategy):
+    return {
+        fsm.stepping_out: fsm.SteppingOutState,
+        fsm.doubling: fsm.DoublingState,
+    }[strategy]
 
 
 def neal_accept(t, left, right, width, inside):
@@ -47,10 +59,10 @@ def reference(key, x, logdensity, strategy, width, budget, num_steps):
     """Ordinary Python loops for Neal's Figures 3--6, with the same random draws."""
     expansions = shrinks = rejected_checks = 0
     for _ in range(num_steps):
-        key, _, slice_key = random.split(key, 3)
+        key, _ = random.split(key)
         if strategy is fsm.stepping_out:
-            slice_key, budget_key = random.split(slice_key)
-        slice_key, level_key, bracket_key = random.split(slice_key, 3)
+            key, budget_key = random.split(key)
+        key, level_key, bracket_key = random.split(key, 3)
         dtype = x.dtype
         level = float(logdensity(x) + jnp.log(random.uniform(level_key, dtype=dtype)))
         left = -width * float(random.uniform(bracket_key, dtype=dtype))
@@ -70,7 +82,7 @@ def reference(key, x, logdensity, strategy, width, budget, num_steps):
         else:
             k = budget
             while k > 0 and (inside(left) or inside(right)):
-                slice_key, side_key = random.split(slice_key)
+                key, side_key = random.split(key)
                 if bool(random.bernoulli(side_key)):
                     left -= right - left
                 else:
@@ -79,7 +91,7 @@ def reference(key, x, logdensity, strategy, width, budget, num_steps):
                 expansions += 1
         lo, hi = left, right
         while True:
-            slice_key, subkey = random.split(slice_key)
+            key, subkey = random.split(key)
             t = lo + float(random.uniform(subkey, dtype=dtype)) * (hi - lo)
             shrinks += 1
             accepted = inside(t)
@@ -101,7 +113,7 @@ def reference(key, x, logdensity, strategy, width, budget, num_steps):
 @pytest.mark.parametrize("logdensity", [normal, disconnected])
 def test_neal_reference(strategy, budget, logdensity):
     kernel = jax.jit(
-        fsm.build_kernel(evaluate(logdensity), *line, strategy, max_expansions=budget)
+        fsm.build_kernel(line(evaluate(logdensity)), strategy, max_expansions=budget)
     )
     x = jnp.asarray(0.0)
     for seed in range(12):
@@ -109,7 +121,7 @@ def test_neal_reference(strategy, budget, logdensity):
         expected, expansions, shrinks, _ = reference(
             key, x, logdensity, strategy, 1.0, budget, 3
         )
-        actual, info = kernel(key, evaluate(logdensity)(x)[0], 3)
+        actual, info = kernel(key, state_type(strategy)(x, logdensity(x)), 3)
         np.testing.assert_allclose(actual.position, expected, rtol=2e-5, atol=2e-6)
         assert info.num_expansions == expansions
         assert info.num_shrink == shrinks
@@ -120,8 +132,8 @@ def test_doubling_rejects_density_valid_trial():
     assert inside(3.0)
     assert not neal_accept(3.0, -0.25, 3.75, 1.0, inside)
     start, advance = fsm.doubling(1.0, 4)
-    particle = SliceState(jnp.asarray(0.0), jnp.asarray(0.0))
-    s, d = start(random.key(0), particle)
+    particle = fsm.DoublingState(jnp.asarray(0.0), jnp.asarray(0.0))
+    s = start(random.key(0), particle)
     s = s._replace(
         phase=2,
         left=jnp.asarray(-0.25),
@@ -129,14 +141,14 @@ def test_doubling_rejects_density_valid_trial():
         t=jnp.asarray(3.0),
         level=jnp.asarray(-1.0),
     )
-    d = d._replace(left=s.left, right=s.right)
+    s = s._replace(expanded_left=s.left, expanded_right=s.right)
     trial = SliceState(jnp.asarray(3.0), jnp.asarray(0.0))
-    s, d = advance(s, d, trial, jnp.asarray(True))
+    s = advance(s, trial, jnp.asarray(True))
     probes = []
     while int(s.phase) in (4, 5):
         probes.append(float(s.t))
         probe = SliceState(s.t, disconnected(s.t))
-        s, d = advance(s, d, probe, disconnected(s.t) >= s.level)
+        s = advance(s, probe, disconnected(s.t) >= s.level)
     assert s.phase == 2  # Rejected and returned to shrinkage, not accepted.
     assert s.right == 3.0
     assert len(probes) > 0
@@ -144,9 +156,11 @@ def test_doubling_rejects_density_valid_trial():
 
 @pytest.mark.parametrize("strategy", [fsm.stepping_out, fsm.doubling])
 def test_scalar_vmap_and_permuted_chains(strategy):
-    kernel = fsm.build_kernel(evaluate(normal), *line, strategy)
+    kernel = fsm.build_kernel(line(evaluate(normal)), strategy)
     keys = random.split(random.key(72), 24)
-    states = jax.vmap(lambda x: evaluate(normal)(x)[0])(jnp.linspace(-8, 8, 24))
+    states = jax.vmap(lambda x: state_type(strategy)(x, normal(x)))(
+        jnp.linspace(-8, 8, 24)
+    )
     counts = jnp.arange(24) % 5
     batched = jax.jit(jax.vmap(kernel))
     actual = batched(keys, states, counts)
@@ -156,15 +170,65 @@ def test_scalar_vmap_and_permuted_chains(strategy):
         for i in range(24)
     ]
     expected = jax.tree.map(lambda *x: jnp.stack(x), *expected)
+
+    def arrays(tree):
+        return jax.tree.map(
+            lambda x: (
+                random.key_data(x)
+                if jax.dtypes.issubdtype(x.dtype, jax.dtypes.prng_key)
+                else x
+            ),
+            tree,
+        )
+
     jax.tree.map(
         lambda a, b: np.testing.assert_allclose(a, b, rtol=2e-5, atol=2e-6),
-        actual,
-        expected,
+        arrays(actual),
+        arrays(expected),
     )
     reverse = batched(keys[::-1], jax.tree.map(lambda x: x[::-1], states), counts[::-1])
     jax.tree.map(
-        lambda a, b: np.testing.assert_array_equal(a, b[::-1]), actual, reverse
+        lambda a, b: np.testing.assert_array_equal(a, b[::-1]),
+        arrays(actual),
+        arrays(reverse),
     )
+
+
+@pytest.mark.parametrize("strategy", [fsm.stepping_out, fsm.doubling])
+def test_proposal_generated_once_per_move(strategy):
+    calls = []
+
+    def proposal_generator(key, x, index):
+        direction = random.normal(key)
+        jax.debug.callback(lambda x: calls.append(float(x)), direction)
+
+        def slice_fn(t):
+            position = x + direction * t
+            return SliceState(position, normal(position)), index >= 0
+
+        return slice_fn
+
+    kernel = jax.jit(fsm.build_kernel(proposal_generator, strategy))
+    state = state_type(strategy)(jnp.asarray(0.0), jnp.asarray(0.0))
+    state, info = kernel(random.key(32), state, 3)
+    jax.block_until_ready(state)
+    jax.effects_barrier()
+    assert len(calls) == 3
+    assert info.num_evaluations > 3
+
+
+@pytest.mark.parametrize("strategy", [fsm.stepping_out, fsm.doubling])
+def test_successive_calls(strategy):
+    kernel = jax.jit(fsm.build_kernel(line(evaluate(normal)), strategy))
+    state = state_type(strategy)(jnp.asarray(0.0), jnp.asarray(0.0))
+    state, _ = kernel(random.key(17), state, 3)
+    fresh = state_type(strategy)(state.position, state.logdensity)
+    actual, info = kernel(random.key(18), state, 2)
+    expected, expected_info = kernel(random.key(18), fresh, 2)
+    np.testing.assert_array_equal(actual.position, expected.position)
+    np.testing.assert_array_equal(actual.logdensity, expected.logdensity)
+    np.testing.assert_array_equal(info, expected_info)
+    assert actual.index == 2
 
 
 @pytest.mark.parametrize("strategy", [fsm.stepping_out, fsm.doubling])
@@ -177,9 +241,14 @@ def test_auxiliary_state_and_constraint(strategy):
     def evaluate(x):
         return Particle(x, normal(x), x**3 + 10), jnp.abs(x) < 0.25
 
-    kernel = jax.jit(jax.vmap(fsm.build_kernel(evaluate, *line, strategy)))
+    kernel = jax.jit(jax.vmap(fsm.build_kernel(line(evaluate), strategy)))
     x = jnp.zeros(64)
-    states = jax.vmap(lambda x: evaluate(x)[0])(x)
+    ExtendedState = namedtuple(
+        "ExtendedState", (*state_type(strategy)._fields, "loglikelihood")
+    )
+    states = jax.vmap(
+        lambda x: ExtendedState(*state_type(strategy)(x, normal(x)), x**3 + 10)
+    )(x)
     result, info = kernel(random.split(random.key(51), 64), states, jnp.full(64, 5))
     assert jnp.all(jnp.abs(result.position) < 0.25)
     np.testing.assert_allclose(result.loglikelihood, result.position**3 + 10)
@@ -199,10 +268,10 @@ def test_stationarity(strategy, logdensity):
         x = jnp.asarray(
             np.where(right, 3 + rng.uniform(-0.6, 0.6, n), rng.uniform(-0.4, 0.4, n))
         )
-    states = jax.vmap(lambda x: evaluate(logdensity)(x)[0])(x)
+    states = jax.vmap(lambda x: state_type(strategy)(x, logdensity(x)))(x)
     kernel = jax.jit(
         jax.vmap(
-            fsm.build_kernel(evaluate(logdensity), *line, strategy),
+            fsm.build_kernel(line(evaluate(logdensity)), strategy),
             in_axes=(0, 0, None),
         )
     )
@@ -253,10 +322,14 @@ def test_mixed_topology_and_overlapping_blocks(strategy):
     def evaluate(x):
         return SliceState(x, normal(x["abc"])), jnp.asarray(True)
 
-    states = jax.vmap(lambda x: evaluate(x)[0])(x)
+    def proposal_generator(key, x, index):
+        direction = generate(key, x, index)
+        return lambda t: evaluate(move(x, direction, t))
+
+    states = jax.vmap(lambda x: state_type(strategy)(x, normal(x["abc"])))(x)
     kernel = jax.jit(
         jax.vmap(
-            fsm.build_kernel(evaluate, generate, move, strategy, max_expansions=4),
+            fsm.build_kernel(proposal_generator, strategy, max_expansions=4),
             in_axes=(0, 0, None),
         )
     )
@@ -288,9 +361,11 @@ def test_one_evaluation_round_per_tick(strategy):
         result = jax.vmap(evaluate(normal))(x)
         return result, jax.tree.map(lambda _: True, result)
 
-    kernel = fsm.build_kernel(target, *line, strategy)
+    kernel = fsm.build_kernel(line(target), strategy)
     keys = random.split(random.key(182), 16)
-    states = jax.vmap(lambda x: evaluate(normal)(x)[0])(jnp.linspace(-10, 10, 16))
+    states = jax.vmap(lambda x: state_type(strategy)(x, normal(x)))(
+        jnp.linspace(-10, 10, 16)
+    )
     counts = jnp.arange(16) % 5 + 1
     result, info = jax.jit(jax.vmap(kernel))(keys, states, counts)
     jax.block_until_ready(result)
@@ -305,7 +380,7 @@ def test_one_evaluation_round_per_tick(strategy):
             jax.debug.callback(lambda x: calls.append(float(x)), x)
             return evaluate(normal)(x)
 
-        scalar = fsm.build_kernel(scalar_target, *line, strategy)
+        scalar = fsm.build_kernel(line(scalar_target), strategy)
         scalar_result = jax.jit(scalar)(
             keys[i], jax.tree.map(lambda x: x[i], states), counts[i]
         )
