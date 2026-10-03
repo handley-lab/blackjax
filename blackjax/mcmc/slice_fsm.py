@@ -72,7 +72,9 @@ def init_stepping_out(rng_key, state, width, max_expansions):
     bracket_key, budget_key = random.split(interval_key)
     left = -width * random.uniform(bracket_key)
     level = state.logdensity + jnp.log(random.uniform(level_key))
-    state = state._replace(
+    state = SteppingOutState(
+        state.position,
+        state.logdensity,
         phase=_LEFT,
         left=left,
         right=left + width,
@@ -168,7 +170,9 @@ def init_doubling(rng_key, state, width, max_expansions):
     bracket_key, direction_key = random.split(interval_key)
     left = -width * random.uniform(bracket_key)
     level = state.logdensity + jnp.log(random.uniform(level_key))
-    state = state._replace(
+    state = DoublingState(
+        state.position,
+        state.logdensity,
         phase=jnp.where(max_expansions > 0, _LEFT, _SHRINK),
         left=left,
         right=left + width,
@@ -318,25 +322,22 @@ def build_doubling_kernel(slice_fn, width):
 
 
 def build_chain(
-    max_expansions=10, width=1.0, max_shrinkage=None, *, interval=build_doubling_kernel
+    max_expansions=10,
+    width=1.0,
+    max_shrinkage=None,
+    *,
+    init_fn=init_doubling,
+    interval=build_doubling_kernel,
 ):
     """Build asynchronous chains using doubling or stepping-out slice moves."""
-    if interval is build_doubling_kernel:
-        state_type, initialize = DoublingState, init_doubling
-    elif interval is build_stepping_out_kernel:
-        state_type, initialize = SteppingOutState, init_stepping_out
-    else:
-        raise ValueError("Expected build_doubling_kernel or build_stepping_out_kernel")
-
-    def init_fn(rng_key, particle):
-        state = state_type(particle, particle.logdensity)
-        return initialize(rng_key, state, width, max_expansions)
 
     def kernel(rng_key, particle, logdensity_fn, proposal_generator, num_inner_steps):
         keys = random.split(rng_key, num_inner_steps)
         _, slice_key = random.split(keys[0])
         _, _, rng_key = random.split(slice_key, 3)
-        state = init_fn(slice_key, particle)
+        state = init_fn(
+            slice_key, SliceState(particle, particle.logdensity), width, max_expansions
+        )
         info = SliceTransitionInfo(False, 0, 0, state.left, state.right)
         info = tree.map(lambda x: jnp.full(num_inner_steps, x), info)
 
@@ -400,7 +401,13 @@ def build_chain(
                 particle = state.position
                 _, slice_key = random.split(keys[count])
                 _, _, shrink_key = random.split(slice_key, 3)
-                return shrink_key, particle, init_fn(slice_key, particle)
+                next_state = init_fn(
+                    slice_key,
+                    SliceState(particle, particle.logdensity),
+                    width,
+                    max_expansions,
+                )
+                return shrink_key, particle, next_state
 
             rng_key, origin, state = lax.cond(
                 finished & (count < num_inner_steps),
@@ -419,18 +426,14 @@ def build_chain(
     return kernel
 
 
-def build_kernel(max_expansions=10, *, interval=build_doubling_kernel):
+def build_kernel(
+    max_expansions=10, *, init_fn=init_doubling, interval=build_doubling_kernel
+):
     """Build a complete doubling or stepping-out move.
 
     The FSM position carries the whole candidate state, preserving auxiliary
     fields supplied by the proposal. Shrinkage is not truncated.
     """
-    if interval is build_doubling_kernel:
-        state_type, init_fn = DoublingState, init_doubling
-    elif interval is build_stepping_out_kernel:
-        state_type, init_fn = SteppingOutState, init_stepping_out
-    else:
-        raise ValueError("Expected build_doubling_kernel or build_stepping_out_kernel")
 
     def kernel(rng_key, state, logdensity_fn, proposal_generator, width=1.0):
         rng_key, move_key = random.split(rng_key)
@@ -442,7 +445,7 @@ def build_kernel(max_expansions=10, *, interval=build_doubling_kernel):
             return SliceState(candidate, candidate.logdensity), is_valid
 
         slice_kernel = interval(slice_fn, width)
-        particle = state_type(state, state.logdensity)
+        particle = SliceState(state, state.logdensity)
         particle = init_fn(slice_key, particle, width, max_expansions)
 
         def body(carry):
@@ -473,6 +476,7 @@ def as_top_level_api(
     proposal_generator=direction_proposal(),
     width=1.0,
     max_expansions=10,
+    init_fn=init_doubling,
     interval=build_doubling_kernel,
 ) -> SamplingAlgorithm:
     """Slice sampling with doubling or stepping-out interval construction.
@@ -483,7 +487,7 @@ def as_top_level_api(
         state = sampler.init(position)
         state, info = jax.jit(sampler.step)(rng_key, state)
     """
-    kernel = build_kernel(max_expansions, interval=interval)
+    kernel = build_kernel(max_expansions, init_fn=init_fn, interval=interval)
 
     return build_sampling_algorithm(
         kernel, init, logdensity_fn, kernel_args=(proposal_generator, width)

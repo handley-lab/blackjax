@@ -51,6 +51,11 @@ def test_matched_streams(budget, random_direction, interval, num_steps):
             budget,
             0.7,
             100,
+            init_fn=(
+                slice_fsm.init_stepping_out
+                if interval is stepping_out
+                else slice_fsm.init_doubling
+            ),
             interval=(
                 slice_fsm.build_stepping_out_kernel
                 if interval is stepping_out

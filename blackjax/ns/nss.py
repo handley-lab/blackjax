@@ -31,10 +31,9 @@ from blackjax.mcmc.slice import SliceInfo
 from blackjax.mcmc.slice import build_kernel as build_slice_kernel
 from blackjax.mcmc.slice import random_order, stepping_out
 from blackjax.mcmc.slice_fsm import build_chain as build_slice_chain
-from blackjax.mcmc.slice_fsm import build_stepping_out_kernel
-from blackjax.ns.adaptive import build_kernel as build_adaptive_kernel
+from blackjax.mcmc.slice_fsm import build_stepping_out_kernel, init_stepping_out
 from blackjax.ns.adaptive import init
-from blackjax.ns.base import NSInfo, NSState, delete_fn, init_state_strategy
+from blackjax.ns.base import NSInfo, NSState, init_state_strategy
 from blackjax.ns.from_mcmc import build_kernel as build_from_mcmc_kernel
 from blackjax.ns.from_mcmc import update_with_mcmc_chains, update_with_mcmc_take_last
 from blackjax.smc.tuning.from_particles import (
@@ -414,16 +413,18 @@ def build_async_kernel(
     """
     inner_kernel_params = _resolve_inner_kernel_params(proposal, inner_kernel_params)
     slice_kernel = build_slice_chain(
+        init_fn=init_stepping_out,
         interval=build_stepping_out_kernel,
         max_expansions=max_steps,
         max_shrinkage=max_shrinkage,
     )
     constrained_chain_fn = slice_constrained_chain(init_state_fn, slice_kernel, proposal)
-    update_fn = update_strategy(constrained_chain_fn, num_inner_steps, num_delete)
-    return build_adaptive_kernel(
-        partial(delete_fn, num_delete=num_delete),
-        update_fn,
-        update_inner_kernel_params_fn=inner_kernel_params,
+    return build_from_mcmc_kernel(
+        constrained_chain_fn,
+        num_inner_steps,
+        inner_kernel_params,
+        num_delete,
+        update_strategy=update_strategy,
     )
 
 

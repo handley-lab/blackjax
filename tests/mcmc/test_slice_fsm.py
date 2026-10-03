@@ -67,7 +67,8 @@ def build_sample(
     def start_move(rng_key, state):
         rng_key, move_key = random.split(rng_key)
         slice_key, proposal_key = random.split(move_key)
-        state = init_move(slice_key, state, width, max_expansions)
+        initialized = init_move(slice_key, state, width, max_expansions)
+        state = state._replace(**initialized._asdict())
         return rng_key, state, proposal_generator(proposal_key, state)
 
     def sample(rng_key, state, num_steps=1):
@@ -221,7 +222,14 @@ def test_sampling_algorithm_matches_kernel(logdensity, strategy):
         return lambda t: (SliceState(position + t, logdensity_fn(position + t)), True)
 
     sampler = fsm.as_top_level_api(
-        logdensity, proposal_generator=proposal_generator, interval=strategy
+        logdensity,
+        proposal_generator=proposal_generator,
+        interval=strategy,
+        init_fn=(
+            fsm.init_stepping_out
+            if strategy is fsm.build_stepping_out_kernel
+            else fsm.init_doubling
+        ),
     )
     step = jax.jit(sampler.step)
     sample = jax.jit(build_sample(*line(evaluate(logdensity)), strategy))
@@ -573,7 +581,14 @@ def test_one_evaluation_round_per_step(strategy, complete_move):
             return lambda t: target(position + t)
 
         sampler = fsm.as_top_level_api(
-            normal, proposal_generator=proposal_generator, interval=strategy
+            normal,
+            proposal_generator=proposal_generator,
+            interval=strategy,
+            init_fn=(
+                fsm.init_stepping_out
+                if strategy is fsm.build_stepping_out_kernel
+                else fsm.init_doubling
+            ),
         )
         states = jax.vmap(sampler.init)(jnp.linspace(-10, 10, 16))
         result, info = jax.jit(jax.vmap(sampler.step))(keys, states)

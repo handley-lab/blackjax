@@ -47,6 +47,7 @@ def test_async_defaults_match_explicit_stepping_out():
         3,
         4,
         slice_kernel=slice_fsm.build_chain(
+            init_fn=slice_fsm.init_stepping_out,
             interval=slice_fsm.build_stepping_out_kernel,
             max_expansions=5,
             max_shrinkage=7,
@@ -96,7 +97,10 @@ def test_async_shrinkage_exhaustion_retains_particle():
         return lambda t: (SliceState(position + t, jnp.array(0.0)), False)
 
     kernel = slice_fsm.build_chain(
-        interval=slice_fsm.build_stepping_out_kernel, max_expansions=1, max_shrinkage=2
+        init_fn=slice_fsm.init_stepping_out,
+        interval=slice_fsm.build_stepping_out_kernel,
+        max_expansions=1,
+        max_shrinkage=2,
     )
     result, info = jax.jit(kernel, static_argnums=(2, 3, 4))(
         jax.random.key(3), particle, None, proposal, 3
@@ -154,7 +158,12 @@ def test_async_replacement_chains(doubling):
         init_particle,
         8,
         16,
-        slice_kernel=slice_fsm.build_chain(interval=build_kernel),
+        slice_kernel=slice_fsm.build_chain(
+            init_fn=slice_fsm.init_doubling
+            if doubling
+            else slice_fsm.init_stepping_out,
+            interval=build_kernel,
+        ),
         proposal=proposal,
         inner_kernel_params=nss.live_covariance_factor,
     )
@@ -213,7 +222,12 @@ def test_covariance_proposal(doubling, factor):
             init_particle,
             8,
             16,
-            slice_kernel=slice_fsm.build_chain(interval=builder),
+            slice_kernel=slice_fsm.build_chain(
+                init_fn=slice_fsm.init_doubling
+                if doubling
+                else slice_fsm.init_stepping_out,
+                interval=builder,
+            ),
             inner_kernel_params=parameters,
         )
     )
