@@ -26,6 +26,8 @@ from typing import Any, NamedTuple
 import jax.numpy as jnp
 from jax import lax, random
 
+from blackjax.base import SamplingAlgorithm, build_sampling_algorithm
+from blackjax.mcmc.slice import direction_proposal, init
 from blackjax.types import Array
 
 _LEFT, _RIGHT, _SHRINK, _EXPAND_LEFT, _EXPAND_RIGHT, _CHECK_LEFT, _CHECK_RIGHT = range(
@@ -317,3 +319,60 @@ def build_doubling_kernel(slice_fn, width):
         return state, info
 
     return kernel
+
+
+def as_top_level_api(
+    logdensity_fn,
+    *,
+    proposal_generator=direction_proposal(),
+    width=1.0,
+    interval=build_doubling_kernel,
+    max_expansions=10,
+) -> SamplingAlgorithm:
+    """Complete one slice move by advancing evaluation ticks to acceptance.
+
+    ``interval`` selects ``build_stepping_out_kernel`` or
+    ``build_doubling_kernel``. Shrinkage is not truncated.
+
+    .. code:: python
+
+        sampler = slice_fsm.as_top_level_api(logdensity_fn)
+        state = sampler.init(position)
+        state, info = jax.jit(sampler.step)(rng_key, state)
+    """
+    state_type, init_move = {
+        build_stepping_out_kernel: (SteppingOutState, init_stepping_out),
+        build_doubling_kernel: (DoublingState, init_doubling),
+    }[interval]
+
+    def kernel(rng_key, state, logdensity_fn):
+        rng_key, move_key = random.split(rng_key)
+        slice_key, proposal_key = random.split(move_key)
+        slice_fn = proposal_generator(proposal_key, state.position, logdensity_fn)
+        tick = interval(slice_fn, width)
+        particle = state_type(state.position, state.logdensity)
+        particle = init_move(slice_key, particle, width, max_expansions)
+
+        def body(carry):
+            rng_key, particle, info = carry
+            rng_key, step_key = random.split(rng_key)
+            particle, tick_info = tick(step_key, particle)
+            info = SliceInfo(
+                tick_info.is_accepted,
+                info.num_evaluations + tick_info.num_evaluations,
+                info.num_expansions + tick_info.num_expansions,
+                info.num_shrink + tick_info.num_shrink,
+            )
+            return rng_key, particle, info
+
+        _, particle, info = lax.while_loop(
+            lambda carry: ~carry[2].is_accepted,
+            body,
+            (rng_key, particle, SliceInfo(jnp.asarray(False), 0, 0, 0)),
+        )
+        state = state._replace(
+            position=particle.position, logdensity=particle.logdensity
+        )
+        return state, info
+
+    return build_sampling_algorithm(kernel, init, logdensity_fn)

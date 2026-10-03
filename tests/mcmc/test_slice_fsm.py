@@ -210,6 +210,66 @@ def test_neal_reference(strategy, budget, logdensity):
         assert info.num_shrink == shrinks
 
 
+@pytest.mark.parametrize(
+    "strategy", [fsm.build_stepping_out_kernel, fsm.build_doubling_kernel]
+)
+@pytest.mark.parametrize("logdensity", [normal, disconnected])
+def test_sampling_algorithm_matches_ticks(strategy, logdensity):
+    def proposal_generator(rng_key, position, logdensity_fn):
+        return lambda t: (SliceState(position + t, logdensity_fn(position + t)), True)
+
+    sampler = fsm.as_top_level_api(
+        logdensity, proposal_generator=proposal_generator, interval=strategy
+    )
+    step = jax.jit(sampler.step)
+    ticks = jax.jit(build_sample(*line(evaluate(logdensity)), strategy))
+    state = sampler.init(jnp.asarray(0.0), random.key(0))
+    for seed in range(8):
+        key = random.key(seed)
+        expected, counts = ticks(
+            key, state_type(strategy)(state.position, state.logdensity)
+        )
+        state, info = step(key, state)
+        assert isinstance(state, SliceState)
+        np.testing.assert_array_equal(state.position, expected.position)
+        np.testing.assert_array_equal(state.logdensity, expected.logdensity)
+        assert info.is_accepted
+        assert tuple(info[1:]) == tuple(counts)
+
+
+@pytest.mark.parametrize(
+    "strategy", [fsm.build_stepping_out_kernel, fsm.build_doubling_kernel]
+)
+def test_sampling_algorithm_pytree_scan_vmap(strategy):
+    def logdensity(position):
+        return -sum(jnp.square(x).sum() for x in jax.tree.leaves(position)) / 2
+
+    sampler = fsm.as_top_level_api(logdensity, interval=strategy)
+    initial = sampler.init({"x": jnp.asarray([0.2, -0.3]), "y": jnp.asarray(0.5)})
+
+    def sample(key):
+        def body(state, key):
+            state, info = sampler.step(key, state)
+            return state, (state, info)
+
+        return jax.lax.scan(body, initial, random.split(key, 5))
+
+    keys = random.split(random.key(12), 4)
+    batched = jax.jit(jax.vmap(sample))(keys)
+    scalar = jax.jit(sample)
+    for index, key in enumerate(keys):
+        for actual, expected in zip(
+            jax.tree.leaves(batched), jax.tree.leaves(scalar(key))
+        ):
+            np.testing.assert_allclose(actual[index], expected, rtol=1e-12, atol=1e-12)
+    _, (states, infos) = batched
+    assert jnp.all(infos.is_accepted)
+    assert jnp.all(infos.num_evaluations >= infos.num_shrink)
+    np.testing.assert_allclose(
+        states.logdensity, jax.vmap(jax.vmap(logdensity))(states.position)
+    )
+
+
 def test_doubling_rejects_density_valid_trial():
     inside = lambda t: abs(t) < 0.4 or abs(t - 3) < 0.6
     assert inside(3.0)
