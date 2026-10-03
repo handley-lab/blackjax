@@ -74,13 +74,13 @@ def build_sample(
             step = interval(lambda t: slice_fn(t, proposal_state), width)
             state, info = step(step_key, state)
             state = state._replace(
-                index=state.index + info.is_finished,
+                index=state.index + info.is_accepted,
                 num_evaluations=state.num_evaluations + info.num_evaluations,
                 num_expansions=state.num_expansions + info.num_expansions,
                 num_shrink=state.num_shrink + info.num_shrink,
             )
             return jax.lax.cond(
-                info.is_finished & (state.index < num_steps),
+                info.is_accepted & (state.index < num_steps),
                 lambda carry: start_move(carry[0], carry[1]),
                 lambda carry: carry,
                 (rng_key, state, proposal_state),

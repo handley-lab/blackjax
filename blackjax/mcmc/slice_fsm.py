@@ -23,7 +23,6 @@ the slice independently of the interval strategy.
 
 from typing import Any, NamedTuple
 
-import jax
 import jax.numpy as jnp
 from jax import lax, random
 
@@ -36,7 +35,7 @@ _DONE = -1
 
 
 class SliceInfo(NamedTuple):
-    is_finished: Array
+    is_accepted: Array
     num_evaluations: Array
     num_expansions: Array
     num_shrink: Array
@@ -127,24 +126,20 @@ def build_stepping_out_kernel(slice_fn, width):
         j, k = state.left_steps, state.right_steps
 
         def expand_left(_):
-            expand = inside & (j > 0)
             new_state = state._replace(
-                left=state.left - width * expand,
-                phase=jnp.where(expand, _LEFT, _RIGHT),
+                left=state.left - width * inside,
+                phase=jnp.where(inside, _LEFT, _RIGHT),
+                left_steps=jnp.where(inside, j - 1, 0),
             )
-            return _next_phase(
-                new_state._replace(left_steps=jnp.where(inside, j - 1, 0))
-            )
+            return _next_phase(new_state)
 
         def expand_right(_):
-            expand = inside & (k > 0)
             new_state = state._replace(
-                right=state.right + width * expand,
-                phase=jnp.where(expand, _RIGHT, _SHRINK),
+                right=state.right + width * inside,
+                phase=jnp.where(inside, _RIGHT, _SHRINK),
+                right_steps=jnp.where(inside, k - 1, 0),
             )
-            return _next_phase(
-                new_state._replace(right_steps=jnp.where(inside, k - 1, 0))
-            )
+            return _next_phase(new_state)
 
         def accept_or_shrink(_):
             return lax.cond(
