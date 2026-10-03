@@ -30,7 +30,8 @@ from blackjax import SamplingAlgorithm
 from blackjax.mcmc.slice import SliceInfo
 from blackjax.mcmc.slice import build_kernel as build_slice_kernel
 from blackjax.mcmc.slice import random_order, stepping_out
-from blackjax.mcmc.slice_chain import build_doubling_kernel as build_slice_chain
+from blackjax.mcmc.slice_fsm import build_chain as build_slice_chain
+from blackjax.mcmc.slice_fsm import build_stepping_out_kernel
 from blackjax.ns.adaptive import build_kernel as build_adaptive_kernel
 from blackjax.ns.adaptive import init
 from blackjax.ns.base import NSInfo, NSState, delete_fn, init_state_strategy
@@ -311,6 +312,18 @@ def slice_constrained_step(
     return step
 
 
+def slice_constrained_chain(
+    init_state_fn: Callable, slice_kernel: Callable, proposal: Callable
+) -> Callable:
+    """Bind a likelihood contour to an asynchronous slice chain."""
+
+    def chain(rng_key, state, num_inner_steps, loglikelihood_0, **params):
+        proposal_generator = proposal(init_state_fn, loglikelihood_0, **params)
+        return slice_kernel(rng_key, state, None, proposal_generator, num_inner_steps)
+
+    return chain
+
+
 def _resolve_inner_kernel_params(
     proposal: Callable, inner_kernel_params: Callable | None
 ) -> Callable:
@@ -385,25 +398,28 @@ def build_kernel(
 
 
 def build_async_kernel(
-    init_state_fn,
-    num_inner_steps,
-    num_delete=1,
-    slice_kernel=build_slice_chain(),
-    proposal=covariance_proposal,
-    inner_kernel_params=None,
-):
-    """Build NSS using an asynchronous slice-chain kernel."""
+    init_state_fn: Callable,
+    num_inner_steps: int,
+    num_delete: int = 1,
+    max_steps: int = 10,
+    max_shrinkage: int = 100,
+    proposal: Callable = covariance_proposal,
+    inner_kernel_params: Callable | None = None,
+    update_strategy: Callable = update_with_mcmc_chains,
+) -> Callable:
+    """Build NSS using asynchronous stepping-out chains.
+
+    ``update_strategy`` consumes a complete constrained chain rather than a
+    single constrained step.
+    """
     inner_kernel_params = _resolve_inner_kernel_params(proposal, inner_kernel_params)
-
-    def constrained_chain_fn(
-        rng_key, particle, num_inner_steps, loglikelihood_0, **parameters
-    ):
-        generate = proposal(init_state_fn, loglikelihood_0, **parameters)
-        return slice_kernel(rng_key, particle, None, generate, num_inner_steps)
-
-    update_fn = update_with_mcmc_chains(
-        constrained_chain_fn, num_inner_steps, num_delete
+    slice_kernel = build_slice_chain(
+        interval=build_stepping_out_kernel,
+        max_expansions=max_steps,
+        max_shrinkage=max_shrinkage,
     )
+    constrained_chain_fn = slice_constrained_chain(init_state_fn, slice_kernel, proposal)
+    update_fn = update_strategy(constrained_chain_fn, num_inner_steps, num_delete)
     return build_adaptive_kernel(
         partial(delete_fn, num_delete=num_delete),
         update_fn,

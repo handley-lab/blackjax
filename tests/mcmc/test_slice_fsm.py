@@ -214,20 +214,23 @@ def test_neal_reference(strategy, budget, logdensity):
 
 
 @pytest.mark.parametrize("logdensity", [normal, disconnected])
-def test_sampling_algorithm_matches_kernel(logdensity):
+@pytest.mark.parametrize(
+    "strategy", [fsm.build_stepping_out_kernel, fsm.build_doubling_kernel]
+)
+def test_sampling_algorithm_matches_kernel(logdensity, strategy):
     def proposal_generator(rng_key, position, logdensity_fn):
         return lambda t: (SliceState(position + t, logdensity_fn(position + t)), True)
 
-    sampler = fsm.as_top_level_api(logdensity, proposal_generator=proposal_generator)
-    step = jax.jit(sampler.step)
-    sample = jax.jit(
-        build_sample(*line(evaluate(logdensity)), fsm.build_doubling_kernel)
+    sampler = fsm.as_top_level_api(
+        logdensity, proposal_generator=proposal_generator, interval=strategy
     )
+    step = jax.jit(sampler.step)
+    sample = jax.jit(build_sample(*line(evaluate(logdensity)), strategy))
     state = sampler.init(jnp.asarray(0.0), random.key(0))
     for seed in range(8):
         key = random.key(seed)
         expected, counts = sample(
-            key, state_type(fsm.build_doubling_kernel)(state.position, state.logdensity)
+            key, state_type(strategy)(state.position, state.logdensity)
         )
         state, info = step(key, state)
         assert isinstance(state, SliceState)
@@ -444,7 +447,7 @@ def test_auxiliary_state_and_constraint(strategy):
     result, info = kernel(random.split(random.key(51), 64), states, jnp.full(64, 5))
     assert jnp.all(jnp.abs(result.position) < 0.25)
     np.testing.assert_allclose(result.loglikelihood, result.position**3 + 10)
-    np.testing.assert_allclose(result.logdensity, -result.position**2 / 2)
+    np.testing.assert_allclose(result.logdensity, -(result.position**2) / 2)
     assert jnp.all(info.num_shrink >= 5)
 
 
@@ -566,13 +569,13 @@ def test_one_evaluation_round_per_step(strategy, complete_move):
 
     keys = random.split(random.key(182), 16)
     if complete_move:
-        if strategy is not fsm.build_doubling_kernel:
-            pytest.skip("The complete-move sampler uses doubling")
 
         def proposal_generator(rng_key, position, logdensity_fn):
             return lambda t: target(position + t)
 
-        sampler = fsm.as_top_level_api(normal, proposal_generator=proposal_generator)
+        sampler = fsm.as_top_level_api(
+            normal, proposal_generator=proposal_generator, interval=strategy
+        )
         states = jax.vmap(sampler.init)(jnp.linspace(-10, 10, 16))
         result, info = jax.jit(jax.vmap(sampler.step))(keys, states)
         jax.block_until_ready(result)
