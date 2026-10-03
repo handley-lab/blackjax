@@ -134,11 +134,8 @@ def reference(key, x, logdensity, strategy, width, budget, num_steps):
     for _ in range(num_steps):
         move_key = step_key()
         slice_key, _ = random.split(move_key)
-        if strategy is fsm.build_stepping_out_kernel:
-            level_key, interval_key, _ = random.split(slice_key, 3)
-            bracket_key, budget_key = random.split(interval_key)
-        else:
-            level_key, bracket_key = random.split(slice_key)
+        level_key, interval_key, _ = random.split(slice_key, 3)
+        bracket_key, budget_key = random.split(interval_key)
         dtype = x.dtype
         level = float(logdensity(x) + jnp.log(random.uniform(level_key, dtype=dtype)))
         left = -width * float(random.uniform(bracket_key, dtype=dtype))
@@ -163,17 +160,18 @@ def reference(key, x, logdensity, strategy, width, budget, num_steps):
                 expansions += 1
         else:
             k = budget
+            left_expands = random.bernoulli(budget_key, 0.5, (budget + 1,))
             if k > 0:
                 step_key()
-                side_key = step_key()
+                step_key()
             while k > 0 and (inside(left) or inside(right)):
-                if bool(random.bernoulli(side_key)):
+                if bool(left_expands[budget - k]):
                     left -= right - left
                 else:
                     right += right - left
                 k -= 1
                 expansions += 1
-                side_key = step_key()
+                step_key()
         lo, hi = left, right
         while True:
             subkey = step_key()

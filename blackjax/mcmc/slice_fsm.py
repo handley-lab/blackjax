@@ -62,6 +62,7 @@ class DoublingState(NamedTuple):
     right: Array = 0.0
     level: Array = 0.0
     remaining: Array = 0
+    left_expands: Array = ()
     other_inside: Array = False
     expanded_left: Array = 0.0
     expanded_right: Array = 0.0
@@ -163,16 +164,17 @@ def build_stepping_out_kernel(slice_fn, width):
 
 
 def init_doubling(rng_key, state, width, max_expansions):
-    level_key, bracket_key = random.split(rng_key)
-    dtype = state.logdensity.dtype
-    left = -width * random.uniform(bracket_key, dtype=dtype)
-    level = state.logdensity + jnp.log(random.uniform(level_key, dtype=dtype))
+    level_key, interval_key, _ = random.split(rng_key, 3)
+    bracket_key, direction_key = random.split(interval_key)
+    left = -width * random.uniform(bracket_key)
+    level = state.logdensity + jnp.log(random.uniform(level_key))
     state = state._replace(
         phase=jnp.where(max_expansions > 0, _LEFT, _SHRINK),
         left=left,
         right=left + width,
         level=level,
         remaining=max_expansions,
+        left_expands=random.bernoulli(direction_key, 0.5, (max_expansions + 1,)),
         other_inside=False,
         expanded_left=left,
         expanded_right=left + width,
@@ -190,9 +192,9 @@ def build_doubling_kernel(slice_fn, width):
     shrinkage candidate or a reverse-construction endpoint.
     """
 
-    def expand(rng_key, state, inside, left_endpoint):
+    def expand(state, inside, left_endpoint):
         def extend(state):
-            side = random.bernoulli(rng_key)
+            side = state.left_expands[state.left_expands.size - 1 - state.remaining]
             span = state.right - state.left
             left = state.left - jnp.where(side, span, 0)
             right = state.right + jnp.where(side, 0, span)
@@ -240,11 +242,8 @@ def build_doubling_kernel(slice_fn, width):
             (
                 lambda state: state.left,
                 lambda state: state.right,
-                lambda state: random.uniform(
-                    rng_key,
-                    dtype=state.left.dtype,
-                    minval=state.left,
-                    maxval=state.right,
+                lambda state: (
+                    state.left + random.uniform(rng_key) * (state.right - state.left)
                 ),
                 lambda state: state.left,
                 lambda state: state.right,
@@ -260,7 +259,7 @@ def build_doubling_kernel(slice_fn, width):
             return state._replace(phase=_RIGHT, other_inside=inside)
 
         def first_right(_):
-            return expand(rng_key, state, inside, False)
+            return expand(state, inside, False)
 
         def check_or_shrink(_):
 
@@ -280,7 +279,7 @@ def build_doubling_kernel(slice_fn, width):
             )
 
         def endpoint(_):
-            return expand(rng_key, state, inside, state.phase == _EXPAND_LEFT)
+            return expand(state, inside, state.phase == _EXPAND_LEFT)
 
         def check_left(_):
             return state._replace(phase=_CHECK_RIGHT, other_inside=inside)
@@ -351,7 +350,7 @@ def build_chain(
             proposal_key, slice_key = random.split(keys[count])
             _, interval_key, _ = random.split(slice_key, 3)
             rng_key, step_key = lax.cond(
-                (state.phase == _SHRINK) | (interval is build_doubling_kernel),
+                state.phase == _SHRINK,
                 random.split,
                 lambda key: jnp.stack((key, interval_key)),
                 rng_key,

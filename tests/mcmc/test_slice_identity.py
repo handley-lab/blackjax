@@ -8,7 +8,7 @@ import pytest
 
 from blackjax.mcmc import slice_fsm
 from blackjax.mcmc.slice import SliceInfo, build_kernel as build_slice_kernel
-from blackjax.mcmc.slice import stepping_out
+from blackjax.mcmc.slice import doubling, stepping_out
 from blackjax.util import thin_kernel
 
 
@@ -21,7 +21,9 @@ class Particle(NamedTuple):
 
 @pytest.mark.parametrize("budget", [0, 1, 4, 10])
 @pytest.mark.parametrize("random_direction", [False, True])
-def test_matched_stepping_out_streams(budget, random_direction):
+@pytest.mark.parametrize("interval", [stepping_out, doubling])
+@pytest.mark.parametrize("num_steps", [1, 4])
+def test_matched_streams(budget, random_direction, interval, num_steps):
     def logdensity(x):
         return -jnp.sum(x**2) / 2
 
@@ -39,18 +41,25 @@ def test_matched_stepping_out_streams(budget, random_direction):
         return evaluate
 
     sync = partial(
-        thin_kernel(build_slice_kernel(stepping_out, budget, 100), 1),
+        thin_kernel(build_slice_kernel(interval, budget, 100), num_steps),
         logdensity_fn=logdensity,
         proposal_generator=proposal,
         width=0.7,
     )
     asynchronous = partial(
         slice_fsm.build_chain(
-            budget, 0.7, 100, interval=slice_fsm.build_stepping_out_kernel
+            budget,
+            0.7,
+            100,
+            interval=(
+                slice_fsm.build_stepping_out_kernel
+                if interval is stepping_out
+                else slice_fsm.build_doubling_kernel
+            ),
         ),
         logdensity_fn=logdensity,
         proposal_generator=proposal,
-        num_inner_steps=1,
+        num_inner_steps=num_steps,
     )
     keys = jax.random.split(jax.random.key(1), 16)
     states = jax.vmap(lambda x: Particle(x, logdensity(x), jnp.zeros_like(x), 0.0))(
@@ -60,13 +69,15 @@ def test_matched_stepping_out_streams(budget, random_direction):
     actual = jax.jit(jax.vmap(asynchronous))(keys, states)
     assert isinstance(actual[1], SliceInfo)
     assert jax.tree.structure(actual) == jax.tree.structure(expected)
-    for x, y in zip(
-        jax.tree.leaves((actual[0].direction, actual[0].coordinate, actual[1])),
-        jax.tree.leaves((expected[0].direction, expected[0].coordinate, expected[1])),
-    ):
+    exact_actual = (actual[0].direction, actual[1][:3])
+    exact_expected = (expected[0].direction, expected[1][:3])
+    if interval is stepping_out and num_steps == 1:
+        exact_actual += (actual[0].coordinate, actual[1][3:])
+        exact_expected += (expected[0].coordinate, expected[1][3:])
+    for x, y in zip(jax.tree.leaves(exact_actual), jax.tree.leaves(exact_expected)):
         np.testing.assert_array_equal(x, y)
         assert np.asarray(x).tobytes() == np.asarray(y).tobytes()
-    for x, y in zip(jax.tree.leaves(actual[0]), jax.tree.leaves(expected[0])):
+    for x, y in zip(jax.tree.leaves(actual), jax.tree.leaves(expected)):
         np.testing.assert_allclose(x, y, rtol=1e-13, atol=1e-14)
     x, y = np.asarray(actual[0].position), np.asarray(expected[0].position)
     print(
