@@ -20,14 +20,13 @@ Interval strategies implement Neal (2003), Figures 3--6. The proposal defines
 the slice independently of the interval strategy.
 """
 
-from functools import partial
 from typing import Any, NamedTuple
 
-import jax
 import jax.numpy as jnp
 from jax import lax, random
 
 from blackjax.base import SamplingAlgorithm, build_sampling_algorithm
+from blackjax.mcmc.slice import SliceInfo as SliceTransitionInfo
 from blackjax.mcmc.slice import SliceState, direction_proposal, init
 from blackjax.types import Array
 
@@ -85,10 +84,10 @@ def _next_phase(state):
 
 
 def init_stepping_out(rng_key, state, width, max_expansions):
-    level_key, bracket_key, budget_key = random.split(rng_key, 3)
-    dtype = state.logdensity.dtype
-    left = -width * random.uniform(bracket_key, dtype=dtype)
-    level = state.logdensity + jnp.log(random.uniform(level_key, dtype=dtype))
+    level_key, interval_key, _ = random.split(rng_key, 3)
+    bracket_key, budget_key = random.split(interval_key)
+    left = -width * random.uniform(bracket_key)
+    level = state.logdensity + jnp.log(random.uniform(level_key))
     state = state._replace(
         phase=_LEFT,
         left=left,
@@ -115,11 +114,8 @@ def build_stepping_out_kernel(slice_fn, width):
             (
                 lambda state: state.left,
                 lambda state: state.right,
-                lambda state: random.uniform(
-                    rng_key,
-                    dtype=state.left.dtype,
-                    minval=state.left,
-                    maxval=state.right,
+                lambda state: (
+                    state.left + random.uniform(rng_key) * (state.right - state.left)
                 ),
             ),
             state,
@@ -337,80 +333,96 @@ def build_chain(
         state = state_type(particle, particle.logdensity)
         return initialize(rng_key, state, width, max_expansions)
 
-    return partial(
-        _run_chain,
-        init_fn=init_fn,
-        build_kernel_fn=partial(interval, width=width),
-        max_shrinkage=max_shrinkage,
-    )
+    def kernel(rng_key, particle, logdensity_fn, proposal_generator, num_inner_steps):
+        keys = random.split(rng_key, num_inner_steps)
+        _, slice_key = random.split(keys[0])
+        _, _, rng_key = random.split(slice_key, 3)
+        state = init_fn(slice_key, particle)
+        info = SliceTransitionInfo(
+            jnp.zeros(num_inner_steps, dtype=bool),
+            jnp.zeros(num_inner_steps, dtype=int),
+            jnp.zeros(num_inner_steps, dtype=int),
+            jnp.zeros(num_inner_steps, dtype=state.left.dtype),
+            jnp.zeros(num_inner_steps, dtype=state.right.dtype),
+        )
 
-
-def _run_chain(
-    rng_key,
-    particle,
-    logdensity_fn,
-    proposal_generator,
-    num_inner_steps,
-    init_fn,
-    build_kernel_fn,
-    max_shrinkage,
-):
-    rng_key, proposal_key, init_key = random.split(rng_key, 3)
-    state = init_fn(init_key, particle)
-    info = SliceInfo(
-        jnp.zeros(num_inner_steps, dtype=bool),
-        jnp.zeros(num_inner_steps, dtype=int),
-        jnp.zeros(num_inner_steps, dtype=int),
-        jnp.zeros(num_inner_steps, dtype=int),
-    )
-
-    def body(carry):
-        rng_key, proposal_key, origin, state, count, info = carry
-        rng_key, step_key, next_key, init_key = random.split(rng_key, 4)
-        proposal = proposal_generator(proposal_key, origin.position, logdensity_fn)
-
-        def slice_fn(t):
-            candidate, valid = proposal(t)
-            return SliceState(candidate, candidate.logdensity), valid
-
-        exhausted = jnp.asarray(False)
-        if max_shrinkage is not None:
-            exhausted = (info.num_shrink[count] >= max_shrinkage) & (
-                state.phase == _SHRINK
+        def body(carry):
+            rng_key, origin, state, count, info = carry
+            proposal_key, slice_key = random.split(keys[count])
+            _, interval_key, _ = random.split(slice_key, 3)
+            rng_key, step_key = lax.cond(
+                (state.phase == _SHRINK) | (interval is build_doubling_kernel),
+                random.split,
+                lambda key: jnp.stack((key, interval_key)),
+                rng_key,
             )
-        state, step_info = lax.cond(
-            exhausted,
-            lambda _: (
-                state._replace(position=origin, logdensity=origin.logdensity),
-                SliceInfo(jnp.asarray(False), 0, 0, 0),
-            ),
-            lambda _: build_kernel_fn(slice_fn)(step_key, state),
-            None,
-        )
-        finished = step_info.is_accepted | exhausted
-        info = jax.tree.map(lambda x, y: x.at[count].set(x[count] + y), info, step_info)
-        info = info._replace(
-            is_accepted=info.is_accepted.at[count].set(step_info.is_accepted)
-        )
-        count += finished.astype(int)
+            proposal = proposal_generator(proposal_key, origin.position, logdensity_fn)
 
-        def next_move(_):
-            particle = state.position
-            return next_key, particle, init_fn(init_key, particle)
+            def slice_fn(t):
+                candidate, valid = proposal(t)
+                return SliceState(candidate, candidate.logdensity), valid
 
-        proposal_key, origin, state = lax.cond(
-            finished & (count < num_inner_steps),
-            next_move,
-            lambda _: (proposal_key, origin, state),
-            None,
+            exhausted = jnp.asarray(False)
+            if max_shrinkage is not None:
+                exhausted = (info.num_shrink[count] >= max_shrinkage) & (
+                    state.phase == _SHRINK
+                )
+            info = info._replace(
+                bracket_left=info.bracket_left.at[count].set(
+                    jnp.where(
+                        info.num_shrink[count] == 0,
+                        state.left,
+                        info.bracket_left[count],
+                    )
+                ),
+                bracket_right=info.bracket_right.at[count].set(
+                    jnp.where(
+                        info.num_shrink[count] == 0,
+                        state.right,
+                        info.bracket_right[count],
+                    )
+                ),
+            )
+            state, step_info = lax.cond(
+                exhausted,
+                lambda _: (
+                    state._replace(position=origin, logdensity=origin.logdensity),
+                    SliceInfo(jnp.asarray(False), 0, 0, 0),
+                ),
+                lambda _: interval(slice_fn, width)(step_key, state),
+                None,
+            )
+            finished = step_info.is_accepted | exhausted
+            info = info._replace(
+                is_accepted=info.is_accepted.at[count].set(step_info.is_accepted),
+                num_expansions=info.num_expansions.at[count].add(
+                    step_info.num_expansions
+                ),
+                num_shrink=info.num_shrink.at[count].add(step_info.num_shrink),
+            )
+            count += finished.astype(int)
+
+            def next_move(_):
+                particle = state.position
+                _, slice_key = random.split(keys[count])
+                _, _, shrink_key = random.split(slice_key, 3)
+                return shrink_key, particle, init_fn(slice_key, particle)
+
+            rng_key, origin, state = lax.cond(
+                finished & (count < num_inner_steps),
+                next_move,
+                lambda _: (rng_key, origin, state),
+                None,
+            )
+            return rng_key, origin, state, count, info
+
+        carry = (rng_key, particle, state, 0, info)
+        _, _, state, _, info = lax.while_loop(
+            lambda carry: carry[3] < num_inner_steps, body, carry
         )
-        return rng_key, proposal_key, origin, state, count, info
+        return state.position, info
 
-    carry = (rng_key, proposal_key, particle, state, 0, info)
-    _, _, _, state, _, info = lax.while_loop(
-        lambda carry: carry[4] < num_inner_steps, body, carry
-    )
-    return state.position, info
+    return kernel
 
 
 def build_kernel(max_expansions=10, *, interval=build_doubling_kernel):

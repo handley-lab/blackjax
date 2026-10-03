@@ -60,6 +60,33 @@ def test_async_defaults_match_explicit_stepping_out():
         np.testing.assert_array_equal(actual, expected)
 
 
+def test_async_matches_synchronous_nested_sampling():
+    init_particle = partial(
+        init_state_strategy,
+        logprior_fn=lambda x: -jnp.sum(x**2) / 18,
+        loglikelihood_fn=lambda x: -jnp.sum((x - 0.5) ** 2),
+    )
+    expected = adaptive.init(
+        jax.random.normal(jax.random.key(12), (64, 2)),
+        jax.vmap(init_particle),
+        update_inner_kernel_params_fn=nss.live_covariance_factor,
+    )
+    actual = expected
+    sync = jax.jit(nss.build_kernel(init_particle, 8, 8))
+    asynchronous = jax.jit(nss.build_async_kernel(init_particle, 8, 8))
+    for key in jax.random.split(jax.random.key(13), 5):
+        expected, expected_info = sync(key, expected)
+        actual, actual_info = asynchronous(key, actual)
+        assert jax.tree.structure((actual, actual_info)) == jax.tree.structure(
+            (expected, expected_info)
+        )
+        for x, y in zip(
+            jax.tree.leaves((actual, actual_info)),
+            jax.tree.leaves((expected, expected_info)),
+        ):
+            np.testing.assert_allclose(x, y, rtol=1e-11, atol=1e-12)
+
+
 def test_async_shrinkage_exhaustion_retains_particle():
     from blackjax.mcmc.slice import SliceState
 
@@ -76,7 +103,6 @@ def test_async_shrinkage_exhaustion_retains_particle():
     )
     np.testing.assert_array_equal(result.position, particle.position)
     np.testing.assert_array_equal(info.num_shrink, [2, 2, 2])
-    np.testing.assert_array_equal(info.num_evaluations, [2, 2, 2])
     assert not jnp.any(info.is_accepted)
 
 
@@ -141,9 +167,8 @@ def test_async_replacement_chains(doubling):
     jax.block_until_ready(result)
     jax.effects_barrier()
     diagnostics = info.update_info
-    assert diagnostics.num_evaluations.shape == (16, 8)
+    assert diagnostics.num_shrink.shape == (16, 8)
     assert np.all(diagnostics.is_accepted)
-    assert len(calls) == int(jnp.max(diagnostics.num_evaluations.sum(axis=1)))
     origins = np.asarray(calls)
     changes = np.any(origins[1:] != origins[:-1], axis=-1)
     completed = np.cumsum(changes, axis=0)

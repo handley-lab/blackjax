@@ -135,7 +135,8 @@ def reference(key, x, logdensity, strategy, width, budget, num_steps):
         move_key = step_key()
         slice_key, _ = random.split(move_key)
         if strategy is fsm.build_stepping_out_kernel:
-            level_key, bracket_key, budget_key = random.split(slice_key, 3)
+            level_key, interval_key, _ = random.split(slice_key, 3)
+            bracket_key, budget_key = random.split(interval_key)
         else:
             level_key, bracket_key = random.split(slice_key)
         dtype = x.dtype
