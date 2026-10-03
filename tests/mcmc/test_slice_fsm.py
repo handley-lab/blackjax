@@ -101,7 +101,7 @@ def reference(key, x, logdensity, strategy, width, budget, num_steps):
 @pytest.mark.parametrize("logdensity", [normal, disconnected])
 def test_neal_reference(strategy, budget, logdensity):
     kernel = jax.jit(
-        fsm.build_kernel(evaluate(logdensity), line, strategy, max_expansions=budget)
+        fsm.build_kernel(evaluate(logdensity), *line, strategy, max_expansions=budget)
     )
     x = jnp.asarray(0.0)
     for seed in range(12):
@@ -144,7 +144,7 @@ def test_doubling_rejects_density_valid_trial():
 
 @pytest.mark.parametrize("strategy", [fsm.stepping_out, fsm.doubling])
 def test_scalar_vmap_and_permuted_chains(strategy):
-    kernel = fsm.build_kernel(evaluate(normal), line, strategy)
+    kernel = fsm.build_kernel(evaluate(normal), *line, strategy)
     keys = random.split(random.key(72), 24)
     states = jax.vmap(lambda x: evaluate(normal)(x)[0])(jnp.linspace(-8, 8, 24))
     counts = jnp.arange(24) % 5
@@ -177,7 +177,7 @@ def test_auxiliary_state_and_constraint(strategy):
     def evaluate(x):
         return Particle(x, normal(x), x**3 + 10), jnp.abs(x) < 0.25
 
-    kernel = jax.jit(jax.vmap(fsm.build_kernel(evaluate, line, strategy)))
+    kernel = jax.jit(jax.vmap(fsm.build_kernel(evaluate, *line, strategy)))
     x = jnp.zeros(64)
     states = jax.vmap(lambda x: evaluate(x)[0])(x)
     result, info = kernel(random.split(random.key(51), 64), states, jnp.full(64, 5))
@@ -202,7 +202,8 @@ def test_stationarity(strategy, logdensity):
     states = jax.vmap(lambda x: evaluate(logdensity)(x)[0])(x)
     kernel = jax.jit(
         jax.vmap(
-            fsm.build_kernel(evaluate(logdensity), line, strategy), in_axes=(0, 0, None)
+            fsm.build_kernel(evaluate(logdensity), *line, strategy),
+            in_axes=(0, 0, None),
         )
     )
     result, _ = kernel(random.split(random.key(982), n), states, 8)
@@ -255,7 +256,7 @@ def test_mixed_topology_and_overlapping_blocks(strategy):
     states = jax.vmap(lambda x: evaluate(x)[0])(x)
     kernel = jax.jit(
         jax.vmap(
-            fsm.build_kernel(evaluate, (generate, move), strategy, max_expansions=4),
+            fsm.build_kernel(evaluate, generate, move, strategy, max_expansions=4),
             in_axes=(0, 0, None),
         )
     )
@@ -287,7 +288,7 @@ def test_one_evaluation_round_per_tick(strategy):
         result = jax.vmap(evaluate(normal))(x)
         return result, jax.tree.map(lambda _: True, result)
 
-    kernel = fsm.build_kernel(target, line, strategy)
+    kernel = fsm.build_kernel(target, *line, strategy)
     keys = random.split(random.key(182), 16)
     states = jax.vmap(lambda x: evaluate(normal)(x)[0])(jnp.linspace(-10, 10, 16))
     counts = jnp.arange(16) % 5 + 1
@@ -304,7 +305,7 @@ def test_one_evaluation_round_per_tick(strategy):
             jax.debug.callback(lambda x: calls.append(float(x)), x)
             return evaluate(normal)(x)
 
-        scalar = fsm.build_kernel(scalar_target, line, strategy)
+        scalar = fsm.build_kernel(scalar_target, *line, strategy)
         scalar_result = jax.jit(scalar)(
             keys[i], jax.tree.map(lambda x: x[i], states), counts[i]
         )

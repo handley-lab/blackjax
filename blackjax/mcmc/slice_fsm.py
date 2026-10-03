@@ -39,8 +39,8 @@ class SliceInfo(NamedTuple):
     num_shrink: Array
 
 
-class _Slice(NamedTuple):
-    key: PRNGKey
+class _SliceState(NamedTuple):
+    rng_key: PRNGKey
     phase: Array
     left: Array
     right: Array
@@ -51,18 +51,18 @@ class _Slice(NamedTuple):
     num_shrink: Array
 
 
-def _initialise(key, particle, width):
-    key, level_key, bracket_key = random.split(key, 3)
-    dtype = particle.logdensity.dtype
+def _init_slice(rng_key, state, width):
+    rng_key, level_key, bracket_key = random.split(rng_key, 3)
+    dtype = state.logdensity.dtype
     left = -width * random.uniform(bracket_key, dtype=dtype)
-    level = particle.logdensity + jnp.log(random.uniform(level_key, dtype=dtype))
-    return _Slice(key, _LEFT, left, left + width, left, level, particle, 0, 0)
+    level = state.logdensity + jnp.log(random.uniform(level_key, dtype=dtype))
+    return _SliceState(rng_key, _LEFT, left, left + width, left, level, state, 0, 0)
 
 
 def _draw(s):
-    key, subkey = random.split(s.key)
+    rng_key, subkey = random.split(s.rng_key)
     t = s.left + random.uniform(subkey, dtype=s.left.dtype) * (s.right - s.left)
-    return s._replace(key=key, phase=_SHRINK, t=t)
+    return s._replace(rng_key=rng_key, phase=_SHRINK, t=t)
 
 
 def _reject(s, t):
@@ -78,9 +78,9 @@ def stepping_out(width, max_expansions):
     no expansion. Shrinkage is not truncated.
     """
 
-    def start(key, particle):
-        key, budget_key = random.split(key)
-        s = _initialise(key, particle, width)
+    def init(rng_key, state):
+        rng_key, budget_key = random.split(rng_key)
+        s = _init_slice(rng_key, state, width)
         j = jnp.floor(max_expansions * random.uniform(budget_key)).astype(int)
         k = max_expansions - 1 - j
         return request(s, (j, k))
@@ -92,7 +92,7 @@ def stepping_out(width, max_expansions):
         s = s._replace(phase=phase, t=jnp.where(phase == _LEFT, s.left, s.right))
         return lax.cond(phase == _SHRINK, _draw, lambda s: s, s), budget
 
-    def advance(s, budget, candidate, inside):
+    def update(s, budget, candidate, inside):
         j, k = budget
 
         def left(_):
@@ -125,10 +125,10 @@ def stepping_out(width, max_expansions):
 
         return lax.switch(s.phase, (left, right, shrink), None)
 
-    return start, advance
+    return init, update
 
 
-class _Doubling(NamedTuple):
+class _DoublingState(NamedTuple):
     remaining: Array
     side: Array
     left_inside: Array
@@ -148,9 +148,9 @@ def doubling(width, max_expansions):
     a newly doubled endpoint, and 4/5 evaluate reverse-construction endpoints.
     """
 
-    def start(key, particle):
-        s = _initialise(key, particle, width)
-        d = _Doubling(
+    def init(rng_key, state):
+        s = _init_slice(rng_key, state, width)
+        d = _DoublingState(
             max_expansions,
             False,
             False,
@@ -167,13 +167,13 @@ def doubling(width, max_expansions):
     def expand(s, d):
         def extend(pair):
             s, d = pair
-            key, subkey = random.split(s.key)
+            rng_key, subkey = random.split(s.rng_key)
             side = random.bernoulli(subkey)
             span = s.right - s.left
             left = s.left - jnp.where(side, span, 0)
             right = s.right + jnp.where(side, 0, span)
             s = s._replace(
-                key=key,
+                rng_key=rng_key,
                 phase=_EXPAND,
                 left=left,
                 right=right,
@@ -205,7 +205,7 @@ def doubling(width, max_expansions):
         check = needs_check & d.separated
         return s._replace(phase=jnp.where(check, _CHECK_LEFT, _DONE), t=d.check_left), d
 
-    def advance(s, d, candidate, inside):
+    def update(s, d, candidate, inside):
         def first_left(_):
             return s._replace(phase=_RIGHT, t=s.right), d._replace(left_inside=inside)
 
@@ -258,73 +258,86 @@ def doubling(width, max_expansions):
             None,
         )
 
-    return start, advance
+    return init, update
 
 
-class _Chain(NamedTuple):
-    key: PRNGKey
+class _ChainState(NamedTuple):
+    rng_key: PRNGKey
     index: Array
-    particle: Any
+    state: Any
     direction: Any
-    slice: _Slice
+    slice: _SliceState
     interval: Any
     info: SliceInfo
 
 
 def build_kernel(
-    evaluate, proposal, strategy=stepping_out, *, width=1.0, max_expansions=10
+    proposal_fn,
+    direction_generator,
+    position_update_fn,
+    interval=stepping_out,
+    *,
+    width=1.0,
+    max_expansions=10,
 ):
-    """Build a scalar, vmappable kernel returning ``(particle, SliceInfo)``.
+    """Build a scalar, vmappable kernel returning ``(state, SliceInfo)``.
 
-    ``evaluate(position) -> (particle, is_valid)`` supplies a particle with position
+    ``proposal_fn(position) -> (state, is_valid)`` supplies a state with position
     and logdensity fields, optionally containing other evaluated quantities.
-    ``proposal`` is a pair of pure functions:
-    ``generate(key, position, move_index) -> direction`` and
-    ``move(position, direction, t) -> position``. Direction may be any fixed-shape
-    pytree. Each path must preserve the target's base measure and support the
-    reverse move with the same probability.
+    ``direction_generator(rng_key, position, move_index) -> direction`` draws
+    fixed-shape proposal data. ``position_update_fn(position, direction, t)``
+    constructs the position along that path. Each path must preserve the target's
+    base measure and support the reverse move with the same probability.
 
-    ``kernel(key, particle, num_steps)`` completes every prescribed move. Per-chain
+    ``kernel(rng_key, state, num_steps)`` completes every prescribed move. Per-chain
     keys are independent of other chains' progress. Shrinkage continues until an
     acceptable candidate is found; max_expansions limits only bracket construction.
     """
-    generate, move = proposal
-    start, advance = strategy(width, max_expansions)
+    init, update = interval(width, max_expansions)
 
-    def kernel(key, particle, num_steps=1):
-        def enter(key, particle, index, info):
-            key, direction_key, slice_key = random.split(key, 3)
-            direction = generate(direction_key, particle.position, index)
-            s, interval = start(slice_key, particle)
-            return _Chain(key, index, particle, direction, s, interval, info)
-
-        def body(c):
-            position = move(c.particle.position, c.direction, c.slice.t)
-            candidate, valid = evaluate(position)
-            inside = valid & (candidate.logdensity >= c.slice.level)
-            s, interval = advance(c.slice, c.interval, candidate, inside)
-            done = s.phase == _DONE
-            info = SliceInfo(
-                c.info.num_evaluations + 1,
-                c.info.num_expansions + jnp.where(done, s.num_expansions, 0),
-                c.info.num_shrink + jnp.where(done, s.num_shrink, 0),
+    def kernel(rng_key, state, num_steps=1):
+        def init_move(rng_key, state, index, info):
+            rng_key, direction_key, slice_key = random.split(rng_key, 3)
+            direction = direction_generator(direction_key, state.position, index)
+            slice_state, interval_state = init(slice_key, state)
+            return _ChainState(
+                rng_key, index, state, direction, slice_state, interval_state, info
             )
-            c = c._replace(slice=s, interval=interval, info=info)
 
-            def finish(c):
-                index = c.index + 1
-                c = c._replace(index=index, particle=s.trial)
+        def body(carry):
+            position = position_update_fn(
+                carry.state.position, carry.direction, carry.slice.t
+            )
+            proposed_state, is_valid = proposal_fn(position)
+            inside = is_valid & (proposed_state.logdensity >= carry.slice.level)
+            slice_state, interval_state = update(
+                carry.slice, carry.interval, proposed_state, inside
+            )
+            done = slice_state.phase == _DONE
+            info = SliceInfo(
+                carry.info.num_evaluations + 1,
+                carry.info.num_expansions
+                + jnp.where(done, slice_state.num_expansions, 0),
+                carry.info.num_shrink + jnp.where(done, slice_state.num_shrink, 0),
+            )
+            carry = carry._replace(
+                slice=slice_state, interval=interval_state, info=info
+            )
+
+            def finish_move(carry):
+                index = carry.index + 1
+                carry = carry._replace(index=index, state=slice_state.trial)
                 return lax.cond(
                     index < num_steps,
-                    lambda c: enter(c.key, c.particle, c.index, c.info),
+                    lambda c: init_move(c.rng_key, c.state, c.index, c.info),
                     lambda c: c,
-                    c,
+                    carry,
                 )
 
-            return lax.cond(done, finish, lambda c: c, c)
+            return lax.cond(done, finish_move, lambda c: c, carry)
 
-        c = enter(key, particle, 0, SliceInfo(0, 0, 0))
-        c = lax.while_loop(lambda c: c.index < num_steps, body, c)
-        return c.particle, c.info
+        carry = init_move(rng_key, state, 0, SliceInfo(0, 0, 0))
+        carry = lax.while_loop(lambda c: c.index < num_steps, body, carry)
+        return carry.state, carry.info
 
     return kernel
