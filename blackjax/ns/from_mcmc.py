@@ -22,6 +22,7 @@ from jax import random
 
 from blackjax.ns.adaptive import build_kernel as build_adaptive_kernel
 from blackjax.ns.base import delete_fn as default_delete_fn
+from blackjax.util import thin_kernel
 
 __all__ = [
     "ConstrainedMCMCInfo",
@@ -73,23 +74,19 @@ def update_with_mcmc_take_last(
     infos.
     """
 
-    def chain(rng_key, state, num_steps, loglikelihood_0, **step_parameters):
-        keys = random.split(rng_key, num_steps)
+    def constrained_chain_fn(
+        rng_key, state, num_inner_steps, loglikelihood_0, **step_parameters
+    ):
+        kernel = thin_kernel(constrained_mcmc_step_fn, num_inner_steps)
+        return kernel(rng_key, state, loglikelihood_0, **step_parameters)
 
-        def body_fn(state, rng_key):
-            return constrained_mcmc_step_fn(
-                rng_key, state, loglikelihood_0, **step_parameters
-            )
-
-        return jax.lax.scan(body_fn, state, keys)
-
-    return update_with_mcmc_chains(chain, num_mcmc_steps, num_delete)
+    return update_with_mcmc_chains(constrained_chain_fn, num_mcmc_steps, num_delete)
 
 
-def update_with_mcmc_chains(chain_fn, num_mcmc_steps, num_delete):
+def update_with_mcmc_chains(constrained_chain_fn, num_mcmc_steps, num_delete):
     """Replace particles using complete constrained chains.
 
-    ``chain_fn(key, particle, num_steps, loglikelihood_0, **parameters)``
+    ``constrained_chain_fn(key, particle, num_inner_steps, loglikelihood_0, **parameters)``
     returns the final particle and diagnostics. It owns the move schedule.
     """
 
@@ -110,8 +107,8 @@ def update_with_mcmc_chains(chain_fn, num_mcmc_steps, num_delete):
         start_state = jax.tree.map(lambda x: x[start_idx], particles)
 
         mcmc_kernel = partial(
-            chain_fn,
-            num_steps=num_mcmc_steps,
+            constrained_chain_fn,
+            num_inner_steps=num_mcmc_steps,
             loglikelihood_0=loglikelihood_0,
             **step_parameters,
         )
@@ -201,9 +198,7 @@ def build_kernel(
     ----------
     constrained_step_fn
         Constrained inner step ``(rng_key, state, loglikelihood_0, **params) ->
-        (new_state, info)`` for the default strategy. Custom strategies define
-        this callable's contract; :func:`update_with_mcmc_chains` takes a
-        complete-chain function instead.
+        (new_state, info)``.
     num_inner_steps
         Number of inner steps per particle replacement.
     update_inner_kernel_params_fn

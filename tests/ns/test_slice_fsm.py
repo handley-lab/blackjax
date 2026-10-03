@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 from jax.custom_batching import custom_vmap
 
-from blackjax.mcmc import slice_fsm as fsm
+from blackjax.mcmc import slice_chain
 from blackjax.ns import adaptive, nss
 from blackjax.ns.base import init_state_strategy
 
@@ -49,22 +49,19 @@ def test_async_replacement_chains(doubling):
 
         return generate
 
-    state_type = fsm.DoublingState if doubling else fsm.SteppingOutState
-    init_move = fsm.init_doubling if doubling else fsm.init_stepping_out
     build_kernel = (
-        fsm.build_doubling_kernel if doubling else fsm.build_stepping_out_kernel
+        slice_chain.build_doubling_kernel
+        if doubling
+        else slice_chain.build_stepping_out_kernel
     )
-
-    def init_slice(key, particle):
-        return init_move(key, state_type(particle, particle.logdensity), 1.0, 10)
 
     kernel = nss.build_async_kernel(
         init_particle,
         8,
-        init_slice,
-        partial(build_kernel, width=1.0),
         16,
+        slice_kernel=build_kernel(),
         proposal=proposal,
+        inner_kernel_params=nss.live_covariance_factor,
     )
     state = adaptive.init(
         3 * jax.random.normal(jax.random.key(20), (128, 2)),
@@ -97,3 +94,45 @@ def test_async_replacement_chains(doubling):
     threshold = jnp.sort(state.particles.loglikelihood)[15]
     np.testing.assert_array_equal(result.particles.loglikelihood_birth[born], threshold)
     assert jnp.all(result.particles.loglikelihood[born] > threshold)
+
+
+@pytest.mark.parametrize("doubling", [False, True])
+@pytest.mark.parametrize("factor", [False, True])
+def test_covariance_proposal(doubling, factor):
+    def logprior(x):
+        return -jnp.sum(x**2) / 18
+
+    def loglikelihood(x):
+        return -jnp.sum((x - 0.5) ** 2)
+
+    init_particle = partial(
+        init_state_strategy, logprior_fn=logprior, loglikelihood_fn=loglikelihood
+    )
+    parameters = nss.live_covariance_factor if factor else nss.live_covariance
+    builder = (
+        slice_chain.build_doubling_kernel
+        if doubling
+        else slice_chain.build_stepping_out_kernel
+    )
+    kernel = jax.jit(
+        nss.build_async_kernel(
+            init_particle,
+            8,
+            16,
+            slice_kernel=builder(),
+            inner_kernel_params=parameters,
+        )
+    )
+    state = adaptive.init(
+        3 * jax.random.normal(jax.random.key(20), (128, 2)),
+        jax.vmap(init_particle),
+        update_inner_kernel_params_fn=parameters,
+    )
+    for key in jax.random.split(jax.random.key(30), 3):
+        state, info = kernel(key, state)
+        assert jnp.all(info.update_info.is_accepted)
+        np.testing.assert_allclose(
+            state.particles.loglikelihood,
+            jax.vmap(loglikelihood)(state.particles.position),
+            rtol=1e-6,
+        )

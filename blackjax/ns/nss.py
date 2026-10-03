@@ -27,12 +27,13 @@ import jax.flatten_util
 import jax.numpy as jnp
 
 from blackjax import SamplingAlgorithm
-from blackjax.mcmc.slice import SliceInfo, SliceState
+from blackjax.mcmc.slice import SliceInfo
 from blackjax.mcmc.slice import build_kernel as build_slice_kernel
 from blackjax.mcmc.slice import random_order, stepping_out
-from blackjax.mcmc.slice_fsm import SliceInfo as FSMSliceInfo
+from blackjax.mcmc.slice_chain import build_doubling_kernel as build_slice_chain
+from blackjax.ns.adaptive import build_kernel as build_adaptive_kernel
 from blackjax.ns.adaptive import init
-from blackjax.ns.base import NSInfo, NSState, init_state_strategy
+from blackjax.ns.base import NSInfo, NSState, delete_fn, init_state_strategy
 from blackjax.ns.from_mcmc import build_kernel as build_from_mcmc_kernel
 from blackjax.ns.from_mcmc import update_with_mcmc_chains, update_with_mcmc_take_last
 from blackjax.smc.tuning.from_particles import (
@@ -386,67 +387,27 @@ def build_kernel(
 def build_async_kernel(
     init_state_fn,
     num_inner_steps,
-    init_slice_fn,
-    build_kernel_fn,
     num_delete=1,
+    slice_kernel=build_slice_chain(),
     proposal=covariance_proposal,
-    inner_kernel_params=live_covariance_factor,
+    inner_kernel_params=None,
 ):
-    """Advance each replacement chain through its moves without move barriers.
+    """Build NSS using an asynchronous slice-chain kernel."""
+    inner_kernel_params = _resolve_inner_kernel_params(proposal, inner_kernel_params)
 
-    ``init_slice_fn(key, particle)`` initializes an FSM whose position is the
-    complete particle. ``build_kernel_fn(slice_fn)`` builds a kernel that performs
-    one slice-function evaluation per call.
-    """
-
-    def chain(rng_key, particle, num_steps, loglikelihood_0, **parameters):
+    def constrained_chain_fn(
+        rng_key, particle, num_inner_steps, loglikelihood_0, **parameters
+    ):
         generate = proposal(init_state_fn, loglikelihood_0, **parameters)
-        rng_key, proposal_key, init_key = jax.random.split(rng_key, 3)
-        state = init_slice_fn(init_key, particle)
-        info = FSMSliceInfo(jnp.asarray(False), 0, 0, 0)
+        return slice_kernel(rng_key, particle, None, generate, num_inner_steps)
 
-        def body(carry):
-            rng_key, proposal_key, origin, state, count, info = carry
-            rng_key, step_key, next_key, init_key = jax.random.split(rng_key, 4)
-            proposed = generate(proposal_key, origin.position, None)
-
-            def slice_fn(t):
-                candidate, valid = proposed(t)
-                return SliceState(candidate, candidate.logdensity), valid
-
-            state, step_info = build_kernel_fn(slice_fn)(step_key, state)
-            count += step_info.is_accepted.astype(int)
-            info = FSMSliceInfo(
-                count == num_steps,
-                info.num_evaluations + step_info.num_evaluations,
-                info.num_expansions + step_info.num_expansions,
-                info.num_shrink + step_info.num_shrink,
-            )
-
-            def next_move(_):
-                particle = state.position
-                return next_key, particle, init_slice_fn(init_key, particle)
-
-            proposal_key, origin, state = jax.lax.cond(
-                step_info.is_accepted & (count < num_steps),
-                next_move,
-                lambda _: (proposal_key, origin, state),
-                None,
-            )
-            return rng_key, proposal_key, origin, state, count, info
-
-        carry = (rng_key, proposal_key, particle, state, 0, info)
-        _, _, _, state, _, info = jax.lax.while_loop(
-            lambda carry: carry[4] < num_steps, body, carry
-        )
-        return state.position, info
-
-    return build_from_mcmc_kernel(
-        chain,
-        num_inner_steps,
-        inner_kernel_params,
-        num_delete,
-        update_strategy=update_with_mcmc_chains,
+    update_fn = update_with_mcmc_chains(
+        constrained_chain_fn, num_inner_steps, num_delete
+    )
+    return build_adaptive_kernel(
+        partial(delete_fn, num_delete=num_delete),
+        update_fn,
+        update_inner_kernel_params_fn=inner_kernel_params,
     )
 
 
