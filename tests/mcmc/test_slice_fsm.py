@@ -1,6 +1,7 @@
 """Independent scalar references and batching tests for asynchronous slices."""
 
 from collections import namedtuple
+from functools import partial
 from typing import NamedTuple
 
 import jax
@@ -11,6 +12,8 @@ from jax import random
 
 from blackjax.mcmc import slice_fsm as fsm
 from blackjax.mcmc.slice import SliceState
+from blackjax.ns import adaptive, from_mcmc, nss
+from blackjax.ns.base import init_state_strategy
 
 
 def normal(x):
@@ -210,24 +213,21 @@ def test_neal_reference(strategy, budget, logdensity):
         assert info.num_shrink == shrinks
 
 
-@pytest.mark.parametrize(
-    "strategy", [fsm.build_stepping_out_kernel, fsm.build_doubling_kernel]
-)
 @pytest.mark.parametrize("logdensity", [normal, disconnected])
-def test_sampling_algorithm_matches_ticks(strategy, logdensity):
+def test_sampling_algorithm_matches_ticks(logdensity):
     def proposal_generator(rng_key, position, logdensity_fn):
         return lambda t: (SliceState(position + t, logdensity_fn(position + t)), True)
 
-    sampler = fsm.as_top_level_api(
-        logdensity, proposal_generator=proposal_generator, interval=strategy
-    )
+    sampler = fsm.as_top_level_api(logdensity, proposal_generator=proposal_generator)
     step = jax.jit(sampler.step)
-    ticks = jax.jit(build_sample(*line(evaluate(logdensity)), strategy))
+    ticks = jax.jit(
+        build_sample(*line(evaluate(logdensity)), fsm.build_doubling_kernel)
+    )
     state = sampler.init(jnp.asarray(0.0), random.key(0))
     for seed in range(8):
         key = random.key(seed)
         expected, counts = ticks(
-            key, state_type(strategy)(state.position, state.logdensity)
+            key, state_type(fsm.build_doubling_kernel)(state.position, state.logdensity)
         )
         state, info = step(key, state)
         assert isinstance(state, SliceState)
@@ -237,14 +237,11 @@ def test_sampling_algorithm_matches_ticks(strategy, logdensity):
         assert tuple(info[1:]) == tuple(counts)
 
 
-@pytest.mark.parametrize(
-    "strategy", [fsm.build_stepping_out_kernel, fsm.build_doubling_kernel]
-)
-def test_sampling_algorithm_pytree_scan_vmap(strategy):
+def test_sampling_algorithm_pytree_scan_vmap():
     def logdensity(position):
         return -sum(jnp.square(x).sum() for x in jax.tree.leaves(position)) / 2
 
-    sampler = fsm.as_top_level_api(logdensity, interval=strategy)
+    sampler = fsm.as_top_level_api(logdensity)
     initial = sampler.init({"x": jnp.asarray([0.2, -0.3]), "y": jnp.asarray(0.5)})
 
     def sample(key):
@@ -268,6 +265,43 @@ def test_sampling_algorithm_pytree_scan_vmap(strategy):
     np.testing.assert_allclose(
         states.logdensity, jax.vmap(jax.vmap(logdensity))(states.position)
     )
+
+
+def test_nested_sampling_preserves_particle_fields():
+    logprior = lambda x: normal(x / 3)
+    loglikelihood = lambda x: normal((x - 0.5) / 0.3)
+    init_particle = partial(
+        init_state_strategy, logprior_fn=logprior, loglikelihood_fn=loglikelihood
+    )
+    positions = 3 * random.normal(random.key(1), (64, 2))
+    state = adaptive.init(
+        positions,
+        jax.vmap(init_particle),
+        update_inner_kernel_params_fn=nss.live_covariance_factor,
+    )
+    constrained = nss.slice_constrained_step(
+        init_particle, fsm.build_kernel(), nss.covariance_proposal
+    )
+    step = jax.jit(
+        from_mcmc.build_kernel(constrained, 8, nss.live_covariance_factor, 8)
+    )
+    for key in random.split(random.key(2), 5):
+        state, info = step(key, state)
+        particles = state.particles
+        np.testing.assert_allclose(
+            particles.logdensity, jax.vmap(logprior)(particles.position)
+        )
+        np.testing.assert_allclose(
+            particles.loglikelihood, jax.vmap(loglikelihood)(particles.position)
+        )
+        born = ~jnp.isnan(particles.loglikelihood_birth)
+        assert jnp.all(
+            particles.loglikelihood[born] > particles.loglikelihood_birth[born]
+        )
+        assert jnp.any(
+            particles.loglikelihood_birth == info.particles.loglikelihood.max()
+        )
+        assert jnp.all(info.update_info.is_accepted)
 
 
 def test_doubling_rejects_density_valid_trial():

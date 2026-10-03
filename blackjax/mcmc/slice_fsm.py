@@ -27,7 +27,7 @@ import jax.numpy as jnp
 from jax import lax, random
 
 from blackjax.base import SamplingAlgorithm, build_sampling_algorithm
-from blackjax.mcmc.slice import direction_proposal, init
+from blackjax.mcmc.slice import SliceState, direction_proposal, init
 from blackjax.types import Array
 
 _LEFT, _RIGHT, _SHRINK, _EXPAND_LEFT, _EXPAND_RIGHT, _CHECK_LEFT, _CHECK_RIGHT = range(
@@ -321,37 +321,25 @@ def build_doubling_kernel(slice_fn, width):
     return kernel
 
 
-def as_top_level_api(
-    logdensity_fn,
-    *,
-    proposal_generator=direction_proposal(),
-    width=1.0,
-    interval=build_doubling_kernel,
-    max_expansions=10,
-) -> SamplingAlgorithm:
-    """Complete one slice move by advancing evaluation ticks to acceptance.
+def build_kernel(max_expansions=10):
+    """Build a complete doubling move from evaluation ticks.
 
-    ``interval`` selects ``build_stepping_out_kernel`` or
-    ``build_doubling_kernel``. Shrinkage is not truncated.
-
-    .. code:: python
-
-        sampler = slice_fsm.as_top_level_api(logdensity_fn)
-        state = sampler.init(position)
-        state, info = jax.jit(sampler.step)(rng_key, state)
+    The FSM position carries the whole candidate state, preserving auxiliary
+    fields supplied by the proposal. Shrinkage is not truncated.
     """
-    state_type, init_move = {
-        build_stepping_out_kernel: (SteppingOutState, init_stepping_out),
-        build_doubling_kernel: (DoublingState, init_doubling),
-    }[interval]
 
-    def kernel(rng_key, state, logdensity_fn):
+    def kernel(rng_key, state, logdensity_fn, proposal_generator, width=1.0):
         rng_key, move_key = random.split(rng_key)
         slice_key, proposal_key = random.split(move_key)
-        slice_fn = proposal_generator(proposal_key, state.position, logdensity_fn)
-        tick = interval(slice_fn, width)
-        particle = state_type(state.position, state.logdensity)
-        particle = init_move(slice_key, particle, width, max_expansions)
+        proposal = proposal_generator(proposal_key, state.position, logdensity_fn)
+
+        def slice_fn(t):
+            candidate, is_valid = proposal(t)
+            return SliceState(candidate, candidate.logdensity), is_valid
+
+        tick = build_doubling_kernel(slice_fn, width)
+        particle = DoublingState(state, state.logdensity)
+        particle = init_doubling(slice_key, particle, width, max_expansions)
 
         def body(carry):
             rng_key, particle, info = carry
@@ -370,9 +358,28 @@ def as_top_level_api(
             body,
             (rng_key, particle, SliceInfo(jnp.asarray(False), 0, 0, 0)),
         )
-        state = state._replace(
-            position=particle.position, logdensity=particle.logdensity
-        )
-        return state, info
+        return particle.position, info
 
-    return build_sampling_algorithm(kernel, init, logdensity_fn)
+    return kernel
+
+
+def as_top_level_api(
+    logdensity_fn,
+    *,
+    proposal_generator=direction_proposal(),
+    width=1.0,
+    max_expansions=10,
+) -> SamplingAlgorithm:
+    """Slice sampling with doubling and evaluation-driven ticks.
+
+    .. code:: python
+
+        sampler = slice_fsm.as_top_level_api(logdensity_fn)
+        state = sampler.init(position)
+        state, info = jax.jit(sampler.step)(rng_key, state)
+    """
+    kernel = build_kernel(max_expansions)
+
+    return build_sampling_algorithm(
+        kernel, init, logdensity_fn, kernel_args=(proposal_generator, width)
+    )
