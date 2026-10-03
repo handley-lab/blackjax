@@ -23,7 +23,7 @@ the slice independently of the interval strategy.
 from typing import Any, NamedTuple
 
 import jax.numpy as jnp
-from jax import lax, random
+from jax import lax, random, tree
 
 from blackjax.base import SamplingAlgorithm, build_sampling_algorithm
 from blackjax.mcmc.slice import SliceInfo as SliceTransitionInfo
@@ -337,13 +337,8 @@ def build_chain(
         _, slice_key = random.split(keys[0])
         _, _, rng_key = random.split(slice_key, 3)
         state = init_fn(slice_key, particle)
-        info = SliceTransitionInfo(
-            jnp.zeros(num_inner_steps, dtype=bool),
-            jnp.zeros(num_inner_steps, dtype=int),
-            jnp.zeros(num_inner_steps, dtype=int),
-            jnp.zeros(num_inner_steps, dtype=state.left.dtype),
-            jnp.zeros(num_inner_steps, dtype=state.right.dtype),
-        )
+        info = SliceTransitionInfo(False, 0, 0, state.left, state.right)
+        info = tree.map(lambda x: jnp.full(num_inner_steps, x), info)
 
         def body(carry):
             rng_key, origin, state, count, info = carry
