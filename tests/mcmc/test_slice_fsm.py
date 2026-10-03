@@ -548,7 +548,8 @@ def test_mixed_topology_and_overlapping_blocks(strategy):
 @pytest.mark.parametrize(
     "strategy", [fsm.build_stepping_out_kernel, fsm.build_doubling_kernel]
 )
-def test_one_evaluation_round_per_tick(strategy):
+@pytest.mark.parametrize("complete_move", [False, True])
+def test_one_evaluation_round_per_tick(strategy, complete_move):
     from jax.custom_batching import custom_vmap
 
     rounds = []
@@ -563,8 +564,24 @@ def test_one_evaluation_round_per_tick(strategy):
         result = jax.vmap(evaluate(normal))(x)
         return result, jax.tree.map(lambda _: True, result)
 
-    kernel = build_sample(*line(target), strategy)
     keys = random.split(random.key(182), 16)
+    if complete_move:
+        if strategy is not fsm.build_doubling_kernel:
+            pytest.skip("The complete-move sampler uses doubling")
+
+        def proposal_generator(rng_key, position, logdensity_fn):
+            return lambda t: target(position + t)
+
+        sampler = fsm.as_top_level_api(normal, proposal_generator=proposal_generator)
+        states = jax.vmap(sampler.init)(jnp.linspace(-10, 10, 16))
+        result, info = jax.jit(jax.vmap(sampler.step))(keys, states)
+        jax.block_until_ready(result)
+        jax.effects_barrier()
+        assert len(rounds) == int(jnp.max(info.num_evaluations))
+        assert np.ptp(np.asarray(info.num_evaluations)) > 0
+        return
+
+    kernel = build_sample(*line(target), strategy)
     states = jax.vmap(lambda x: state_type(strategy)(x, normal(x)))(
         jnp.linspace(-10, 10, 16)
     )
