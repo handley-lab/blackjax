@@ -26,20 +26,80 @@ def evaluate(logdensity):
 
 
 def line(evaluate):
-    def proposal_generator(key, x, index):
-        return lambda t: evaluate(x + t)
+    def proposal_generator(key, state):
+        return state.position
 
-    return proposal_generator
+    def slice_fn(t, proposal_state):
+        return evaluate(proposal_state + t)
+
+    return proposal_generator, slice_fn
+
+
+class SliceInfo(NamedTuple):
+    num_evaluations: object
+    num_expansions: object
+    num_shrink: object
 
 
 def state_type(strategy):
-    return {
-        fsm.stepping_out: fsm.SteppingOutState,
-        fsm.doubling: fsm.DoublingState,
+    state = {
+        fsm.build_stepping_out_kernel: fsm.SteppingOutState,
+        fsm.build_doubling_kernel: fsm.DoublingState,
     }[strategy]
+    return namedtuple(
+        "ChainState",
+        (*state._fields, "index", *SliceInfo._fields),
+        defaults=(*state._field_defaults.values(), 0, 0, 0, 0),
+    )
 
 
-def neal_accept(t, left, right, width, inside):
+def build_sample(
+    proposal_generator, slice_fn, interval, *, width=1.0, max_expansions=10
+):
+    init_move = {
+        fsm.build_stepping_out_kernel: fsm.init_stepping_out,
+        fsm.build_doubling_kernel: fsm.init_doubling,
+    }[interval]
+
+    def start_move(rng_key, state):
+        rng_key, move_key = random.split(rng_key)
+        slice_key, proposal_key = random.split(move_key)
+        state = init_move(slice_key, state, width, max_expansions)
+        return rng_key, state, proposal_generator(proposal_key, state)
+
+    def sample(rng_key, state, num_steps=1):
+        def body(carry):
+            rng_key, state, proposal_state = carry
+            rng_key, step_key = random.split(rng_key)
+            step = interval(lambda t: slice_fn(t, proposal_state), width)
+            state, info = step(step_key, state)
+            state = state._replace(
+                index=state.index + info.is_finished,
+                num_evaluations=state.num_evaluations + info.num_evaluations,
+                num_expansions=state.num_expansions + info.num_expansions,
+                num_shrink=state.num_shrink + info.num_shrink,
+            )
+            return jax.lax.cond(
+                info.is_finished & (state.index < num_steps),
+                lambda carry: start_move(carry[0], carry[1]),
+                lambda carry: carry,
+                (rng_key, state, proposal_state),
+            )
+
+        state = state._replace(
+            index=0, num_evaluations=0, num_expansions=0, num_shrink=0
+        )
+        carry = start_move(rng_key, state)
+        _, state, _ = jax.lax.while_loop(
+            lambda carry: carry[1].index < num_steps, body, carry
+        )
+        info = SliceInfo(state.num_evaluations, state.num_expansions, state.num_shrink)
+        return state, info
+
+    return sample
+
+
+def neal_accept(t, left, right, width, inside, probe=None):
     """Figure 6, deliberately independent of the implementation's transitions."""
     separated = False
     while right - left > 1.1 * width:
@@ -50,53 +110,74 @@ def neal_accept(t, left, right, width, inside):
             right = mid
         else:
             left = mid
-        if separated and not inside(left) and not inside(right):
-            return False
+        if separated:
+            if probe is not None:
+                probe()
+                probe()
+            if not inside(left) and not inside(right):
+                return False
     return True
 
 
 def reference(key, x, logdensity, strategy, width, budget, num_steps):
     """Ordinary Python loops for Neal's Figures 3--6, with the same random draws."""
     expansions = shrinks = rejected_checks = 0
+
+    def tick_key():
+        nonlocal key
+        key, subkey = random.split(key)
+        return subkey
+
     for _ in range(num_steps):
-        key, _ = random.split(key)
-        if strategy is fsm.stepping_out:
-            key, budget_key = random.split(key)
-        key, level_key, bracket_key = random.split(key, 3)
+        move_key = tick_key()
+        slice_key, _ = random.split(move_key)
+        if strategy is fsm.build_stepping_out_kernel:
+            level_key, bracket_key, budget_key = random.split(slice_key, 3)
+        else:
+            level_key, bracket_key = random.split(slice_key)
         dtype = x.dtype
         level = float(logdensity(x) + jnp.log(random.uniform(level_key, dtype=dtype)))
         left = -width * float(random.uniform(bracket_key, dtype=dtype))
         right = left + width
         inside = lambda t: float(logdensity(x + t)) >= level
-        if strategy is fsm.stepping_out:
+        if strategy is fsm.build_stepping_out_kernel:
             j = int(jnp.floor(budget * random.uniform(budget_key)))
             k = budget - 1 - j
-            while j > 0 and inside(left):
+            while j > 0:
+                tick_key()
+                if not inside(left):
+                    break
                 left -= width
                 j -= 1
                 expansions += 1
-            while k > 0 and inside(right):
+            while k > 0:
+                tick_key()
+                if not inside(right):
+                    break
                 right += width
                 k -= 1
                 expansions += 1
         else:
             k = budget
+            if k > 0:
+                tick_key()
+                side_key = tick_key()
             while k > 0 and (inside(left) or inside(right)):
-                key, side_key = random.split(key)
                 if bool(random.bernoulli(side_key)):
                     left -= right - left
                 else:
                     right += right - left
                 k -= 1
                 expansions += 1
+                side_key = tick_key()
         lo, hi = left, right
         while True:
-            key, subkey = random.split(key)
+            subkey = tick_key()
             t = lo + float(random.uniform(subkey, dtype=dtype)) * (hi - lo)
             shrinks += 1
             accepted = inside(t)
-            if accepted and strategy is fsm.doubling:
-                accepted = neal_accept(t, left, right, width, inside)
+            if accepted and strategy is fsm.build_doubling_kernel:
+                accepted = neal_accept(t, left, right, width, inside, tick_key)
                 rejected_checks += not accepted
             if accepted:
                 x = x + t
@@ -108,12 +189,14 @@ def reference(key, x, logdensity, strategy, width, budget, num_steps):
     return x, expansions, shrinks, rejected_checks
 
 
-@pytest.mark.parametrize("strategy", [fsm.stepping_out, fsm.doubling])
+@pytest.mark.parametrize(
+    "strategy", [fsm.build_stepping_out_kernel, fsm.build_doubling_kernel]
+)
 @pytest.mark.parametrize("budget", [0, 1, 4, 8])
 @pytest.mark.parametrize("logdensity", [normal, disconnected])
 def test_neal_reference(strategy, budget, logdensity):
     kernel = jax.jit(
-        fsm.build_kernel(line(evaluate(logdensity)), strategy, max_expansions=budget)
+        build_sample(*line(evaluate(logdensity)), strategy, max_expansions=budget)
     )
     x = jnp.asarray(0.0)
     for seed in range(12):
@@ -131,32 +214,41 @@ def test_doubling_rejects_density_valid_trial():
     inside = lambda t: abs(t) < 0.4 or abs(t - 3) < 0.6
     assert inside(3.0)
     assert not neal_accept(3.0, -0.25, 3.75, 1.0, inside)
-    start, advance = fsm.doubling(1.0, 4)
+    advance = fsm.build_doubling_kernel(evaluate(disconnected), 1.0)
     particle = fsm.DoublingState(jnp.asarray(0.0), jnp.asarray(0.0))
-    s = start(random.key(0), particle)
+    s = fsm.init_doubling(random.key(0), particle, 1.0, 4)
+    for seed in range(100):
+        key = random.key(seed)
+        t = -0.25 + 4 * random.uniform(key, dtype=s.left.dtype)
+        if inside(t) and not neal_accept(t, -0.25, 3.75, 1.0, inside):
+            break
+    else:
+        pytest.fail("No reverse-construction rejection in the fixture keys")
     s = s._replace(
         phase=2,
         left=jnp.asarray(-0.25),
         right=jnp.asarray(3.75),
-        t=jnp.asarray(3.0),
         level=jnp.asarray(-1.0),
     )
     s = s._replace(expanded_left=s.left, expanded_right=s.right)
-    trial = SliceState(jnp.asarray(3.0), jnp.asarray(0.0))
-    s = advance(s, trial, jnp.asarray(True))
+    s, _ = advance(key, s)
     probes = []
-    while int(s.phase) in (4, 5):
-        probes.append(float(s.t))
-        probe = SliceState(s.t, disconnected(s.t))
-        s = advance(s, probe, disconnected(s.t) >= s.level)
+    while int(s.phase) in (fsm._CHECK_LEFT, fsm._CHECK_RIGHT):
+        probes.append(
+            float(s.check_left if int(s.phase) == fsm._CHECK_LEFT else s.check_right)
+        )
+        key, subkey = random.split(key)
+        s, _ = advance(subkey, s)
     assert s.phase == 2  # Rejected and returned to shrinkage, not accepted.
-    assert s.right == 3.0
+    assert s.right == t
     assert len(probes) > 0
 
 
-@pytest.mark.parametrize("strategy", [fsm.stepping_out, fsm.doubling])
+@pytest.mark.parametrize(
+    "strategy", [fsm.build_stepping_out_kernel, fsm.build_doubling_kernel]
+)
 def test_scalar_vmap_and_permuted_chains(strategy):
-    kernel = fsm.build_kernel(line(evaluate(normal)), strategy)
+    kernel = build_sample(*line(evaluate(normal)), strategy)
     keys = random.split(random.key(72), 24)
     states = jax.vmap(lambda x: state_type(strategy)(x, normal(x)))(
         jnp.linspace(-8, 8, 24)
@@ -194,21 +286,23 @@ def test_scalar_vmap_and_permuted_chains(strategy):
     )
 
 
-@pytest.mark.parametrize("strategy", [fsm.stepping_out, fsm.doubling])
+@pytest.mark.parametrize(
+    "strategy", [fsm.build_stepping_out_kernel, fsm.build_doubling_kernel]
+)
 def test_proposal_generated_once_per_move(strategy):
     calls = []
 
-    def proposal_generator(key, x, index):
+    def proposal_generator(key, state):
         direction = random.normal(key)
         jax.debug.callback(lambda x: calls.append(float(x)), direction)
+        return state.position, direction, state.index
 
-        def slice_fn(t):
-            position = x + direction * t
-            return SliceState(position, normal(position)), index >= 0
+    def slice_fn(t, proposal_state):
+        x, direction, index = proposal_state
+        position = x + direction * t
+        return SliceState(position, normal(position)), index >= 0
 
-        return slice_fn
-
-    kernel = jax.jit(fsm.build_kernel(proposal_generator, strategy))
+    kernel = jax.jit(build_sample(proposal_generator, slice_fn, strategy))
     state = state_type(strategy)(jnp.asarray(0.0), jnp.asarray(0.0))
     state, info = kernel(random.key(32), state, 3)
     jax.block_until_ready(state)
@@ -217,9 +311,11 @@ def test_proposal_generated_once_per_move(strategy):
     assert info.num_evaluations > 3
 
 
-@pytest.mark.parametrize("strategy", [fsm.stepping_out, fsm.doubling])
+@pytest.mark.parametrize(
+    "strategy", [fsm.build_stepping_out_kernel, fsm.build_doubling_kernel]
+)
 def test_successive_calls(strategy):
-    kernel = jax.jit(fsm.build_kernel(line(evaluate(normal)), strategy))
+    kernel = jax.jit(build_sample(*line(evaluate(normal)), strategy))
     state = state_type(strategy)(jnp.asarray(0.0), jnp.asarray(0.0))
     state, _ = kernel(random.key(17), state, 3)
     fresh = state_type(strategy)(state.position, state.logdensity)
@@ -231,7 +327,9 @@ def test_successive_calls(strategy):
     assert actual.index == 2
 
 
-@pytest.mark.parametrize("strategy", [fsm.stepping_out, fsm.doubling])
+@pytest.mark.parametrize(
+    "strategy", [fsm.build_stepping_out_kernel, fsm.build_doubling_kernel]
+)
 def test_auxiliary_state_and_constraint(strategy):
     class Particle(NamedTuple):
         position: object
@@ -241,7 +339,7 @@ def test_auxiliary_state_and_constraint(strategy):
     def evaluate(x):
         return Particle(x, normal(x), x**3 + 10), jnp.abs(x) < 0.25
 
-    kernel = jax.jit(jax.vmap(fsm.build_kernel(line(evaluate), strategy)))
+    kernel = jax.jit(jax.vmap(build_sample(*line(evaluate), strategy)))
     x = jnp.zeros(64)
     ExtendedState = namedtuple(
         "ExtendedState", (*state_type(strategy)._fields, "loglikelihood")
@@ -256,7 +354,9 @@ def test_auxiliary_state_and_constraint(strategy):
     assert jnp.all(info.num_shrink >= 5)
 
 
-@pytest.mark.parametrize("strategy", [fsm.stepping_out, fsm.doubling])
+@pytest.mark.parametrize(
+    "strategy", [fsm.build_stepping_out_kernel, fsm.build_doubling_kernel]
+)
 @pytest.mark.parametrize("logdensity", [normal, disconnected])
 def test_stationarity(strategy, logdensity):
     n = 8192
@@ -271,7 +371,7 @@ def test_stationarity(strategy, logdensity):
     states = jax.vmap(lambda x: state_type(strategy)(x, logdensity(x)))(x)
     kernel = jax.jit(
         jax.vmap(
-            fsm.build_kernel(line(evaluate(logdensity)), strategy),
+            build_sample(*line(evaluate(logdensity)), strategy),
             in_axes=(0, 0, None),
         )
     )
@@ -287,7 +387,9 @@ def test_stationarity(strategy, logdensity):
         assert abs(result[~right].mean()) < 0.03
 
 
-@pytest.mark.parametrize("strategy", [fsm.stepping_out, fsm.doubling])
+@pytest.mark.parametrize(
+    "strategy", [fsm.build_stepping_out_kernel, fsm.build_doubling_kernel]
+)
 def test_mixed_topology_and_overlapping_blocks(strategy):
     n = 2048
     rng = np.random.default_rng(531)
@@ -322,14 +424,18 @@ def test_mixed_topology_and_overlapping_blocks(strategy):
     def evaluate(x):
         return SliceState(x, normal(x["abc"])), jnp.asarray(True)
 
-    def proposal_generator(key, x, index):
-        direction = generate(key, x, index)
-        return lambda t: evaluate(move(x, direction, t))
+    def proposal_generator(key, state):
+        direction = generate(key, state.position, state.index)
+        return state.position, direction
+
+    def slice_fn(t, proposal_state):
+        x, direction = proposal_state
+        return evaluate(move(x, direction, t))
 
     states = jax.vmap(lambda x: state_type(strategy)(x, normal(x["abc"])))(x)
     kernel = jax.jit(
         jax.vmap(
-            fsm.build_kernel(proposal_generator, strategy, max_expansions=4),
+            build_sample(proposal_generator, slice_fn, strategy, max_expansions=4),
             in_axes=(0, 0, None),
         )
     )
@@ -345,7 +451,9 @@ def test_mixed_topology_and_overlapping_blocks(strategy):
     assert jnp.max(jnp.abs(jnp.mean(result.position["sphere"], axis=0))) < 0.06
 
 
-@pytest.mark.parametrize("strategy", [fsm.stepping_out, fsm.doubling])
+@pytest.mark.parametrize(
+    "strategy", [fsm.build_stepping_out_kernel, fsm.build_doubling_kernel]
+)
 def test_one_evaluation_round_per_tick(strategy):
     from jax.custom_batching import custom_vmap
 
@@ -361,7 +469,7 @@ def test_one_evaluation_round_per_tick(strategy):
         result = jax.vmap(evaluate(normal))(x)
         return result, jax.tree.map(lambda _: True, result)
 
-    kernel = fsm.build_kernel(line(target), strategy)
+    kernel = build_sample(*line(target), strategy)
     keys = random.split(random.key(182), 16)
     states = jax.vmap(lambda x: state_type(strategy)(x, normal(x)))(
         jnp.linspace(-10, 10, 16)
@@ -380,7 +488,7 @@ def test_one_evaluation_round_per_tick(strategy):
             jax.debug.callback(lambda x: calls.append(float(x)), x)
             return evaluate(normal)(x)
 
-        scalar = fsm.build_kernel(line(scalar_target), strategy)
+        scalar = build_sample(*line(scalar_target), strategy)
         scalar_result = jax.jit(scalar)(
             keys[i], jax.tree.map(lambda x: x[i], states), counts[i]
         )
