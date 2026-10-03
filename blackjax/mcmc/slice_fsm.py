@@ -13,9 +13,8 @@
 # limitations under the License.
 """Evaluation-driven slice sampling, following Iman Faisal's FSM scheduler.
 
-A scalar tick advances interval construction, shrinkage and acceptance checks.
-The caller schedules ticks and successive moves. The slice function has one
-shared call site.
+Each kernel call advances interval construction, shrinkage or acceptance checks
+with one slice-function evaluation. The caller schedules successive moves.
 
 Interval strategies implement Neal (2003), Figures 3--6. The proposal defines
 the slice independently of the interval strategy.
@@ -189,7 +188,7 @@ def init_doubling(rng_key, state, width, max_expansions):
 def build_doubling_kernel(slice_fn, width):
     """Random-side doubling and Neal's reverse-construction acceptance test.
 
-    Each tick evaluates an initial endpoint, a newly doubled endpoint, a
+    Each kernel call evaluates an initial endpoint, a newly doubled endpoint, a
     shrinkage candidate or a reverse-construction endpoint.
     """
 
@@ -322,7 +321,7 @@ def build_doubling_kernel(slice_fn, width):
 
 
 def build_kernel(max_expansions=10):
-    """Build a complete doubling move from evaluation ticks.
+    """Build a complete doubling move.
 
     The FSM position carries the whole candidate state, preserving auxiliary
     fields supplied by the proposal. Shrinkage is not truncated.
@@ -337,19 +336,19 @@ def build_kernel(max_expansions=10):
             candidate, is_valid = proposal(t)
             return SliceState(candidate, candidate.logdensity), is_valid
 
-        tick = build_doubling_kernel(slice_fn, width)
+        slice_kernel = build_doubling_kernel(slice_fn, width)
         particle = DoublingState(state, state.logdensity)
         particle = init_doubling(slice_key, particle, width, max_expansions)
 
         def body(carry):
             rng_key, particle, info = carry
             rng_key, step_key = random.split(rng_key)
-            particle, tick_info = tick(step_key, particle)
+            particle, step_info = slice_kernel(step_key, particle)
             info = SliceInfo(
-                tick_info.is_accepted,
-                info.num_evaluations + tick_info.num_evaluations,
-                info.num_expansions + tick_info.num_expansions,
-                info.num_shrink + tick_info.num_shrink,
+                step_info.is_accepted,
+                info.num_evaluations + step_info.num_evaluations,
+                info.num_expansions + step_info.num_expansions,
+                info.num_shrink + step_info.num_shrink,
             )
             return rng_key, particle, info
 
@@ -370,7 +369,7 @@ def as_top_level_api(
     width=1.0,
     max_expansions=10,
 ) -> SamplingAlgorithm:
-    """Slice sampling with doubling and evaluation-driven ticks.
+    """Slice sampling with doubling.
 
     .. code:: python
 

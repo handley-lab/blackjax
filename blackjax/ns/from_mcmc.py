@@ -25,6 +25,7 @@ from blackjax.ns.base import delete_fn as default_delete_fn
 
 __all__ = [
     "ConstrainedMCMCInfo",
+    "update_with_mcmc_chains",
     "update_with_mcmc_take_last",
     "reject_constrained_step",
     "build_kernel",
@@ -72,6 +73,26 @@ def update_with_mcmc_take_last(
     infos.
     """
 
+    def chain(rng_key, state, num_steps, loglikelihood_0, **step_parameters):
+        keys = random.split(rng_key, num_steps)
+
+        def body_fn(state, rng_key):
+            return constrained_mcmc_step_fn(
+                rng_key, state, loglikelihood_0, **step_parameters
+            )
+
+        return jax.lax.scan(body_fn, state, keys)
+
+    return update_with_mcmc_chains(chain, num_mcmc_steps, num_delete)
+
+
+def update_with_mcmc_chains(chain_fn, num_mcmc_steps, num_delete):
+    """Replace particles using complete constrained chains.
+
+    ``chain_fn(key, particle, num_steps, loglikelihood_0, **parameters)``
+    returns the final particle and diagnostics. It owns the move schedule.
+    """
+
     def update_function(rng_key, state, loglikelihood_0, **step_parameters):
         choice_key, sample_key = random.split(rng_key)
         particles = state.particles
@@ -88,21 +109,12 @@ def update_with_mcmc_take_last(
         )
         start_state = jax.tree.map(lambda x: x[start_idx], particles)
 
-        shared_mcmc_step_fn = partial(
-            constrained_mcmc_step_fn,
+        mcmc_kernel = partial(
+            chain_fn,
+            num_steps=num_mcmc_steps,
             loglikelihood_0=loglikelihood_0,
             **step_parameters,
         )
-
-        def mcmc_kernel(rng_key, state):
-            keys = random.split(rng_key, num_mcmc_steps)
-
-            def body_fn(state, rng_key):
-                new_state, info = shared_mcmc_step_fn(rng_key, state)
-                return new_state, info
-
-            final_state, infos = jax.lax.scan(body_fn, state, keys)
-            return final_state, infos
 
         sample_keys = random.split(sample_key, num_delete)
         new_particles, infos = jax.vmap(mcmc_kernel)(sample_keys, start_state)
@@ -189,7 +201,9 @@ def build_kernel(
     ----------
     constrained_step_fn
         Constrained inner step ``(rng_key, state, loglikelihood_0, **params) ->
-        (new_state, info)``.
+        (new_state, info)`` for the default strategy. Custom strategies define
+        this callable's contract; :func:`update_with_mcmc_chains` takes a
+        complete-chain function instead.
     num_inner_steps
         Number of inner steps per particle replacement.
     update_inner_kernel_params_fn

@@ -7,7 +7,7 @@ import pytest
 from jax.custom_batching import custom_vmap
 
 from blackjax.mcmc import slice_fsm as fsm
-from blackjax.ns import adaptive, nss, slice_fsm
+from blackjax.ns import adaptive, nss
 from blackjax.ns.base import init_state_strategy
 
 
@@ -51,18 +51,18 @@ def test_async_replacement_chains(doubling):
 
     state_type = fsm.DoublingState if doubling else fsm.SteppingOutState
     init_move = fsm.init_doubling if doubling else fsm.init_stepping_out
-    build_tick = (
+    build_kernel = (
         fsm.build_doubling_kernel if doubling else fsm.build_stepping_out_kernel
     )
 
     def init_slice(key, particle):
         return init_move(key, state_type(particle, particle.logdensity), 1.0, 10)
 
-    kernel = slice_fsm.build_kernel(
+    kernel = nss.build_async_kernel(
         init_particle,
         8,
         init_slice,
-        partial(build_tick, width=1.0),
+        partial(build_kernel, width=1.0),
         16,
         proposal=proposal,
     )
@@ -75,6 +75,7 @@ def test_async_replacement_chains(doubling):
     jax.block_until_ready(result)
     jax.effects_barrier()
     diagnostics = info.update_info
+    assert diagnostics.num_evaluations.shape == (16,)
     assert np.all(diagnostics.is_accepted)
     assert len(calls) == int(jnp.max(diagnostics.num_evaluations))
     origins = np.asarray(calls)

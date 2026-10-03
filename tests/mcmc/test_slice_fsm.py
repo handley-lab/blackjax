@@ -126,13 +126,13 @@ def reference(key, x, logdensity, strategy, width, budget, num_steps):
     """Ordinary Python loops for Neal's Figures 3--6, with the same random draws."""
     expansions = shrinks = rejected_checks = 0
 
-    def tick_key():
+    def step_key():
         nonlocal key
         key, subkey = random.split(key)
         return subkey
 
     for _ in range(num_steps):
-        move_key = tick_key()
+        move_key = step_key()
         slice_key, _ = random.split(move_key)
         if strategy is fsm.build_stepping_out_kernel:
             level_key, bracket_key, budget_key = random.split(slice_key, 3)
@@ -147,14 +147,14 @@ def reference(key, x, logdensity, strategy, width, budget, num_steps):
             j = int(jnp.floor(budget * random.uniform(budget_key)))
             k = budget - 1 - j
             while j > 0:
-                tick_key()
+                step_key()
                 if not inside(left):
                     break
                 left -= width
                 j -= 1
                 expansions += 1
             while k > 0:
-                tick_key()
+                step_key()
                 if not inside(right):
                     break
                 right += width
@@ -163,8 +163,8 @@ def reference(key, x, logdensity, strategy, width, budget, num_steps):
         else:
             k = budget
             if k > 0:
-                tick_key()
-                side_key = tick_key()
+                step_key()
+                side_key = step_key()
             while k > 0 and (inside(left) or inside(right)):
                 if bool(random.bernoulli(side_key)):
                     left -= right - left
@@ -172,15 +172,15 @@ def reference(key, x, logdensity, strategy, width, budget, num_steps):
                     right += right - left
                 k -= 1
                 expansions += 1
-                side_key = tick_key()
+                side_key = step_key()
         lo, hi = left, right
         while True:
-            subkey = tick_key()
+            subkey = step_key()
             t = lo + float(random.uniform(subkey, dtype=dtype)) * (hi - lo)
             shrinks += 1
             accepted = inside(t)
             if accepted and strategy is fsm.build_doubling_kernel:
-                accepted = neal_accept(t, left, right, width, inside, tick_key)
+                accepted = neal_accept(t, left, right, width, inside, step_key)
                 rejected_checks += not accepted
             if accepted:
                 x = x + t
@@ -214,19 +214,19 @@ def test_neal_reference(strategy, budget, logdensity):
 
 
 @pytest.mark.parametrize("logdensity", [normal, disconnected])
-def test_sampling_algorithm_matches_ticks(logdensity):
+def test_sampling_algorithm_matches_kernel(logdensity):
     def proposal_generator(rng_key, position, logdensity_fn):
         return lambda t: (SliceState(position + t, logdensity_fn(position + t)), True)
 
     sampler = fsm.as_top_level_api(logdensity, proposal_generator=proposal_generator)
     step = jax.jit(sampler.step)
-    ticks = jax.jit(
+    sample = jax.jit(
         build_sample(*line(evaluate(logdensity)), fsm.build_doubling_kernel)
     )
     state = sampler.init(jnp.asarray(0.0), random.key(0))
     for seed in range(8):
         key = random.key(seed)
-        expected, counts = ticks(
+        expected, counts = sample(
             key, state_type(fsm.build_doubling_kernel)(state.position, state.logdensity)
         )
         state, info = step(key, state)
@@ -549,7 +549,7 @@ def test_mixed_topology_and_overlapping_blocks(strategy):
     "strategy", [fsm.build_stepping_out_kernel, fsm.build_doubling_kernel]
 )
 @pytest.mark.parametrize("complete_move", [False, True])
-def test_one_evaluation_round_per_tick(strategy, complete_move):
+def test_one_evaluation_round_per_step(strategy, complete_move):
     from jax.custom_batching import custom_vmap
 
     rounds = []
