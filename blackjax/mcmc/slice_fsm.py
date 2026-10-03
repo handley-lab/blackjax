@@ -54,23 +54,6 @@ class SteppingOutState(NamedTuple):
     right_steps: Array = 0
 
 
-class DoublingState(NamedTuple):
-    position: Any
-    logdensity: Array
-    phase: Array = _LEFT
-    left: Array = 0.0
-    right: Array = 0.0
-    level: Array = 0.0
-    remaining: Array = 0
-    left_expands: Array = ()
-    other_inside: Array = False
-    expanded_left: Array = 0.0
-    expanded_right: Array = 0.0
-    check_left: Array = 0.0
-    check_right: Array = 0.0
-    trial_t: Array = 0.0
-
-
 def _shrink_bracket(state, t):
     left = jnp.where(t < 0, t, state.left)
     right = jnp.where(t >= 0, t, state.right)
@@ -115,8 +98,8 @@ def build_stepping_out_kernel(slice_fn, width):
             (
                 lambda state: state.left,
                 lambda state: state.right,
-                lambda state: (
-                    state.left + random.uniform(rng_key) * (state.right - state.left)
+                lambda state: random.uniform(
+                    rng_key, minval=state.left, maxval=state.right
                 ),
             ),
             state,
@@ -161,6 +144,23 @@ def build_stepping_out_kernel(slice_fn, width):
         return state, info
 
     return kernel
+
+
+class DoublingState(NamedTuple):
+    position: Any
+    logdensity: Array
+    phase: Array = _LEFT
+    left: Array = 0.0
+    right: Array = 0.0
+    level: Array = 0.0
+    remaining: Array = 0
+    left_expands: Array = ()
+    other_inside: Array = False
+    expanded_left: Array = 0.0
+    expanded_right: Array = 0.0
+    check_left: Array = 0.0
+    check_right: Array = 0.0
+    trial_t: Array = 0.0
 
 
 def init_doubling(rng_key, state, width, max_expansions):
@@ -242,8 +242,8 @@ def build_doubling_kernel(slice_fn, width):
             (
                 lambda state: state.left,
                 lambda state: state.right,
-                lambda state: (
-                    state.left + random.uniform(rng_key) * (state.right - state.left)
+                lambda state: random.uniform(
+                    rng_key, minval=state.left, maxval=state.right
                 ),
                 lambda state: state.left,
                 lambda state: state.right,
