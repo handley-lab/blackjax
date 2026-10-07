@@ -407,14 +407,17 @@ def build_scheduled_chain(
                     )
                 ),
             )
-            state, step_info = lax.cond(
-                exhausted,
-                lambda _: (
-                    state._replace(position=origin, logdensity=origin.logdensity),
-                    SliceInfo(jnp.asarray(False), 0, 0, 0),
-                ),
-                lambda _: interval(slice_fn, width)(step_key, state),
-                None,
+            # Select rather than lax.cond: under vmap a batched cond broadcasts
+            # every operand, including constants closed over by the likelihood,
+            # so each lane would repeat the likelihood's constant work.
+            stay = (
+                state._replace(position=origin, logdensity=origin.logdensity),
+                SliceInfo(jnp.asarray(False), 0, 0, 0),
+            )
+            state, step_info = tree.map(
+                lambda a, b: jnp.where(exhausted, a, b),
+                stay,
+                interval(slice_fn, width)(step_key, state),
             )
             finished = step_info.is_accepted | exhausted
             info = info._replace(

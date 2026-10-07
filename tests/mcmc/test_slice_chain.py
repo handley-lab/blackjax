@@ -157,3 +157,29 @@ def test_chain_without_nested_sampling(builder):
         actual = jax.tree.map(lambda x: x[i], (result, info))
         for x, y in zip(jax.tree.leaves(actual), jax.tree.leaves(expected)):
             np.testing.assert_allclose(x, y, rtol=1e-12, atol=1e-12)
+
+
+@pytest.mark.parametrize("doubling", [False, True])
+def test_batched_chain_keeps_constants_unbatched(doubling):
+    # A batched lax.cond around the likelihood would broadcast this constant
+    # across lanes, repeating its work in every lane on every tick.
+    table = jnp.linspace(0.0, 1.0, 1013)
+
+    def logdensity(x):
+        return -jnp.sum(x**2) / 2 + 0.0 * jnp.sum(jnp.cos(table))
+
+    chain = slice_fsm.build_chain(
+        max_shrinkage=100,
+        init_fn=slice_fsm.init_doubling if doubling else slice_fsm.init_stepping_out,
+        interval=(
+            slice_fsm.build_doubling_kernel
+            if doubling
+            else slice_fsm.build_stepping_out_kernel
+        ),
+    )
+    states = jax.vmap(partial(init, logdensity_fn=logdensity))(jnp.ones((16, 2)))
+    keys = jax.random.split(jax.random.key(3), 16)
+    jaxpr = jax.make_jaxpr(
+        jax.vmap(lambda k, s: chain(k, s, logdensity, direction_proposal(), 4))
+    )(keys, states)
+    assert "[16,1013]" not in str(jaxpr)
