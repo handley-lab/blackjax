@@ -71,7 +71,7 @@ def init_stepping_out(rng_key, state, width, max_expansions):
     level_key, interval_key, _ = random.split(rng_key, 3)
     bracket_key, budget_key = random.split(interval_key)
     left = -width * random.uniform(bracket_key)
-    level = state.logdensity + jnp.log(random.uniform(level_key))
+    level = state.logdensity - random.exponential(level_key)
     state = SteppingOutState(
         state.position,
         state.logdensity,
