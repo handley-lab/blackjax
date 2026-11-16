@@ -22,6 +22,7 @@ the slice independently of the interval strategy.
 
 from typing import Any, NamedTuple
 
+import jax
 import jax.numpy as jnp
 from jax import lax, random, tree
 
@@ -71,7 +72,7 @@ def init_stepping_out(rng_key, state, width, max_expansions):
     level_key, interval_key, _ = random.split(rng_key, 3)
     bracket_key, budget_key = random.split(interval_key)
     left = -width * random.uniform(bracket_key)
-    level = state.logdensity + jnp.log(random.uniform(level_key))
+    level = state.logdensity - random.exponential(level_key)
     state = SteppingOutState(
         state.position,
         state.logdensity,
@@ -83,6 +84,38 @@ def init_stepping_out(rng_key, state, width, max_expansions):
     j = jnp.floor(max_expansions * random.uniform(budget_key)).astype(int)
     k = max_expansions - 1 - j
     return _next_phase(state._replace(left_steps=j, right_steps=k))
+
+
+def _draw_stepping_out(rng_key, width, max_expansions):
+    """`init_stepping_out`'s random draws, which depend on the key alone."""
+    level_key, interval_key, _ = random.split(rng_key, 3)
+    bracket_key, budget_key = random.split(interval_key)
+    return (
+        random.uniform(bracket_key),
+        random.exponential(level_key),
+        random.uniform(budget_key),
+    )
+
+
+def _start_stepping_out(draws, state, width, max_expansions):
+    """`init_stepping_out` from pre-drawn randoms."""
+    bracket, exponential, budget = draws
+    left = -width * bracket
+    state = SteppingOutState(
+        state.position,
+        state.logdensity,
+        phase=_LEFT,
+        left=left,
+        right=left + width,
+        level=state.logdensity - exponential,
+    )
+    j = jnp.floor(max_expansions * budget).astype(int)
+    k = max_expansions - 1 - j
+    return _next_phase(state._replace(left_steps=j, right_steps=k))
+
+
+# Initializers whose random draws can be made for every move up front.
+_SPLIT_INITS = {init_stepping_out: (_draw_stepping_out, _start_stepping_out)}
 
 
 def build_stepping_out_kernel(slice_fn, width):
@@ -266,7 +299,6 @@ def build_doubling_kernel(slice_fn, width):
             return expand(state, inside, False)
 
         def check_or_shrink(_):
-
             def check(state):
                 state = state._replace(
                     check_left=state.expanded_left,
@@ -334,14 +366,27 @@ def build_chain(
     def kernel(rng_key, particle, logdensity_fn, proposal_generator, num_inner_steps):
         keys = random.split(rng_key, num_inner_steps)
 
-        def initialize(index, key, state, width):
-            return init_fn(key, state, width, max_expansions)
+        if init_fn in _SPLIT_INITS:
+            draw, start = _SPLIT_INITS[init_fn]
+            chain = build_scheduled_chain(
+                lambda index, draws, state, width: start(
+                    draws, state, width, max_expansions
+                ),
+                interval,
+                width,
+                max_shrinkage,
+                draw_fn=lambda key, width: draw(key, width, max_expansions),
+            )
+        else:
 
-        chain = build_scheduled_chain(initialize, interval, width, max_shrinkage)
+            def initialize(index, key, state, width):
+                return init_fn(key, state, width, max_expansions)
+
+            chain = build_scheduled_chain(initialize, interval, width, max_shrinkage)
+        proposal_keys = jax.vmap(lambda key: random.split(key)[0])(keys)
 
         def proposal(index, position, logdensity_fn):
-            proposal_key, _ = random.split(keys[index])
-            return proposal_generator(proposal_key, position, logdensity_fn)
+            return proposal_generator(proposal_keys[index], position, logdensity_fn)
 
         return chain(keys, particle, logdensity_fn, proposal)
 
@@ -353,6 +398,7 @@ def build_scheduled_chain(
     interval,
     width=1.0,
     max_shrinkage=None,
+    draw_fn=None,
 ):
     """Build a chain with explicit move keys and indexed initialization.
 
@@ -360,20 +406,37 @@ def build_scheduled_chain(
     function; init_fn receives the index, key, slice state and width.
     The returned kernel takes keys, particle, log density function
     and proposal generator; the leading key dimension determines chain length.
+
+    With ``draw_fn(key, width)``, each move's random initialization is drawn
+    for every move before the loop, and ``init_fn`` takes the draws in place of
+    the key. Inside the loop a draw would run on every iteration, for every lane.
     """
 
     def kernel(keys, particle, logdensity_fn, proposal_generator):
         num_inner_steps = keys.shape[0]
-        _, slice_key = random.split(keys[0])
-        _, _, rng_key = random.split(slice_key, 3)
-        state = init_fn(0, slice_key, SliceState(particle, particle.logdensity), width)
+        slice_keys = jax.vmap(lambda key: random.split(key)[1])(keys)
+        _, interval_keys, shrink_keys = jax.vmap(
+            lambda key: tuple(random.split(key, 3))
+        )(slice_keys)
+        draws = (
+            None
+            if draw_fn is None
+            else jax.vmap(draw_fn, in_axes=(0, None))(slice_keys, width)
+        )
+
+        def start(index, particle):
+            if draws is None:
+                return init_fn(index, slice_keys[index], particle, width)
+            return init_fn(index, tree.map(lambda d: d[index], draws), particle, width)
+
+        rng_key = shrink_keys[0]
+        state = start(0, SliceState(particle, particle.logdensity))
         info = SliceTransitionInfo(False, 0, 0, state.left, state.right)
         info = tree.map(lambda x: jnp.full(num_inner_steps, x), info)
 
         def body(carry):
             rng_key, origin, state, count, info = carry
-            _, slice_key = random.split(keys[count])
-            _, interval_key, _ = random.split(slice_key, 3)
+            interval_key = interval_keys[count]
             rng_key, step_key = lax.cond(
                 state.phase == _SHRINK,
                 random.split,
@@ -431,15 +494,8 @@ def build_scheduled_chain(
 
             def next_move(_):
                 particle = state.position
-                _, slice_key = random.split(keys[count])
-                _, _, shrink_key = random.split(slice_key, 3)
-                next_state = init_fn(
-                    count,
-                    slice_key,
-                    SliceState(particle, particle.logdensity),
-                    width,
-                )
-                return shrink_key, particle, next_state
+                next_state = start(count, SliceState(particle, particle.logdensity))
+                return shrink_keys[count], particle, next_state
 
             rng_key, origin, state = lax.cond(
                 finished & (count < num_inner_steps),
